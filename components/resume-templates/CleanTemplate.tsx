@@ -4,15 +4,22 @@ import type { ResumeData, WorkContent, EducationContent, SkillsContent, Certific
 // Must render identically in browser and via ReactDOMServer.renderToStaticMarkup().
 // A4: 794px × 1123px. Fonts via @font-face in <style> tag below.
 
-const colors = {
-  text: '#1a1a1a',
-  muted: '#555555',
-  border: '#d4d4d4',
-  accent: '#1d4ed8',
+export const CLEAN_THEMES: Record<string, { label: string; accent: string }> = {
+  blue:    { label: 'Blue',    accent: '#1d4ed8' },
+  emerald: { label: 'Emerald', accent: '#059669' },
+  rose:    { label: 'Rose',    accent: '#e11d48' },
 }
 
 export default function CleanTemplate({ data }: { data: ResumeData }) {
   const { personalInfo, sections } = data
+
+  const { accent } = CLEAN_THEMES[personalInfo.theme ?? 'blue'] ?? CLEAN_THEMES.blue
+  const colors = {
+    text: '#1a1a1a',
+    muted: '#555555',
+    border: '#d4d4d4',
+    accent,
+  }
   const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder)
 
   const work = sorted.filter((s) => s.type === 'work')
@@ -57,14 +64,14 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
       {/* About Me */}
       {personalInfo.summary && (
-        <Section title="About Me">
+        <Section title="About Me" accent={colors.accent} border={colors.border}>
           <p style={{ margin: 0, lineHeight: 1.7, color: colors.muted }}>{personalInfo.summary}</p>
         </Section>
       )}
 
       {/* Work experience */}
       {work.length > 0 && (
-        <Section title="Experience">
+        <Section title="Experience" accent={colors.accent} border={colors.border}>
           {work.map((s) => {
             const c = s.content as WorkContent
             return (
@@ -97,7 +104,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
       {/* Education */}
       {education.length > 0 && (
-        <Section title="Education">
+        <Section title="Education" accent={colors.accent} border={colors.border}>
           {education.map((s) => {
             const c = s.content as EducationContent
             return (
@@ -117,7 +124,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
       {/* Skills */}
       {skills.length > 0 && (
-        <Section title="Skills">
+        <Section title="Skills" accent={colors.accent} border={colors.border}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {skills.map((skill, i) => (
               <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: '#f0f4ff', color: colors.accent, padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 500 }}>
@@ -131,7 +138,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
       {/* Projects */}
       {projects.length > 0 && (
-        <Section title="Projects">
+        <Section title="Projects" accent={colors.accent} border={colors.border}>
           {projects.map((p, i) => (
             <div key={i} style={{ marginBottom: 10 }}>
               <div style={{ fontWeight: 600, fontSize: 12 }}>{p.name}{p.url ? <span style={{ fontWeight: 400, color: colors.muted, fontSize: 10 }}> · {p.url}</span> : null}</div>
@@ -149,7 +156,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
       {/* Certifications */}
       {certs.length > 0 && (
-        <Section title="Certifications">
+        <Section title="Certifications" accent={colors.accent} border={colors.border}>
           {certs.map((c, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
               <span style={{ fontWeight: 500 }}>{c.name}{c.issuer ? <span style={{ fontWeight: 400, color: colors.muted }}> · {c.issuer}</span> : null}</span>
@@ -161,7 +168,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
       {/* Languages */}
       {langs.length > 0 && (
-        <Section title="Languages">
+        <Section title="Languages" accent={colors.accent} border={colors.border}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 24px' }}>
             {langs.map((l, i) => (
               <span key={i}><span style={{ fontWeight: 500 }}>{l.language}</span>{l.proficiency ? <span style={{ color: colors.muted }}> · {l.proficiency}</span> : null}</span>
@@ -173,10 +180,10 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, accent, border, children }: { title: string; accent: string; border: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 20 }}>
-      <h2 style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: colors.accent, borderBottom: `1px solid ${colors.border}`, paddingBottom: 4 }}>
+      <h2 style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: accent, borderBottom: `1px solid ${border}`, paddingBottom: 4 }}>
         {title}
       </h2>
       {children}

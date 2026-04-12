@@ -5,16 +5,24 @@ import type { ResumeData, WorkContent, EducationContent, SkillsContent, Certific
 // Photo/monogram in sidebar. Same serif typography and circle markers.
 // A4: 794px × 1123px
 
-const SIDEBAR_BG  = '#3b1f0a'
-const SIDEBAR_MUT = '#a07850'
-const SIDEBAR_DIV = '#5c3520'
-const CREAM       = '#f5f0e6'
-const DARK        = '#2a1f0e'
-const ACCENT      = '#c8935a'   // warm gold-orange — readable on dark bg
-const MUTED       = '#9c8060'
-const DIVIDER     = '#d8c9b0'
-const LEFT_W      = 230
-const RIGHT_W     = 794 - LEFT_W
+const CREAM   = '#f5f0e6'
+const DARK    = '#2a1f0e'
+const MUTED   = '#9c8060'
+const DIVIDER = '#d8c9b0'
+const LEFT_W  = 230
+const RIGHT_W = 794 - LEFT_W
+
+export const ELEGANT_DARK_THEMES: Record<string, {
+  label: string
+  sidebarBg: string
+  accent: string
+  sidebarDiv: string
+  sidebarMut: string
+}> = {
+  amber:    { label: 'Amber',    sidebarBg: '#3b1f0a', accent: '#c8935a', sidebarDiv: '#5c3520', sidebarMut: '#a07850' },
+  midnight: { label: 'Midnight', sidebarBg: '#0f172a', accent: '#818cf8', sidebarDiv: '#1e3a5f', sidebarMut: '#7090b0' },
+  forest:   { label: 'Forest',   sidebarBg: '#1a2e1a', accent: '#86efac', sidebarDiv: '#2a4a2a', sidebarMut: '#6a9a6a' },
+}
 
 export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
   const { personalInfo: p, sections } = data
@@ -31,6 +39,9 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
   const certs    = certSec   ? (certSec.content   as CertificationContent[]) : []
   const langs    = langSec   ? (langSec.content   as LanguageContent[]) : []
   const projects = projSec   ? (projSec.content   as ProjectContent[]) : []
+
+  const { sidebarBg: SIDEBAR_BG, accent: ACCENT, sidebarDiv: SIDEBAR_DIV, sidebarMut: SIDEBAR_MUT } =
+    ELEGANT_DARK_THEMES[p.theme ?? 'amber'] ?? ELEGANT_DARK_THEMES.amber
 
   const firstName = (p.name || 'Your Name').split(' ')[0]
   const lastName  = (p.name || '').split(' ').slice(1).join(' ')

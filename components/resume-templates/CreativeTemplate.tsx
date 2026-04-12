@@ -5,15 +5,22 @@ import type { ResumeData, WorkContent, EducationContent, SkillsContent, Certific
 // Strong contrast variant — suits tech/design roles.
 // A4: 794px × 1123px
 
-const SIDEBAR_W = 230
-const MAIN_W = 794 - SIDEBAR_W
-const DARK = '#1c1c1c'
-const DARK_MUTED = '#a0a0a0'
-const DARK_BORDER = '#333333'
-const ACCENT = '#c8a96e'   // warm gold — stands out on dark bg
+const SIDEBAR_W  = 230
+const MAIN_W     = 794 - SIDEBAR_W
 const LIGHT_TEXT = '#f0f0f0'
 const MAIN_MUTED = '#555555'
 const MAIN_BORDER = '#e0e0e0'
+
+export const CREATIVE_THEMES: Record<string, {
+  label: string
+  sidebarBg: string
+  accent: string
+  darkBorder: string
+}> = {
+  carbon: { label: 'Carbon', sidebarBg: '#1c1c1c', accent: '#c8a96e', darkBorder: '#333333' },
+  slate:  { label: 'Slate',  sidebarBg: '#1e2a3a', accent: '#60a5fa', darkBorder: '#2a3a4e' },
+  forest: { label: 'Forest', sidebarBg: '#1a2e1f', accent: '#4ade80', darkBorder: '#2a3e2f' },
+}
 
 export default function CreativeTemplate({ data }: { data: ResumeData }) {
   const { personalInfo: p, sections } = data
@@ -32,6 +39,10 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
   const projects = projSec   ? (projSec.content   as ProjectContent[]) : []
 
   const levelPct: Record<string, number> = { Beginner: 25, Intermediate: 50, Advanced: 75, Expert: 100 }
+
+  const { sidebarBg: DARK, accent: ACCENT, darkBorder: DARK_BORDER } =
+    CREATIVE_THEMES[p.theme ?? 'carbon'] ?? CREATIVE_THEMES.carbon
+  const DARK_MUTED = '#a0a0a0'
 
   return (
     <div style={{ width: 794, minHeight: 1123, fontFamily: '"Libre Franklin", Arial, sans-serif', fontSize: 11, display: 'flex', boxSizing: 'border-box' }}>

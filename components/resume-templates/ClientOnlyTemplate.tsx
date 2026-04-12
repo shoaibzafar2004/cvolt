@@ -10,6 +10,12 @@ import ElegantSingleTemplate from './ElegantSingleTemplate'
 import ElegantDarkTemplate from './ElegantDarkTemplate'
 import ElegantBannerTemplate from './ElegantBannerTemplate'
 import BoldPhotoTemplate from './BoldPhotoTemplate'
+import ProSidebarTemplate from './ProSidebarTemplate'
+import SoftPortraitTemplate from './SoftPortraitTemplate'
+import GeometricTemplate from './GeometricTemplate'
+import BoldHeaderTemplate from './BoldHeaderTemplate'
+import EditorialTemplate from './EditorialTemplate'
+import ColumnarTemplate from './ColumnarTemplate'
 
 // Renders a template only on the client — never during SSR.
 // This prevents React 19's <style> hoisting from causing hydration mismatches.
@@ -34,5 +40,11 @@ export default function ClientOnlyTemplate({ slug, data }: Props) {
   if (slug === 'elegant-dark')   return <ElegantDarkTemplate data={data} />
   if (slug === 'elegant-banner') return <ElegantBannerTemplate data={data} />
   if (slug === 'bold-photo')     return <BoldPhotoTemplate data={data} />
+  if (slug === 'pro-sidebar')      return <ProSidebarTemplate data={data} />
+if (slug === 'soft-portrait')    return <SoftPortraitTemplate data={data} />
+  if (slug === 'geometric')        return <GeometricTemplate data={data} />
+  if (slug === 'bold-header')      return <BoldHeaderTemplate data={data} />
+  if (slug === 'editorial')        return <EditorialTemplate data={data} />
+  if (slug === 'columnar')         return <ColumnarTemplate data={data} />
   return null
 }
