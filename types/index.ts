@@ -14,6 +14,9 @@ export interface PersonalInfo {
   location: string
   linkedIn?: string
   website?: string
+  photoUrl?: string
+  summary?: string
+  theme?: string
 }
 
 export interface WorkContent {
@@ -23,6 +26,7 @@ export interface WorkContent {
   endDate?: string
   current: boolean
   bullets: string[]
+  skills?: string[]
 }
 
 export interface EducationContent {

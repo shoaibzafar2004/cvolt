@@ -1,35 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { useResumeStore } from '@/store/resumeStore'
 
 interface CheckoutFormProps {
   clientSecret: string
   templateId: string
   publishableKey: string
+  userEmail: string | null
 }
 
-export default function CheckoutForm({ clientSecret, templateId, publishableKey }: CheckoutFormProps) {
-  const stripePromise = loadStripe(publishableKey)
+export default function CheckoutForm({ clientSecret, templateId, publishableKey, userEmail }: CheckoutFormProps) {
+  const router = useRouter()
+  const personalInfo = useResumeStore((s) => s.personalInfo)
+
+  useEffect(() => {
+    if (!personalInfo.name) {
+      router.replace('/build')
+    }
+  }, [personalInfo.name, router])
+
+  // userEmail is always set — checkout page redirects to login if not authenticated
+
+  // loadStripe must be stable — memoize so it's not recreated on every render
+  const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey])
 
   return (
     <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-      <InnerForm templateId={templateId} />
+      <InnerForm templateId={templateId} clientSecret={clientSecret} userEmail={userEmail} />
     </Elements>
   )
 }
 
-function InnerForm({ templateId }: { templateId: string }) {
+function InnerForm({ templateId, clientSecret, userEmail }: { templateId: string; clientSecret: string; userEmail: string | null }) {
   const stripe = useStripe()
   const elements = useElements()
-  const [email, setEmail] = useState('')
+  const [email] = useState(userEmail ?? '')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!stripe || !elements) return
 
@@ -42,6 +56,13 @@ function InnerForm({ templateId }: { templateId: string }) {
       setLoading(false)
       return
     }
+
+    // Attach email to the PaymentIntent so the webhook can read it from intent.metadata.email
+    await fetch('/api/update-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ intentId: clientSecret.split('_secret_')[0], email }),
+    })
 
     const returnUrl = `${window.location.origin}/checkout/processing?templateId=${templateId}&email=${encodeURIComponent(email)}`
 
@@ -59,16 +80,9 @@ function InnerForm({ templateId }: { templateId: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-1">
-        <label className="text-sm font-medium">Email</label>
-        <Input
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <p className="text-xs text-muted-foreground">We&apos;ll send your download link here.</p>
+      <div className="flex items-center gap-2 text-sm border rounded-lg px-4 py-3 bg-muted/30">
+        <span className="text-muted-foreground">Sending receipt to</span>
+        <span className="font-medium text-foreground">{userEmail}</span>
       </div>
 
       <div className="space-y-2">

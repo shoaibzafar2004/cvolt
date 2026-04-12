@@ -12,8 +12,9 @@ async function SuccessContent({ paymentId }: { paymentId: string }) {
     .single()
 
   const expiresAt = payment?.expires_at ? new Date(payment.expires_at) : null
+  const now = new Date()
   const daysLeft = expiresAt
-    ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
     : 30
 
   return (

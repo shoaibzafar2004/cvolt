@@ -140,3 +140,23 @@ create trigger resumes_updated_at
 create trigger resume_sections_updated_at
   before update on public.resume_sections
   for each row execute function public.set_updated_at();
+
+-- ============================================================
+-- TRIGGER: auto-populate public.users on auth sign-up
+-- Runs whenever a row is inserted into auth.users (magic link,
+-- OAuth, admin.createUser, etc.) so FK references always resolve.
+-- ============================================================
+
+create or replace function public.handle_new_auth_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.users (id, email)
+  values (new.id, new.email)
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+create or replace trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_auth_user();

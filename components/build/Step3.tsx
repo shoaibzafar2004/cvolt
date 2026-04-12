@@ -1,7 +1,7 @@
 'use client'
 
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { step3Schema, type Step3FormData } from '@/lib/schemas'
 import { useResumeStore } from '@/store/resumeStore'
@@ -16,6 +16,7 @@ import { Trash2, Plus, Award, Globe, Code2, Check } from 'lucide-react'
 import type { StepSubmitRef } from './StepWrapper'
 import type { EducationContent, SkillsContent, CertificationContent, LanguageContent, ProjectContent } from '@/types'
 import { v4 as uuidv4 } from 'uuid'
+import { createClient } from '@/lib/supabase/client'
 
 type ToggleKey = 'certifications' | 'languages' | 'projects'
 
@@ -42,7 +43,7 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
   const [skillInput, setSkillInput] = useState('')
   const [skillLevel, setSkillLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'>('Intermediate')
 
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<Step3FormData>({
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<Step3FormData>({
     resolver: zodResolver(step3Schema),
     defaultValues: {
       education: existingEducation.length ? existingEducation : [{ id: uuidv4(), institution: '', degree: '', field: '', startDate: '', endDate: '', gpa: '' }],
@@ -58,25 +59,23 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
   const { fields: langFields, append: appendLang, remove: removeLang } = useFieldArray({ control, name: 'languages' })
   const { fields: projFields, append: appendProj, remove: removeProj } = useFieldArray({ control, name: 'projects' })
 
-  const skills = watch('skills') ?? []
-
-  useImperativeHandle(ref, () => ({
-    submit: () => handleSubmit(onSubmit)(),
-  }))
+  const skills = useWatch({ control, name: 'skills' }) ?? []
+  const watchedEducation = useWatch({ control, name: 'education' }) ?? []
+  const watchedProjects = useWatch({ control, name: 'projects' }) ?? []
 
   function addSkill() {
     const trimmed = skillInput.trim()
-    if (trimmed && !skills.find((s) => s.name === trimmed)) {
+    if (trimmed && !skills.find((s: { name: string }) => s.name === trimmed)) {
       setValue('skills', [...skills, { name: trimmed, level: skillLevel }])
       setSkillInput('')
     }
   }
 
   function removeSkill(name: string) {
-    setValue('skills', skills.filter((s) => s.name !== name))
+    setValue('skills', skills.filter((s: { name: string }) => s.name !== name))
   }
 
-  function onSubmit(data: Step3FormData) {
+  async function onSubmit(data: Step3FormData) {
     // Clear existing education/skills/optional sections
     ;['education', 'skills', 'certifications', 'languages', 'projects'].forEach((type) => {
       store.sections.filter((s) => s.type === type).forEach((s) => store.removeSection(s.id))
@@ -89,26 +88,95 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
     })
 
     // Skills
-    const skillsId = uuidv4()
+    const skillsId = store.sections.find((s) => s.type === 'skills')?.id ?? uuidv4()
     const skillsContent: SkillsContent = { skills: data.skills }
     store.upsertSection({ id: skillsId, type: 'skills', content: skillsContent, displayOrder: 0 })
 
     // Optional sections — each stored as ONE section with array content
+    const certId = store.sections.find((s) => s.type === 'certifications')?.id ?? uuidv4()
     if (toggles.certifications && data.certifications?.length) {
       const content: CertificationContent[] = data.certifications.map((c) => ({ name: c.name, issuer: c.issuer, date: c.date }))
-      store.upsertSection({ id: uuidv4(), type: 'certifications', content, displayOrder: 0 })
+      store.upsertSection({ id: certId, type: 'certifications', content, displayOrder: 0 })
     }
+    const langId = store.sections.find((s) => s.type === 'languages')?.id ?? uuidv4()
     if (toggles.languages && data.languages?.length) {
       const content: LanguageContent[] = data.languages.map((l) => ({ language: l.language, proficiency: l.proficiency }))
-      store.upsertSection({ id: uuidv4(), type: 'languages', content, displayOrder: 0 })
+      store.upsertSection({ id: langId, type: 'languages', content, displayOrder: 0 })
     }
+    const projId = store.sections.find((s) => s.type === 'projects')?.id ?? uuidv4()
     if (toggles.projects && data.projects?.length) {
       const content: ProjectContent[] = data.projects.map((p) => ({ name: p.name, description: p.description, url: p.url, bullets: p.bullets.filter(Boolean) }))
-      store.upsertSection({ id: uuidv4(), type: 'projects', content, displayOrder: 0 })
+      store.upsertSection({ id: projId, type: 'projects', content, displayOrder: 0 })
+    }
+
+    if (store.resumeId) {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const sectionTypes = ['education', 'skills', 'certifications', 'languages', 'projects']
+        await supabase.from('resume_sections').delete().eq('resume_id', store.resumeId).in('section_type', sectionTypes)
+
+        const rows: { id: string; resume_id: string; section_type: string; content: unknown; display_order: number }[] = []
+
+        data.education.forEach((entry, i) => {
+          rows.push({
+            id: entry.id,
+            resume_id: store.resumeId!,
+            section_type: 'education',
+            content: { institution: entry.institution, degree: entry.degree, field: entry.field, startDate: entry.startDate, endDate: entry.endDate, gpa: entry.gpa },
+            display_order: i,
+          })
+        })
+
+        rows.push({
+          id: skillsId,
+          resume_id: store.resumeId!,
+          section_type: 'skills',
+          content: { skills: data.skills },
+          display_order: 0,
+        })
+
+        if (toggles.certifications && data.certifications?.length) {
+          rows.push({
+            id: certId,
+            resume_id: store.resumeId!,
+            section_type: 'certifications',
+            content: data.certifications.map((c) => ({ name: c.name, issuer: c.issuer, date: c.date })),
+            display_order: 0,
+          })
+        }
+
+        if (toggles.languages && data.languages?.length) {
+          rows.push({
+            id: langId,
+            resume_id: store.resumeId!,
+            section_type: 'languages',
+            content: data.languages.map((l) => ({ language: l.language, proficiency: l.proficiency })),
+            display_order: 0,
+          })
+        }
+
+        if (toggles.projects && data.projects?.length) {
+          rows.push({
+            id: projId,
+            resume_id: store.resumeId!,
+            section_type: 'projects',
+            content: data.projects.map((p) => ({ name: p.name, description: p.description, url: p.url, bullets: p.bullets.filter(Boolean) })),
+            display_order: 0,
+          })
+        }
+
+        if (rows.length > 0) await supabase.from('resume_sections').insert(rows)
+        store.markSaved()
+      }
     }
 
     setStep(4)
   }
+
+  useImperativeHandle(ref, () => ({
+    submit: () => handleSubmit(onSubmit)(),
+  }))
 
   return (
     <div className="space-y-8">
@@ -118,7 +186,13 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
         {eduFields.map((field, index) => (
           <div key={field.id} className="border rounded-lg p-4 space-y-4 bg-card">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Education {index + 1}</span>
+              <span className="text-sm font-medium">
+                {(() => {
+                  const deg = watchedEducation?.[index]?.degree
+                  const inst = watchedEducation?.[index]?.institution
+                  return deg && inst ? `${deg} at ${inst}` : deg || inst || `Education ${index + 1}`
+                })()}
+              </span>
               {eduFields.length > 1 && (
                 <Button type="button" variant="ghost" size="icon" onClick={() => removeEdu(index)}>
                   <Trash2 className="w-4 h-4 text-destructive" />
@@ -169,7 +243,7 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
             </div>
           </div>
         ))}
-        <Button type="button" variant="outline" className="w-full h-12 border-dashed border-primary/50 bg-primary/5 text-muted-foreground hover:bg-primary/10 hover:border-primary hover:text-foreground gap-2 text-sm" onClick={() => appendEdu({ id: uuidv4(), institution: '', degree: '', field: '', startDate: '', endDate: '', gpa: '' })}>
+        <Button type="button" variant="outline" className="w-full h-12 border-dashed bg-primary/5 gap-2 text-sm" onClick={() => appendEdu({ id: uuidv4(), institution: '', degree: '', field: '', startDate: '', endDate: '', gpa: '' })}>
           <Plus className="w-4 h-4" /> Add education
         </Button>
       </section>
@@ -177,40 +251,42 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
       {/* Skills */}
       <section className="space-y-3">
         <h3 className="font-medium">Skills</h3>
-        <div className="flex gap-2 w-full">
-          <Input
-            className="flex-1"
-            placeholder="e.g. TypeScript"
-            value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill() } }}
-          />
-          <Select value={skillLevel} onValueChange={(v) => setSkillLevel(v as typeof skillLevel)}>
-            <SelectTrigger className="w-36 shrink-0">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const).map((l) => (
-                <SelectItem key={l} value={l}>{l}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button type="button" variant="outline" onClick={addSkill} className="h-11 gap-1.5 shrink-0">
-            <PlusIcon className="w-3.5 h-3.5" /> Add
-          </Button>
-        </div>
-        {errors.skills && <p className="text-sm text-destructive">{errors.skills.message}</p>}
-        {skills.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
-              <span key={skill.name} className="flex items-center gap-1.5 bg-secondary text-secondary-foreground text-sm px-2.5 py-1 rounded-md">
-                {skill.name}
-                <span className="text-xs text-muted-foreground">· {skill.level}</span>
-                <button type="button" onClick={() => removeSkill(skill.name)} className="text-muted-foreground hover:text-foreground ml-0.5">×</button>
-              </span>
-            ))}
+        <div className="border rounded-2xl p-5 space-y-4 bg-muted/30">
+          <div className="flex gap-2 w-full">
+            <Input
+              className="flex-1"
+              placeholder="e.g. TypeScript"
+              value={skillInput}
+              onChange={(e) => setSkillInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill() } }}
+            />
+            <Select value={skillLevel} onValueChange={(v) => setSkillLevel(v as typeof skillLevel)}>
+              <SelectTrigger className="w-36 shrink-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const).map((l) => (
+                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button type="button" variant="outline" onClick={addSkill} className="h-11 gap-1.5 shrink-0">
+              <PlusIcon className="w-3.5 h-3.5" /> Add
+            </Button>
           </div>
-        )}
+          {errors.skills && <p className="text-sm text-destructive">{errors.skills.message}</p>}
+          {skills.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <span key={skill.name} className="flex items-center gap-1.5 bg-secondary text-secondary-foreground text-sm px-2.5 py-1 rounded-md">
+                  {skill.name}
+                  <span className="text-xs text-muted-foreground">· {skill.level}</span>
+                  <button type="button" onClick={() => removeSkill(skill.name)} className="text-muted-foreground hover:text-foreground ml-0.5">×</button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Optional sections */}
@@ -243,7 +319,7 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
 
         {/* Certifications */}
         {toggles.certifications && (
-          <div className="space-y-3">
+          <div className="border rounded-2xl p-5 space-y-4 bg-muted/30">
             <h4 className="text-sm font-medium">Certifications</h4>
             {certFields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
@@ -261,13 +337,13 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
                 <Button type="button" variant="ghost" size="icon" onClick={() => removeCert(index)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => appendCert({ id: uuidv4(), name: '', issuer: '', date: '' })}><Plus className="w-3 h-3 mr-1" /> Add</Button>
+            <Button type="button" variant="outline" className="w-full border-dashed bg-primary/5 gap-2 text-sm" size="sm" onClick={() => appendCert({ id: uuidv4(), name: '', issuer: '', date: '' })}><Plus className="w-3 h-3 mr-1" /> Add</Button>
           </div>
         )}
 
         {/* Languages */}
         {toggles.languages && (
-          <div className="space-y-3">
+          <div className="border rounded-2xl p-5 space-y-4 bg-muted/30">
             <h4 className="text-sm font-medium">Languages</h4>
             {langFields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
@@ -293,30 +369,31 @@ const Step3 = forwardRef<StepSubmitRef>((_, ref) => {
                 <Button type="button" variant="ghost" size="icon" onClick={() => removeLang(index)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => appendLang({ id: uuidv4(), language: '', proficiency: '' })}><Plus className="w-3 h-3 mr-1" /> Add</Button>
+            <Button type="button" variant="outline" size="sm" className="w-full border-dashed bg-primary/5 gap-2 text-sm" onClick={() => appendLang({ id: uuidv4(), language: '', proficiency: '' })}><Plus className="w-3 h-3 mr-1" /> Add</Button>
           </div>
         )}
 
         {/* Projects */}
         {toggles.projects && (
-          <div className="space-y-3">
+          <div className="border rounded-2xl p-5 space-y-4 bg-muted/30">
             <h4 className="text-sm font-medium">Projects</h4>
             {projFields.map((field, index) => (
-              <div key={field.id} className="border rounded-lg p-4 space-y-3 bg-card">
+              <div key={field.id} className="border rounded-xl p-4 space-y-3 bg-background">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Project {index + 1}</span>
+                  <span className="text-sm font-medium">{watchedProjects?.[index]?.name || `Project ${index + 1}`}</span>
                   <Button type="button" variant="ghost" size="icon" onClick={() => removeProj(index)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
                 <Input placeholder="Project name" {...register(`projects.${index}.name`)} />
-                <Input placeholder="URL (optional)" {...register(`projects.${index}.url`)} />
+                <Input placeholder="URL (optional)" spellCheck={false} {...register(`projects.${index}.url`)} />
                 <Textarea
                   className="min-h-20 resize-y"
                   placeholder="Brief description"
+                  spellCheck={true}
                   {...register(`projects.${index}.description`)}
                 />
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => appendProj({ id: uuidv4(), name: '', description: '', url: '', bullets: [''] })}><Plus className="w-3 h-3 mr-1" /> Add project</Button>
+            <Button type="button" variant="outline" size="sm" className="w-full border-dashed bg-primary/5 gap-2 text-sm" onClick={() => appendProj({ id: uuidv4(), name: '', description: '', url: '', bullets: [''] })}><Plus className="w-3 h-3 mr-1" /> Add project</Button>
           </div>
         )}
       </section>

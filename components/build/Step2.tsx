@@ -20,6 +20,7 @@ import {
 import { step2Schema, type Step2FormData } from '@/lib/schemas'
 import { useResumeStore } from '@/store/resumeStore'
 import { useUIStore } from '@/store/uiStore'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import WorkBlock from './WorkBlock'
@@ -37,6 +38,7 @@ function buildDefaultEntry() {
     endDate: '',
     current: false,
     bullets: [''],
+    skills: [] as string[],
   }
 }
 
@@ -51,7 +53,8 @@ function storeWorkEntries(
       startDate: entry.startDate,
       endDate: entry.endDate,
       current: entry.current,
-      bullets: entry.bullets.filter(Boolean),
+      bullets: entry.bullets.flatMap((b) => b.split('\n')).map((b) => b.trim()).filter(Boolean),
+      skills: entry.skills ?? [],
     }
     const section: Section = {
       id: entry.id,
@@ -79,7 +82,8 @@ const Step2 = forwardRef<StepSubmitRef>((_, ref) => {
         startDate: c.startDate,
         endDate: c.endDate ?? '',
         current: c.current,
-        bullets: c.bullets.length ? c.bullets : [''],
+        bullets: [c.bullets.length ? c.bullets.join('\n') : ''],
+        skills: c.skills ?? [],
       }
     })
 
@@ -99,19 +103,44 @@ const Step2 = forwardRef<StepSubmitRef>((_, ref) => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
+  async function onSubmit(data: Step2FormData) {
+    store.sections.filter((s) => s.type === 'work').forEach((s) => store.removeSection(s.id))
+    storeWorkEntries(store.upsertSection, data.workEntries)
+
+    if (store.resumeId) {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const sections = store.sections.filter((s) => s.type !== 'work')
+        const workSections = data.workEntries.map((entry, i) => ({
+          id: entry.id,
+          resume_id: store.resumeId!,
+          section_type: 'work',
+          content: {
+            company: entry.company,
+            role: entry.role,
+            startDate: entry.startDate,
+            endDate: entry.endDate,
+            current: entry.current,
+            bullets: entry.bullets.flatMap((b) => b.split('\n')).map((b) => b.trim()).filter(Boolean),
+            skills: entry.skills ?? [],
+          },
+          display_order: i,
+        }))
+        // Delete existing work sections then insert fresh ones
+        await supabase.from('resume_sections').delete().eq('resume_id', store.resumeId).eq('section_type', 'work')
+        if (workSections.length > 0) await supabase.from('resume_sections').insert(workSections)
+        void sections // keep linter happy — non-work sections are managed by their own steps
+        store.markSaved()
+      }
+    }
+
+    setStep(3)
+  }
+
   useImperativeHandle(ref, () => ({
     submit: () => handleSubmit(onSubmit)(),
   }))
-
-  function onSubmit(data: Step2FormData) {
-    // Remove old work sections before upserting new ones
-    store.sections
-      .filter((s) => s.type === 'work')
-      .forEach((s) => store.removeSection(s.id))
-
-    storeWorkEntries(store.upsertSection, data.workEntries)
-    setStep(3)
-  }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -137,6 +166,8 @@ const Step2 = forwardRef<StepSubmitRef>((_, ref) => {
                 remove={remove}
                 errors={errors}
                 watchCurrent={watchedEntries?.[index]?.current ?? false}
+                watchRole={watchedEntries?.[index]?.role ?? ''}
+                watchCompany={watchedEntries?.[index]?.company ?? ''}
               />
             ))}
           </div>
@@ -146,7 +177,7 @@ const Step2 = forwardRef<StepSubmitRef>((_, ref) => {
       <Button
         type="button"
         variant="outline"
-        className="w-full h-12 border-dashed border-primary/50 bg-primary/5 text-muted-foreground hover:bg-primary/10 hover:border-primary hover:text-foreground gap-2 text-sm"
+        className="w-full h-12 border-dashed gap-2 text-sm"
         onClick={() => append(buildDefaultEntry())}
       >
         <Plus className="w-4 h-4" /> Add experience

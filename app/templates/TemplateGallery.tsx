@@ -26,7 +26,7 @@ export default function TemplateGallery({ templates, payments }: TemplateGallery
           No templates in this category yet.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map((template) => (
             <TemplateCard key={template.id} template={template} payments={payments} />
           ))}

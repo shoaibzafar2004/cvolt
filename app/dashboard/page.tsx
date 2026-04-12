@@ -1,112 +1,219 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
+import { Download, Pencil, Plus, Clock } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
+
+function getServiceClient() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 function daysRemaining(expiresAt: string): number {
   return Math.max(0, Math.ceil((new Date(expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+}
+
+// Mini resume mockup thumbnail — purely decorative, matches template slug colours
+function TemplateMockup({ slug, name }: { slug?: string; name?: string }) {
+  const isModern = slug === 'modern'
+  const isCreative = slug === 'creative'
+  const accentBg = isCreative
+    ? '#7c3aed'
+    : isModern
+    ? '#1e293b'
+    : '#4f46e5'
+
+  return (
+    <div
+      style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        background: '#f8fafc',
+      }}
+    >
+      {/* Header bar */}
+      <div style={{ background: accentBg, padding: '12px 14px 10px' }}>
+        <div style={{ height: 7, width: '60%', borderRadius: 4, background: 'rgba(255,255,255,0.85)', marginBottom: 5 }} />
+        <div style={{ height: 4, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.45)' }} />
+      </div>
+
+      {/* Body lines */}
+      <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+        {/* Section label */}
+        <div style={{ height: 3, width: '30%', borderRadius: 3, background: accentBg, opacity: 0.6 }} />
+        {[70, 90, 55, 80].map((w, i) => (
+          <div key={i} style={{ height: 3, width: `${w}%`, borderRadius: 3, background: '#cbd5e1' }} />
+        ))}
+        <div style={{ height: 3, width: '25%', borderRadius: 3, background: accentBg, opacity: 0.6, marginTop: 4 }} />
+        <div style={{ display: 'flex', gap: 5 }}>
+          {[38, 28, 44].map((w, i) => (
+            <div key={i} style={{ height: 12, width: w, borderRadius: 6, background: isCreative ? '#ede9fe' : '#e0e7ff' }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Template name pill at bottom */}
+      <div style={{ padding: '0 14px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: accentBg }} />
+        <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          {name ?? slug}
+        </span>
+      </div>
+    </div>
+  )
 }
 
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: payments } = await supabase
+  const serviceClient = getServiceClient()
+
+  const { data: payments } = await serviceClient
     .from('payments')
-    .select(`
-      id,
-      purchased_at,
-      expires_at,
-      status,
-      templates ( name, slug, thumbnail_url ),
-      resume_snapshots ( snapshot_data )
-    `)
+    .select('id, purchased_at, expires_at, status, snapshot_id, templates ( name, slug, thumbnail_url )')
     .eq('user_id', user!.id)
     .eq('status', 'completed')
     .order('purchased_at', { ascending: false })
 
+  const snapshotIds = (payments ?? []).map((p) => p.snapshot_id).filter(Boolean) as string[]
+  const { data: snapshots } = snapshotIds.length
+    ? await serviceClient.from('resume_snapshots').select('id, snapshot_data').in('id', snapshotIds)
+    : { data: [] }
+  const snapshotMap = new Map((snapshots ?? []).map((s) => [s.id, s]))
+
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold">My resumes</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">{user!.email}</p>
+    <main className="relative min-h-screen overflow-hidden">
+
+      {/* ── Page header ─────────────────────────────── */}
+      <div className="border-b bg-muted/30">
+        <div className="max-w-5xl mx-auto px-6 py-10">
+          <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Dashboard</p>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h1
+                className="text-3xl font-bold leading-tight"
+                style={{ fontFamily: 'var(--font-jost)' }}
+              >
+                My resumes
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">{user!.email}</p>
+            </div>
+            <Link
+              href="/build"
+              className="inline-flex items-center gap-2 text-sm font-semibold bg-foreground text-background px-5 py-2.5 rounded-full hover:opacity-85 transition-opacity whitespace-nowrap"
+              style={{ fontFamily: 'var(--font-jost)' }}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New resume
+            </Link>
+          </div>
         </div>
-        <Link
-          href="/build"
-          className="text-sm bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
-        >
-          + New resume
-        </Link>
       </div>
 
-      {!payments?.length ? (
-        <div className="text-center py-20 border rounded-xl bg-muted/20">
-          <p className="text-muted-foreground mb-4">No purchased resumes yet.</p>
-          <Link href="/build" className="text-sm underline underline-offset-2">
-            Build your first resume →
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {payments.map((payment) => {
-            const template = Array.isArray(payment.templates) ? payment.templates[0] : payment.templates
-            const days = daysRemaining(payment.expires_at)
-            const expired = days === 0
-            // Get resume title from snapshot data
-            const snapshot = Array.isArray(payment.resume_snapshots) ? payment.resume_snapshots[0] : payment.resume_snapshots
-            const name = (snapshot?.snapshot_data as { personalInfo?: { name?: string } } | null)?.personalInfo?.name
+      {/* ── Content ─────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6 py-10">
+        {!payments?.length ? (
 
-            return (
-              <div key={payment.id} className="border rounded-xl bg-card overflow-hidden flex flex-col">
-                {/* Thumbnail */}
-                <div className="h-40 bg-muted flex items-center justify-center text-muted-foreground text-sm">
-                  {template?.thumbnail_url
-                    ? <img src={template.thumbnail_url} alt={template.name} className="w-full h-full object-cover" />
-                    : template?.name ?? 'Resume'}
+          /* ── Empty state ── */
+          <div className="flex flex-col items-center justify-center py-28 text-center">
+            <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6">
+              <Download className="w-7 h-7 text-indigo-500" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: 'var(--font-jost)' }}>
+              No purchased resumes yet
+            </h2>
+            <p className="text-sm text-muted-foreground mb-8 max-w-xs">
+              Build your resume for free, then pay $1.50 to download a pixel-perfect PDF.
+            </p>
+            <Link
+              href="/build"
+              className="inline-flex items-center gap-2 text-sm font-semibold bg-foreground text-background px-6 py-3 rounded-full hover:opacity-85 transition-opacity"
+              style={{ fontFamily: 'var(--font-jost)' }}
+            >
+              Build your first resume →
+            </Link>
+          </div>
+
+        ) : (
+
+          /* ── Resume grid ── */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {payments.map((payment) => {
+              const template = Array.isArray(payment.templates) ? payment.templates[0] : payment.templates
+              const days = daysRemaining(payment.expires_at)
+              const expired = days === 0
+              const snapshot = payment.snapshot_id ? snapshotMap.get(payment.snapshot_id) : null
+              const resumeName = (snapshot?.snapshot_data as { personalInfo?: { name?: string } } | null)?.personalInfo?.name
+
+              return (
+                <div
+                  key={payment.id}
+                  className="group bg-card border rounded-2xl overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200"
+                >
+                  {/* ── Thumbnail ── */}
+                  <div className="h-44 overflow-hidden border-b relative">
+                    <TemplateMockup slug={template?.slug} name={template?.name} />
+
+                    {/* Expiry overlay badge */}
+                    <div className="absolute top-3 right-3">
+                      {expired ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider bg-destructive/90 text-destructive-foreground px-2.5 py-1 rounded-full backdrop-blur-sm">
+                          Expired
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider bg-background/85 text-foreground px-2.5 py-1 rounded-full backdrop-blur-sm border">
+                          <Clock className="w-2.5 h-2.5 text-indigo-500" />
+                          {days}d left
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Info ── */}
+                  <div className="p-5 flex flex-col gap-4 flex-1">
+                    <div>
+                      <p className="font-semibold leading-tight" style={{ fontFamily: 'var(--font-jost)' }}>
+                        {resumeName || 'Resume'}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 capitalize">
+                        {template?.name ?? '—'} template · {new Date(payment.purchased_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-auto">
+                      <Link
+                        href={`/dashboard/edit/${payment.id}`}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium border rounded-full py-2 hover:bg-muted transition-colors"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        Edit
+                      </Link>
+                      <Link
+                        href={`/dashboard/download/${payment.id}`}
+                        className={[
+                          'flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold rounded-full py-2 transition-opacity',
+                          expired
+                            ? 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'
+                            : 'bg-foreground text-background hover:opacity-80',
+                        ].join(' ')}
+                      >
+                        <Download className="w-3 h-3" />
+                        Download
+                      </Link>
+                    </div>
+                  </div>
                 </div>
+              )
+            })}
+          </div>
 
-                {/* Info */}
-                <div className="p-4 flex flex-col gap-3 flex-1">
-                  <div>
-                    <p className="font-medium">{name || 'Resume'}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{template?.name} template</p>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(payment.purchased_at).toLocaleDateString()}
-                    </p>
-                    {expired
-                      ? <Badge variant="destructive">Expired</Badge>
-                      : <Badge variant="secondary">{days}d left</Badge>
-                    }
-                  </div>
-
-                  <div className="flex gap-2 mt-auto">
-                    <Link
-                      href={`/dashboard/edit/${payment.id}`}
-                      className="flex-1 text-center text-sm border rounded-md py-1.5 hover:bg-muted transition-colors"
-                    >
-                      Edit
-                    </Link>
-                    <Link
-                      href={`/dashboard/download/${payment.id}`}
-                      className={[
-                        'flex-1 text-center text-sm rounded-md py-1.5 transition-colors',
-                        expired
-                          ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                          : 'bg-primary text-primary-foreground hover:opacity-90',
-                      ].join(' ')}
-                    >
-                      Download
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+        )}
+      </div>
     </main>
   )
 }

@@ -8,6 +8,7 @@ export const personalInfoSchema = z.object({
   location: z.string().min(1, 'Location is required'),
   linkedIn: z.union([z.url({ error: 'Enter a valid URL' }), z.literal('')]).optional(),
   website: z.union([z.url({ error: 'Enter a valid URL' }), z.literal('')]).optional(),
+  photoUrl: z.string().optional(),
 })
 
 export const workEntrySchema = z.object({
@@ -18,6 +19,7 @@ export const workEntrySchema = z.object({
   endDate: z.string().optional(),
   current: z.boolean(),
   bullets: z.array(z.string()),
+  skills: z.array(z.string()).optional(),
 })
 
 export const educationEntrySchema = z.object({

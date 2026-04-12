@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Controller } from 'react-hook-form'
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { MonthPicker } from '@/components/ui/month-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { GripVertical, Trash2 } from 'lucide-react'
+import { GripVertical, Trash2, X } from 'lucide-react'
 
 interface WorkBlockProps {
   index: number
@@ -19,9 +20,11 @@ interface WorkBlockProps {
   remove: UseFieldArrayRemove
   errors: FieldErrors<Step2FormData>
   watchCurrent: boolean
+  watchRole: string
+  watchCompany: string
 }
 
-export default function WorkBlock({ index, id, register, control, remove, errors, watchCurrent }: WorkBlockProps) {
+export default function WorkBlock({ index, id, register, control, remove, errors, watchCurrent, watchRole, watchCompany }: WorkBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id })
 
@@ -45,7 +48,11 @@ export default function WorkBlock({ index, id, register, control, remove, errors
         >
           <GripVertical className="w-4 h-4" />
         </button>
-        <span className="text-sm font-medium flex-1">Experience {index + 1}</span>
+        <span className="text-sm font-medium flex-1">
+          {watchRole && watchCompany
+            ? `${watchRole} at ${watchCompany}`
+            : watchRole || watchCompany || `Experience ${index + 1}`}
+        </span>
         {index > 0 && (
           <Button
             type="button"
@@ -62,13 +69,13 @@ export default function WorkBlock({ index, id, register, control, remove, errors
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
           <label className="block text-sm font-medium mb-2 pl-4.5">Company</label>
-          <Input placeholder="Acme Corp" aria-invalid={!!fieldErrors?.company || undefined} {...register(`workEntries.${index}.company`)} />
+          <Input placeholder="Acme Corp" spellCheck={false} aria-invalid={!!fieldErrors?.company || undefined} {...register(`workEntries.${index}.company`)} />
           {fieldErrors?.company && <p className="text-sm text-destructive">{fieldErrors.company.message}</p>}
         </div>
 
         <div className="space-y-1">
           <label className="block text-sm font-medium mb-2 pl-4.5">Role</label>
-          <Input placeholder="Software Engineer" aria-invalid={!!fieldErrors?.role || undefined} {...register(`workEntries.${index}.role`)} />
+          <Input placeholder="Software Engineer" spellCheck={true} aria-invalid={!!fieldErrors?.role || undefined} {...register(`workEntries.${index}.role`)} />
           {fieldErrors?.role && <p className="text-sm text-destructive">{fieldErrors.role.message}</p>}
         </div>
 
@@ -124,11 +131,83 @@ export default function WorkBlock({ index, id, register, control, remove, errors
           <span className="text-muted-foreground font-normal ml-1">(one per line)</span>
         </label>
         <Textarea
-          className="min-h-25 resize-y"
+          className="min-h-45 resize-y"
           placeholder="• Reduced API latency by 40% by..."
+          spellCheck={true}
           {...register(`workEntries.${index}.bullets.0`)}
         />
       </div>
+
+      {/* Skills used at this job */}
+      <Controller
+        control={control}
+        name={`workEntries.${index}.skills`}
+        render={({ field }) => (
+          <SkillTagInput
+            value={field.value ?? []}
+            onChange={field.onChange}
+          />
+        )}
+      />
+    </div>
+  )
+}
+
+function SkillTagInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [input, setInput] = useState('')
+
+  function add() {
+    const trimmed = input.trim()
+    if (trimmed && !value.includes(trimmed)) {
+      onChange([...value, trimmed])
+    }
+    setInput('')
+  }
+
+  function remove(skill: string) {
+    onChange(value.filter((s) => s !== skill))
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium pl-4.5">
+        Technologies / tools used
+        <span className="text-muted-foreground font-normal ml-1">(optional)</span>
+      </label>
+
+      <div className="flex gap-2">
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
+          placeholder="e.g. React, Node.js, PostgreSQL"
+          spellCheck={false}
+          className="flex-1"
+        />
+        <Button type="button" variant="outline" onClick={add} className="shrink-0 rounded-full px-5 h-11">
+          Add
+        </Button>
+      </div>
+
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {value.map((skill) => (
+            <span
+              key={skill}
+              className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground text-xs px-2.5 py-1 rounded-md"
+            >
+              {skill}
+              <button
+                type="button"
+                onClick={() => remove(skill)}
+                className="text-muted-foreground hover:text-foreground ml-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

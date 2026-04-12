@@ -1,175 +1,222 @@
 import type { ResumeData, WorkContent, EducationContent, SkillsContent, CertificationContent, LanguageContent, ProjectContent } from '@/types'
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
-// Bold accent header, horizontal rule section dividers, typographic feel.
+// Dark left sidebar (#1a1a1a) + white right column. Same two-column structure.
+// Strong contrast variant — suits tech/design roles.
+// A4: 794px × 1123px
 
-const colors = {
-  accent: '#7c3aed',
-  accentLight: '#ede9fe',
-  text: '#18181b',
-  muted: '#52525b',
-  border: '#e4e4e7',
-  headerBg: '#faf5ff',
-}
+const SIDEBAR_W = 230
+const MAIN_W = 794 - SIDEBAR_W
+const DARK = '#1c1c1c'
+const DARK_MUTED = '#a0a0a0'
+const DARK_BORDER = '#333333'
+const ACCENT = '#c8a96e'   // warm gold — stands out on dark bg
+const LIGHT_TEXT = '#f0f0f0'
+const MAIN_MUTED = '#555555'
+const MAIN_BORDER = '#e0e0e0'
 
 export default function CreativeTemplate({ data }: { data: ResumeData }) {
-  const { personalInfo, sections } = data
+  const { personalInfo: p, sections } = data
   const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder)
 
-  const work = sorted.filter((s) => s.type === 'work')
+  const work      = sorted.filter((s) => s.type === 'work')
   const education = sorted.filter((s) => s.type === 'education')
-  const skillsSection = sorted.find((s) => s.type === 'skills')
-  const certSection = sorted.find((s) => s.type === 'certifications')
-  const langSection = sorted.find((s) => s.type === 'languages')
-  const projSection = sorted.find((s) => s.type === 'projects')
+  const skillsSec = sorted.find((s) => s.type === 'skills')
+  const certSec   = sorted.find((s) => s.type === 'certifications')
+  const langSec   = sorted.find((s) => s.type === 'languages')
+  const projSec   = sorted.find((s) => s.type === 'projects')
 
-  const skills = skillsSection ? (skillsSection.content as SkillsContent).skills : []
-  const certs = certSection ? (certSection.content as CertificationContent[]) : []
-  const langs = langSection ? (langSection.content as LanguageContent[]) : []
-  const projects = projSection ? (projSection.content as ProjectContent[]) : []
+  const skills   = skillsSec ? (skillsSec.content as SkillsContent).skills : []
+  const certs    = certSec   ? (certSec.content   as CertificationContent[]) : []
+  const langs    = langSec   ? (langSec.content   as LanguageContent[]) : []
+  const projects = projSec   ? (projSec.content   as ProjectContent[]) : []
+
+  const levelPct: Record<string, number> = { Beginner: 25, Intermediate: 50, Advanced: 75, Expert: 100 }
 
   return (
-    <div style={{ width: 794, minHeight: 1123, fontFamily: '"Georgia", "Times New Roman", serif', fontSize: 11, color: colors.text, backgroundColor: '#ffffff', boxSizing: 'border-box', lineHeight: 1.6 }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
-      `}</style>
+    <div style={{ width: 794, minHeight: 1123, fontFamily: '"Libre Franklin", Arial, sans-serif', fontSize: 11, display: 'flex', boxSizing: 'border-box' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 300; src: url('/fonts/libre-franklin-300.woff2') format('woff2'); }
+        @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 400; src: url('/fonts/libre-franklin-400.woff2') format('woff2'); }
+        @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 600; src: url('/fonts/libre-franklin-600.woff2') format('woff2'); }
+        @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 700; src: url('/fonts/libre-franklin-700.woff2') format('woff2'); }
+      ` }} />
 
-      {/* Bold header band */}
-      <div style={{ backgroundColor: colors.headerBg, borderBottom: `4px solid ${colors.accent}`, padding: '36px 56px 28px' }}>
-        <h1 style={{ margin: 0, fontFamily: '"Playfair Display", Georgia, serif', fontSize: 32, fontWeight: 700, color: colors.accent, letterSpacing: '-0.5px', lineHeight: 1.1 }}>
-          {personalInfo.name || 'Your Name'}
-        </h1>
-        {personalInfo.jobTitle && (
-          <p style={{ margin: '6px 0 0', fontFamily: '"Inter", sans-serif', fontSize: 13, color: colors.muted, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-            {personalInfo.jobTitle}
-          </p>
-        )}
-        {/* Contact bar */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0 20px', marginTop: 12, fontFamily: '"Inter", sans-serif', fontSize: 10, color: colors.muted }}>
-          {[personalInfo.email, personalInfo.phone, personalInfo.location, personalInfo.linkedIn, personalInfo.website].filter(Boolean).map((item, i) => (
-            <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ color: colors.accent }}>·</span> {item}
-            </span>
-          ))}
+      {/* ── Dark left sidebar ── */}
+      <div style={{ width: SIDEBAR_W, backgroundColor: DARK, color: LIGHT_TEXT, padding: '40px 22px', boxSizing: 'border-box', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+
+        {/* Name block */}
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 26, fontWeight: 300, letterSpacing: 3, lineHeight: 1, textTransform: 'uppercase', color: LIGHT_TEXT }}>
+            {(p.name || 'Your Name').split(' ')[0]}
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: 3, lineHeight: 1.15, textTransform: 'uppercase', color: ACCENT }}>
+            {(p.name || '').split(' ').slice(1).join(' ') || '\u00A0'}
+          </div>
+          {p.jobTitle && (
+            <div style={{ marginTop: 8, fontSize: 8, letterSpacing: 2.5, textTransform: 'uppercase', color: DARK_MUTED }}>
+              {p.jobTitle}
+            </div>
+          )}
+          <div style={{ marginTop: 12, height: 1, backgroundColor: ACCENT, width: 40 }} />
         </div>
-      </div>
 
-      {/* Body */}
-      <div style={{ padding: '32px 56px' }}>
-        {/* Work */}
-        {work.length > 0 && (
-          <CreativeSection title="Experience">
-            {work.map((s) => {
-              const c = s.content as WorkContent
-              return (
-                <div key={s.id} style={{ marginBottom: 18 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600, fontSize: 12 }}>{c.role}</span>
-                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: 10, color: colors.muted }}>
-                      {c.startDate} – {c.current ? 'Present' : c.endDate}
-                    </span>
-                  </div>
-                  <div style={{ fontFamily: '"Inter", sans-serif', color: colors.accent, fontSize: 11, fontWeight: 500, marginBottom: 5 }}>{c.company}</div>
-                  {c.bullets.filter(Boolean).map((b, i) => (
-                    <div key={i} style={{ fontFamily: '"Inter", sans-serif', display: 'flex', gap: 8, marginBottom: 3, fontSize: 10.5 }}>
-                      <span style={{ color: colors.accent, flexShrink: 0, fontWeight: 700 }}>—</span>
-                      <span>{b}</span>
-                    </div>
-                  ))}
+        {/* Contact */}
+        <SideSection title="Contact" accent={ACCENT} border={DARK_BORDER}>
+          <div style={{ fontSize: 9.5, lineHeight: 2, color: DARK_MUTED }}>
+            {p.location && <div style={{ color: LIGHT_TEXT }}>◉ {p.location}</div>}
+            {p.phone    && <div>✆ {p.phone}</div>}
+            {p.email    && <div style={{ wordBreak: 'break-all' }}>✉ {p.email}</div>}
+            {p.linkedIn && <div style={{ wordBreak: 'break-all', marginTop: 4 }}>⊕ {p.linkedIn}</div>}
+            {p.website  && <div style={{ wordBreak: 'break-all' }}>⊕ {p.website}</div>}
+          </div>
+        </SideSection>
+
+        {/* Skills */}
+        {skills.length > 0 && (
+          <SideSection title="Skills" accent={ACCENT} border={DARK_BORDER}>
+            {skills.map((sk, i) => (
+              <div key={i} style={{ marginBottom: 9 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9.5, marginBottom: 3 }}>
+                  <span style={{ color: LIGHT_TEXT }}>{sk.name}</span>
+                  <span style={{ color: DARK_MUTED, fontSize: 8.5 }}>{sk.level}</span>
                 </div>
-              )
-            })}
-          </CreativeSection>
+                <div style={{ height: 2, backgroundColor: DARK_BORDER, borderRadius: 1 }}>
+                  <div style={{ height: 2, width: `${levelPct[sk.level] ?? 50}%`, backgroundColor: ACCENT, borderRadius: 1 }} />
+                </div>
+              </div>
+            ))}
+          </SideSection>
         )}
 
         {/* Education */}
         {education.length > 0 && (
-          <CreativeSection title="Education">
+          <SideSection title="Education" accent={ACCENT} border={DARK_BORDER}>
             {education.map((s) => {
               const c = s.content as EducationContent
               return (
-                <div key={s.id} style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600, fontSize: 12 }}>{c.degree} in {c.field}</span>
-                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: 10, color: colors.muted }}>{c.startDate} – {c.endDate ?? 'Present'}</span>
+                <div key={s.id} style={{ marginBottom: 12, fontSize: 9.5, pageBreakInside: 'avoid' }}>
+                  <div style={{ fontWeight: 700, color: LIGHT_TEXT, textTransform: 'uppercase', fontSize: 9, letterSpacing: 0.5 }}>{c.degree}</div>
+                  <div style={{ color: DARK_MUTED, marginTop: 2 }}>{c.institution}</div>
+                  {c.field && <div style={{ color: DARK_MUTED }}>{c.field}</div>}
+                  {(c.startDate || c.endDate) && (
+                    <div style={{ color: ACCENT, fontSize: 9, marginTop: 2 }}>
+                      {c.startDate}{c.endDate ? ` – ${c.endDate}` : ''}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </SideSection>
+        )}
+
+        {/* Languages */}
+        {langs.length > 0 && (
+          <SideSection title="Languages" accent={ACCENT} border={DARK_BORDER}>
+            {langs.map((l, i) => (
+              <div key={i} style={{ fontSize: 9.5, marginBottom: 4, color: LIGHT_TEXT }}>
+                {l.language}
+                {l.proficiency && <span style={{ color: DARK_MUTED }}> · {l.proficiency}</span>}
+              </div>
+            ))}
+          </SideSection>
+        )}
+
+        {/* Certifications */}
+        {certs.length > 0 && (
+          <SideSection title="Certifications" accent={ACCENT} border={DARK_BORDER}>
+            {certs.map((c, i) => (
+              <div key={i} style={{ marginBottom: 6, fontSize: 9.5 }}>
+                <div style={{ color: LIGHT_TEXT, fontWeight: 600 }}>{c.name}</div>
+                {c.issuer && <div style={{ color: DARK_MUTED }}>{c.issuer}</div>}
+                {c.date   && <div style={{ color: ACCENT, fontSize: 9 }}>{c.date}</div>}
+              </div>
+            ))}
+          </SideSection>
+        )}
+      </div>
+
+      {/* ── White right column ── */}
+      <div style={{ width: MAIN_W, backgroundColor: '#ffffff', padding: '40px 32px', boxSizing: 'border-box' }}>
+
+        {/* Work experience */}
+        {work.length > 0 && (
+          <MainSection title="Work Experience" accent={DARK}>
+            {work.map((s) => {
+              const c = s.content as WorkContent
+              return (
+                <div key={s.id} style={{ marginBottom: 18, paddingLeft: 12, borderLeft: `2px solid ${MAIN_BORDER}`, pageBreakInside: 'avoid' }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: MAIN_MUTED }}>
+                    {c.role}
+                    {c.startDate && (
+                      <span style={{ fontWeight: 400, marginLeft: 6 }}>| {c.startDate} – {c.current ? 'Present' : c.endDate ?? ''}</span>
+                    )}
                   </div>
-                  <div style={{ fontFamily: '"Inter", sans-serif', color: colors.muted, fontSize: 11 }}>
-                    {c.institution}{c.gpa ? ` · GPA ${c.gpa}` : ''}
+                  <div style={{ fontWeight: 700, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5, color: DARK, marginTop: 3 }}>
+                    {c.company}
+                  </div>
+                  <div style={{ marginTop: 6 }}>
+                    {c.bullets.filter(Boolean).map((b, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 3, fontSize: 10.5, lineHeight: 1.55, color: '#333333' }}>
+                        <span style={{ flexShrink: 0, color: MAIN_MUTED }}>·</span>
+                        <span>{b}</span>
+                      </div>
+                    ))}
+                    {c.skills && c.skills.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 6px', marginTop: 6 }}>
+                        {c.skills.map((skill, i) => (
+                          <span key={i} style={{ fontSize: 9, color: '#ffffff', backgroundColor: MAIN_MUTED, padding: '1px 7px', borderRadius: 10 }}>{skill}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
             })}
-          </CreativeSection>
-        )}
-
-        {/* Skills */}
-        {skills.length > 0 && (
-          <CreativeSection title="Skills">
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {skills.map((skill) => (
-                <span key={skill.name} style={{ fontFamily: '"Inter", sans-serif', display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: colors.accentLight, color: colors.accent, padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 500 }}>
-                  {skill.name}
-                  <span style={{ color: colors.muted, fontWeight: 400, fontSize: 9 }}>· {skill.level}</span>
-                </span>
-              ))}
-            </div>
-          </CreativeSection>
+          </MainSection>
         )}
 
         {/* Projects */}
         {projects.length > 0 && (
-          <CreativeSection title="Projects">
-            {projects.map((p, i) => (
-              <div key={i} style={{ marginBottom: 12 }}>
-                <div style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600, fontSize: 12 }}>{p.name}</div>
-                {p.description && <div style={{ fontFamily: '"Inter", sans-serif', color: colors.muted, fontSize: 10.5, fontStyle: 'italic', marginBottom: 3 }}>{p.description}</div>}
+          <MainSection title="Projects" accent={DARK}>
+            {projects.map((proj, i) => (
+              <div key={i} style={{ marginBottom: 12, paddingLeft: 12, borderLeft: `2px solid ${MAIN_BORDER}` }}>
+                <div style={{ fontWeight: 700, fontSize: 11, color: DARK }}>
+                  {proj.name}
+                  {proj.url && <span style={{ fontWeight: 400, color: MAIN_MUTED, fontSize: 9 }}> · {proj.url}</span>}
+                </div>
+                {proj.description && <div style={{ color: MAIN_MUTED, fontSize: 10, marginTop: 2 }}>{proj.description}</div>}
+                {proj.bullets.filter(Boolean).map((b, j) => (
+                  <div key={j} style={{ display: 'flex', gap: 6, marginTop: 2, fontSize: 10 }}>
+                    <span style={{ flexShrink: 0, color: MAIN_MUTED }}>·</span>
+                    <span>{b}</span>
+                  </div>
+                ))}
               </div>
             ))}
-          </CreativeSection>
-        )}
-
-        {/* Two-column footer: certs + languages */}
-        {(certs.length > 0 || langs.length > 0) && (
-          <div style={{ display: 'flex', gap: 40, marginTop: 4 }}>
-            {certs.length > 0 && (
-              <div style={{ flex: 1 }}>
-                <CreativeSection title="Certifications">
-                  {certs.map((c, i) => (
-                    <p key={i} style={{ fontFamily: '"Inter", sans-serif', margin: '0 0 4px', fontSize: 10.5 }}>
-                      <span style={{ fontWeight: 500 }}>{c.name}</span>
-                      {c.issuer ? <span style={{ color: colors.muted }}> · {c.issuer}</span> : null}
-                    </p>
-                  ))}
-                </CreativeSection>
-              </div>
-            )}
-            {langs.length > 0 && (
-              <div style={{ flex: 1 }}>
-                <CreativeSection title="Languages">
-                  {langs.map((l, i) => (
-                    <p key={i} style={{ fontFamily: '"Inter", sans-serif', margin: '0 0 4px', fontSize: 10.5 }}>
-                      <span style={{ fontWeight: 500 }}>{l.language}</span>
-                      {l.proficiency ? <span style={{ color: colors.muted }}> · {l.proficiency}</span> : null}
-                    </p>
-                  ))}
-                </CreativeSection>
-              </div>
-            )}
-          </div>
+          </MainSection>
         )}
       </div>
     </div>
   )
 }
 
-function CreativeSection({ title, children }: { title: string; children: React.ReactNode }) {
+function SideSection({ title, children, accent, border }: { title: string; children: React.ReactNode; accent: string; border: string }) {
   return (
-    <div style={{ marginBottom: 22 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-        <h2 style={{ margin: 0, fontFamily: '"Playfair Display", Georgia, serif', fontSize: 14, fontWeight: 700, color: colors.text, whiteSpace: 'nowrap' }}>
-          {title}
-        </h2>
-        <div style={{ flex: 1, height: 1, backgroundColor: colors.accent, opacity: 0.3 }} />
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, color: accent, marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${border}` }}>
+        {title}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function MainSection({ title, children, accent }: { title: string; children: React.ReactNode; accent: string }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: accent, marginBottom: 12, paddingBottom: 6, borderBottom: `2px solid ${accent}` }}>
+        {title}
       </div>
       {children}
     </div>

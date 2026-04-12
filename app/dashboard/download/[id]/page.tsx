@@ -1,6 +1,14 @@
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+
+function getServiceClient() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 interface Props {
   params: Promise<{ id: string }>
@@ -15,16 +23,10 @@ export default async function DownloadPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login?returnTo=/dashboard/download/${id}`)
 
-  // Fetch payment with snapshot
+  // Fetch payment (no join — avoids ambiguous FK between payments ↔ resume_snapshots)
   const { data: payment } = await supabase
     .from('payments')
-    .select(`
-      id,
-      expires_at,
-      template_id,
-      user_id,
-      resume_snapshots ( char_count, resume_id )
-    `)
+    .select('id, expires_at, template_id, user_id, snapshot_id')
     .eq('id', id)
     .eq('user_id', user.id)
     .eq('status', 'completed')
@@ -37,9 +39,9 @@ export default async function DownloadPage({ params }: Props) {
   if (expired) redirect(`/checkout?templateId=${payment.template_id}`)
 
   // Check 2: resume diff under 10%?
-  const snapshot = Array.isArray(payment.resume_snapshots)
-    ? payment.resume_snapshots[0]
-    : payment.resume_snapshots
+  const { data: snapshot } = payment.snapshot_id
+    ? await supabase.from('resume_snapshots').select('resume_id, char_count').eq('id', payment.snapshot_id).single()
+    : { data: null }
 
   if (snapshot?.resume_id) {
     const { data: sections } = await supabase
@@ -47,19 +49,17 @@ export default async function DownloadPage({ params }: Props) {
       .select('content')
       .eq('resume_id', snapshot.resume_id)
 
-    const currentCharCount = JSON.stringify(sections ?? []).length
+    const currentCharCount = JSON.stringify((sections ?? []).map((s: { content: unknown }) => s.content)).length
     const diff = Math.abs(currentCharCount - snapshot.char_count) / (snapshot.char_count || 1)
 
-    if (diff > DIFF_THRESHOLD) {
-      redirect(`/checkout?templateId=${payment.template_id}`)
-    }
+    if (diff > DIFF_THRESHOLD) redirect(`/checkout?templateId=${payment.template_id}`)
   }
 
-  // Both checks passed — get signed PDF URL
-  const pdfPath = `resumes/${user.id}/${id}.pdf`
-  const { data: signed } = await supabase.storage
-    .from('pdfs')
-    .createSignedUrl(pdfPath, 300) // 5-minute URL
+  // Check PDF exists — use service client so private bucket access isn't blocked by RLS
+  const pdfUserId = payment.user_id ?? user.id
+  const pdfPath = `resumes/${pdfUserId}/${id}.pdf`
+  const { data: signed } = await getServiceClient().storage.from('pdfs').createSignedUrl(pdfPath, 60)
+  const pdfExists = !!signed?.signedUrl
 
   const daysLeft = Math.ceil(
     (new Date(payment.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
@@ -78,10 +78,9 @@ export default async function DownloadPage({ params }: Props) {
         </p>
       </div>
 
-      {signed?.signedUrl ? (
+      {pdfExists ? (
         <a
-          href={signed.signedUrl}
-          download="resume.pdf"
+          href={`/api/download-pdf/${id}`}
           className="w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity"
         >
           Download PDF

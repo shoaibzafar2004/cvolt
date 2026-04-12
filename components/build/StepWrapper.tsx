@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useUIStore } from '@/store/uiStore'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,6 +29,10 @@ export type StepSubmitRef = { submit: () => void }
 export default function StepWrapper() {
   const { currentStep, setStep } = useUIStore()
   const stepRef = useRef<StepSubmitRef>(null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  const returnTo = searchParams.get('returnTo')
 
   const handleNext = () => stepRef.current?.submit()
   const handleBack = () => setStep(currentStep - 1)
@@ -130,7 +135,7 @@ export default function StepWrapper() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.18, ease: 'easeInOut' }}
-              className="bg-background rounded-2xl border shadow-sm p-6 lg:p-10"
+              className={currentStep === 2 || currentStep === 3 ? '' : 'bg-background rounded-2xl border shadow-sm p-6 lg:p-10'}
             >
               {currentStep === 1 && <Step1 ref={stepRef} />}
               {currentStep === 2 && <Step2 ref={stepRef} />}
@@ -149,9 +154,13 @@ export default function StepWrapper() {
           ) : (
             <div />
           )}
-          <Button size="lg" onClick={handleNext} className="rounded-full">
+          <Button
+            size="lg"
+            onClick={currentStep === TOTAL_STEPS ? () => router.push(returnTo ?? '/templates') : handleNext}
+            className="rounded-full"
+          >
             {currentStep === TOTAL_STEPS ? (
-              <><LayoutTemplate className="w-4 h-4" /> Browse templates</>
+              <><LayoutTemplate className="w-4 h-4" /> {returnTo ? 'Back to preview' : 'Browse templates'}</>
             ) : (
               <>Next <ArrowRight className="w-4 h-4" /></>
             )}

@@ -6,8 +6,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { summarySchema, type SummaryFormData } from '@/lib/schemas'
 import { useResumeStore } from '@/store/resumeStore'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { Textarea } from '@/components/ui/textarea'
+import ClientOnlyTemplate from '@/components/resume-templates/ClientOnlyTemplate'
 import type { StepSubmitRef } from './StepWrapper'
+
+const A4_WIDTH = 794
+const A4_HEIGHT = 1123
+const PREVIEW_SCALE = 0.42
+const PREVIEW_CONTAINER_WIDTH = Math.round(A4_WIDTH * PREVIEW_SCALE)   // ~333px
+const PREVIEW_CONTAINER_HEIGHT = Math.round(A4_HEIGHT * PREVIEW_SCALE) // ~472px
 
 const MAX_CHARS = 500
 
@@ -17,7 +25,7 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<SummaryFormData>({
     resolver: zodResolver(summarySchema),
-    defaultValues: { summary: '' },
+    defaultValues: { summary: store.personalInfo.summary ?? '' },
   })
 
   const summary = watch('summary') ?? ''
@@ -26,13 +34,19 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
     submit: () => handleSubmit(onSubmit)(),
   }))
 
-  function onSubmit(data: SummaryFormData) {
-    // Summary is optional — store as a simple text field in personalInfo extension
-    // For now we attach it to the store's personalInfo as a non-schema field
-    // It will be surfaced in the template via ResumeData in Phase 3
-    if (data.summary) {
-      store.setPersonalInfo({ ...store.personalInfo, summary: data.summary } as typeof store.personalInfo & { summary: string })
+  async function onSubmit(data: SummaryFormData) {
+    const merged = { ...store.personalInfo, summary: data.summary ?? '' }
+    store.setPersonalInfo(merged)
+
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user && store.resumeId) {
+      await supabase
+        .from('resumes')
+        .update({ personal_info: merged, updated_at: new Date().toISOString() })
+        .eq('id', store.resumeId)
     }
+
     router.push('/templates')
   }
 
@@ -51,7 +65,10 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
         <Textarea
           className="min-h-32 resize-y"
           placeholder="Results-driven software engineer with 5+ years of experience building scalable web applications..."
-          {...register('summary')}
+          spellCheck={true}
+          {...register('summary', {
+            onBlur: (e) => store.setPersonalInfo({ ...store.personalInfo, summary: e.target.value }),
+          })}
         />
         <div className="flex justify-between items-center">
           {errors.summary ? (
@@ -65,11 +82,27 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
         </div>
       </div>
 
-      {/* Mini resume preview — placeholder until CleanTemplate is built in Phase 3 */}
+      {/* Mini resume preview */}
       <div className="space-y-2">
         <p className="text-sm font-medium">Resume preview</p>
-        <div className="border rounded-lg bg-muted/30 flex items-center justify-center h-48 text-sm text-muted-foreground">
-          Preview available after templates are built
+        <div
+          className="border rounded-lg overflow-hidden bg-white shadow-sm"
+          style={{ width: PREVIEW_CONTAINER_WIDTH, height: PREVIEW_CONTAINER_HEIGHT, position: 'relative' }}
+        >
+          <div
+            style={{
+              width: A4_WIDTH,
+              transformOrigin: 'top left',
+              transform: `scale(${PREVIEW_SCALE})`,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          >
+            <ClientOnlyTemplate slug="clean" data={{ personalInfo: store.personalInfo, sections: store.sections }} />
+          </div>
         </div>
       </div>
 

@@ -31,28 +31,38 @@ export async function POST(request: Request) {
   }
 
   const intent = event.data.object
-  const { templateId } = intent.metadata
-  const email = intent.receipt_email ?? ''
+  const { templateId, email: metaEmail, userId: metaUserId } = intent.metadata
+  const email = metaEmail ?? intent.receipt_email ?? ''
 
   const supabase = getServiceClient()
 
   try {
-    // 1. Get or create user from email
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .single()
-
-    let userId: string | null = existingUser?.id ?? null
+    // 1. Resolve userId across all three cases:
+    //    Case A — logged in at checkout:   metadata.userId is set, use it directly.
+    //    Case B — existing user, not logged in: createUser fails → look up public.users by email.
+    //    Case C — brand new user:          createUser succeeds → use the new user's id.
+    let userId: string | null = metaUserId ?? null
 
     if (!userId && email) {
-      const { data: newUser } = await supabase.auth.admin.createUser({ email, email_confirm: true })
-      userId = newUser?.user?.id ?? null
+      const { data: created, error: createError } = await supabase.auth.admin.createUser({
+        email,
+        email_confirm: true,
+      })
+
+      if (created?.user) {
+        userId = created.user.id
+      } else if (createError) {
+        const { data: existing } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', email)
+          .single()
+        userId = existing?.id ?? null
+      }
     }
 
-    // 2. Find latest resume for this user (anon draft or authenticated)
-    const { data: resume } = userId
+    // 2. Find latest resume for this user
+    let { data: resume } = userId
       ? await supabase.from('resumes').select('id, personal_info').eq('user_id', userId).order('updated_at', { ascending: false }).limit(1).single()
       : { data: null }
 
@@ -73,8 +83,24 @@ export async function POST(request: Request) {
       })),
     }
 
+    // 3b. resume_snapshots.resume_id is NOT NULL — ensure a resume row exists
+    if (!resume && userId) {
+      const { data: newResume, error: resumeInsertError } = await supabase
+        .from('resumes')
+        .insert({
+          user_id: userId,
+          title: resumeData.personalInfo.name ? `${resumeData.personalInfo.name}'s Resume` : 'My Resume',
+          personal_info: resumeData.personalInfo,
+        })
+        .select('id, personal_info')
+        .single()
+      if (resumeInsertError) console.error('Resume insert error:', resumeInsertError)
+      resume = newResume
+    }
+
     // 4. Step 1 of circular FK fix: insert payment with snapshot_id = null
-    const { data: payment } = await supabase
+    //    Status stays 'pending' until PDF is uploaded — processing page polls for 'completed'
+    const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
         user_id: userId,
@@ -83,19 +109,21 @@ export async function POST(request: Request) {
         stripe_payment_id: intent.id,
         amount: intent.amount / 100,
         currency: intent.currency,
-        status: 'completed',
+        status: 'pending',
       })
       .select('id')
       .single()
 
-    if (!payment) throw new Error('Failed to create payment record')
+    if (paymentError || !payment) throw new Error(`Failed to create payment record: ${paymentError?.message}`)
 
     // 5. Step 2: insert snapshot
-    const charCount = JSON.stringify(resumeData).length
-    const { data: snapshot } = await supabase
+    if (!resume?.id) throw new Error('Cannot create snapshot: resume record is missing')
+    // Measure only section content — must match what the download gate computes
+    const charCount = JSON.stringify(resumeData.sections.map((s) => s.content)).length
+    const { data: snapshot, error: snapshotError } = await supabase
       .from('resume_snapshots')
       .insert({
-        resume_id: resume?.id ?? null,
+        resume_id: resume?.id,
         payment_id: payment.id,
         snapshot_data: resumeData,
         char_count: charCount,
@@ -103,25 +131,36 @@ export async function POST(request: Request) {
       .select('id')
       .single()
 
-    if (!snapshot) throw new Error('Failed to create snapshot')
+    if (snapshotError || !snapshot) throw new Error(`Failed to create snapshot: ${snapshotError?.message}`)
 
     // 6. Step 3: link snapshot back to payment
     await supabase.from('payments').update({ snapshot_id: snapshot.id }).eq('id', payment.id)
 
-    // 7. Generate PDF
-    const TemplateComponent = getTemplate(templateId)
+    // 7. Generate PDF — look up slug from DB since templateId is a UUID
+    const { data: templateRow } = await supabase
+      .from('templates')
+      .select('slug')
+      .eq('id', templateId)
+      .single()
+
+    if (!templateRow) throw new Error(`Template not found: ${templateId}`)
+    const TemplateComponent = getTemplate(templateRow.slug)
     const { renderToStaticMarkup } = await import('react-dom/server')
     const html = renderToStaticMarkup(createElement(TemplateComponent, { data: resumeData }))
     const pdfBuffer = await generatePdfFromHtml(html)
 
     // 8. Upload PDF to Supabase Storage
     const pdfPath = `resumes/${userId ?? 'anon'}/${payment.id}.pdf`
-    await supabase.storage.from('pdfs').upload(pdfPath, pdfBuffer, {
+    const { error: uploadError } = await supabase.storage.from('pdfs').upload(pdfPath, pdfBuffer, {
       contentType: 'application/pdf',
       upsert: true,
     })
+    if (uploadError) throw new Error(`PDF upload failed: ${uploadError.message}`)
 
-    // 9. Send magic link so user can access dashboard
+    // 9. Mark payment as completed — only now is the PDF ready for download
+    await supabase.from('payments').update({ status: 'completed' }).eq('id', payment.id)
+
+    // 10. Send magic link so user can access dashboard
     if (email) {
       await supabase.auth.admin.generateLink({
         type: 'magiclink',

@@ -29,9 +29,12 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
 
   return (
     <div style={{ width: 794, minHeight: 1123, fontFamily: '"Inter", sans-serif', fontSize: 11, color: colors.text, backgroundColor: '#ffffff', padding: '48px 56px', boxSizing: 'border-box', lineHeight: 1.5 }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-      `}</style>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; src: url('/fonts/inter-400.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; src: url('/fonts/inter-500.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; src: url('/fonts/inter-600.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; src: url('/fonts/inter-700.woff2') format('woff2'); }
+      ` }} />
 
       {/* Header */}
       <div style={{ marginBottom: 24, borderBottom: `2px solid ${colors.accent}`, paddingBottom: 16 }}>
@@ -44,13 +47,20 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           </p>
         )}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0 16px', marginTop: 8, fontSize: 10, color: colors.muted }}>
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>{personalInfo.phone}</span>}
-          {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.linkedIn && <span>{personalInfo.linkedIn}</span>}
-          {personalInfo.website && <span>{personalInfo.website}</span>}
+          {personalInfo.email    && <span>✉ {personalInfo.email}</span>}
+          {personalInfo.phone    && <span>✆ {personalInfo.phone}</span>}
+          {personalInfo.location && <span>◉ {personalInfo.location}</span>}
+          {personalInfo.linkedIn && <span>⊕ {personalInfo.linkedIn}</span>}
+          {personalInfo.website  && <span>⊕ {personalInfo.website}</span>}
         </div>
       </div>
+
+      {/* About Me */}
+      {personalInfo.summary && (
+        <Section title="About Me">
+          <p style={{ margin: 0, lineHeight: 1.7, color: colors.muted }}>{personalInfo.summary}</p>
+        </Section>
+      )}
 
       {/* Work experience */}
       {work.length > 0 && (
@@ -58,7 +68,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           {work.map((s) => {
             const c = s.content as WorkContent
             return (
-              <div key={s.id} style={{ marginBottom: 14 }}>
+              <div key={s.id} style={{ marginBottom: 14, pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontWeight: 600, fontSize: 12 }}>{c.role}</span>
                   <span style={{ fontSize: 10, color: colors.muted }}>
@@ -72,6 +82,13 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
                     <span>{b}</span>
                   </div>
                 ))}
+                {c.skills && c.skills.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 6px', marginTop: 6 }}>
+                    {c.skills.map((skill, i) => (
+                      <span key={i} style={{ fontSize: 9, color: colors.accent, border: `1px solid ${colors.accent}`, padding: '1px 7px', borderRadius: 10 }}>{skill}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             )
           })}
@@ -84,7 +101,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           {education.map((s) => {
             const c = s.content as EducationContent
             return (
-              <div key={s.id} style={{ marginBottom: 10 }}>
+              <div key={s.id} style={{ marginBottom: 10, pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontWeight: 600, fontSize: 12 }}>{c.degree} in {c.field}</span>
                   <span style={{ fontSize: 10, color: colors.muted }}>{c.startDate} – {c.endDate ?? 'Present'}</span>
@@ -102,8 +119,8 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
       {skills.length > 0 && (
         <Section title="Skills">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {skills.map((skill) => (
-              <span key={skill.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: '#f0f4ff', color: colors.accent, padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 500 }}>
+            {skills.map((skill, i) => (
+              <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: '#f0f4ff', color: colors.accent, padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 500 }}>
                 {skill.name}
                 <span style={{ color: colors.muted, fontWeight: 400, fontSize: 9 }}>· {skill.level}</span>
               </span>

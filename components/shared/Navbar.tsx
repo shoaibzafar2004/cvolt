@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sheet'
 import { Menu } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
+import LogoutButton from './LogoutButton'
 
 const NAV_LINKS = [
   { label: 'Build', href: '/build' },
@@ -57,6 +58,7 @@ export default async function Navbar() {
           >
             {user ? 'Dashboard' : 'Sign in'}
           </Button>
+          {user && <LogoutButton />}
           <ThemeToggle />
         </nav>
 
@@ -92,6 +94,7 @@ export default async function Navbar() {
                 >
                   {user ? 'Dashboard' : 'Sign in'}
                 </Button>
+                {user && <LogoutButton mobile />}
               </nav>
             </SheetContent>
           </Sheet>
