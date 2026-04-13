@@ -193,7 +193,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 2.5, fontSize: 10.5, lineHeight: 1.55 }}>
                         <span style={{ color: ACCENT, flexShrink: 0, fontWeight: 700 }}>—</span>
-                        <span style={{ color: MUTED }}>{b}</span>
+                        <span style={{ color: MUTED }} dangerouslySetInnerHTML={{ __html: b }} />
                       </div>
                     ))}
                     {c.skills && c.skills.length > 0 && (
@@ -245,7 +245,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
                   {proj.bullets.filter(Boolean).map((b, j) => (
                     <div key={j} style={{ display: 'flex', gap: 7, marginBottom: 2.5, fontSize: 10.5, lineHeight: 1.55, marginTop: 3 }}>
                       <span style={{ color: ACCENT, flexShrink: 0, fontWeight: 700 }}>—</span>
-                      <span style={{ color: MUTED }}>{b}</span>
+                      <span style={{ color: MUTED }} dangerouslySetInnerHTML={{ __html: b }} />
                     </div>
                   ))}
                 </div>

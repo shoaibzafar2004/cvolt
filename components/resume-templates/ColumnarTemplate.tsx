@@ -119,7 +119,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
                 {c.bullets.filter(Boolean).map((b, i) => (
                   <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 3, fontSize: 10.5, lineHeight: 1.6, color: BODY }}>
                     <span style={{ flexShrink: 0 }}>•</span>
-                    <span>{b}</span>
+                    <div dangerouslySetInnerHTML={{ __html: b }} />
                   </div>
                 ))}
               </div>
@@ -170,7 +170,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
               {proj.bullets.filter(Boolean).map((b, j) => (
                 <div key={j} style={{ display: 'flex', gap: 7, marginBottom: 3, fontSize: 10.5, lineHeight: 1.6, color: BODY }}>
                   <span style={{ flexShrink: 0 }}>•</span>
-                  <span>{b}</span>
+                  <div dangerouslySetInnerHTML={{ __html: b }} />
                 </div>
               ))}
             </div>

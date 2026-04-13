@@ -53,7 +53,7 @@ function storeWorkEntries(
       startDate: entry.startDate,
       endDate: entry.endDate,
       current: entry.current,
-      bullets: entry.bullets.flatMap((b) => b.split('\n')).map((b) => b.trim()).filter(Boolean),
+      bullets: entry.bullets.filter(Boolean),
       skills: entry.skills ?? [],
     }
     const section: Section = {
@@ -82,7 +82,7 @@ const Step2 = forwardRef<StepSubmitRef>((_, ref) => {
         startDate: c.startDate,
         endDate: c.endDate ?? '',
         current: c.current,
-        bullets: [c.bullets.length ? c.bullets.join('\n') : ''],
+        bullets: c.bullets.length ? c.bullets : [''],
         skills: c.skills ?? [],
       }
     })
@@ -122,7 +122,7 @@ const Step2 = forwardRef<StepSubmitRef>((_, ref) => {
             startDate: entry.startDate,
             endDate: entry.endDate,
             current: entry.current,
-            bullets: entry.bullets.flatMap((b) => b.split('\n')).map((b) => b.trim()).filter(Boolean),
+            bullets: entry.bullets.filter(Boolean),
             skills: entry.skills ?? [],
           },
           display_order: i,

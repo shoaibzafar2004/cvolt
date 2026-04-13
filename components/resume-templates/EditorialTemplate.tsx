@@ -181,7 +181,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
                     {proj.bullets.filter(Boolean).map((b, j) => (
                       <div key={j} style={{ display: 'flex', gap: 6, marginBottom: 2, fontSize: 10.5, lineHeight: 1.6 }}>
                         <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
-                        <span>{b}</span>
+                        <div dangerouslySetInnerHTML={{ __html: b }} />
                       </div>
                     ))}
                   </div>
@@ -304,7 +304,7 @@ function WorkEntry({ c, accent }: { c: WorkContent; accent: string }) {
       {c.bullets.filter(Boolean).map((b, i) => (
         <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 3, fontSize: 10.5, lineHeight: 1.6, color: '#3d3d3d' }}>
           <span style={{ color: accent, flexShrink: 0 }}>•</span>
-          <span>{b}</span>
+          <div dangerouslySetInnerHTML={{ __html: b }} />
         </div>
       ))}
     </div>

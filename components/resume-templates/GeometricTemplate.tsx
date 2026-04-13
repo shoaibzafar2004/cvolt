@@ -58,6 +58,8 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 400; src: url('/fonts/libre-franklin-400.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 600; src: url('/fonts/libre-franklin-600.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 700; src: url('/fonts/libre-franklin-700.woff2') format('woff2'); }
+        @page { margin: 36px 0; }
+        @page :first { margin: 0; }
       ` }} />
 
       {/* ══════════════════════
@@ -68,12 +70,12 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
         {/* Name + title */}
         <div>
           {/* First name */}
-          <div style={{ fontSize: 52, fontWeight: 700, lineHeight: 1, color: '#55565c', textTransform: 'uppercase', letterSpacing: 3 }}>
+          <div style={{ fontSize: 50, fontWeight: 500, lineHeight: 1, color: '#55565c', textTransform: 'uppercase', letterSpacing: 3 }}>
             {firstName}
           </div>
           {/* Last name — accent colour */}
           {lastName && (
-            <div style={{ fontSize: 52, fontWeight: 700, lineHeight: 1.02, color: ACCENT, textTransform: 'uppercase', letterSpacing: 3 }}>
+            <div style={{ fontSize: 50, fontWeight: 500, lineHeight: 1.02, color: ACCENT, textTransform: 'uppercase', letterSpacing: 3 }}>
               {lastName}
             </div>
           )}
@@ -96,33 +98,33 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
       </div>
 
       {/* Full-width rule */}
-      <div style={{ height: 1.5, backgroundColor: ACCENT, marginInline: PAD, marginBottom: 28 }} />
+      <div style={{ height: 1.5, backgroundColor: ACCENT, marginInline: PAD, marginBottom: 20 }} />
 
       {/* ══════════════════════
           BODY — two columns
       ══════════════════════ */}
-      <div style={{ padding: `0 ${PAD}px 40px`, display: 'flex', gap: GAP }}>
+      <div style={{ padding: `0 ${PAD}px 16px`, display: 'flex', gap: GAP }}>
 
         {/* ── LEFT column ── */}
         <div style={{ width: LEFT, flexShrink: 0 }}>
 
           {/* Profile / About Me */}
           {p.summary && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Profile" accent={ACCENT} />
-              <p style={{ margin: 0, fontSize: 10.5, lineHeight: 1.8, color: MUTED }}>{p.summary}</p>
+              <p style={{ margin: 0, fontSize: 10.5, lineHeight: 1.6, color: MUTED }}>{p.summary}</p>
             </div>
           )}
 
           {/* Work Experience */}
           {work.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Work Experience" accent={ACCENT} />
               {work.map((s, idx) => {
                 const c = s.content as WorkContent
                 const dateStr = [c.startDate, c.current ? 'Present' : c.endDate].filter(Boolean).join(' – ')
                 return (
-                  <div key={s.id} style={{ marginBottom: idx < work.length - 1 ? 18 : 0, pageBreakInside: 'avoid' }}>
+                  <div key={s.id} style={{ marginBottom: idx < work.length - 1 ? 12 : 0, pageBreakInside: 'avoid' }}>
                     {/* Date + Company */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
                       <span style={{ fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: ACCENT }}>
@@ -134,9 +136,9 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#55565c', marginBottom: 6 }}>{c.role}</div>
                     {/* Bullets — square markers */}
                     {c.bullets.filter(Boolean).map((b, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 3, fontSize: 10.5, lineHeight: 1.65, color: BODY }}>
+                      <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 3, fontSize: 10.5, lineHeight: 1.4, color: BODY }}>
                         <span style={{ flexShrink: 0, fontSize: 7, color: ACCENT, marginTop: 4, lineHeight: 1 }}>■</span>
-                        <span>{b}</span>
+                        <div dangerouslySetInnerHTML={{ __html: b }} />
                       </div>
                     ))}
                     {c.skills && c.skills.length > 0 && (
@@ -154,7 +156,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
           {/* Projects */}
           {projects.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Projects" accent={ACCENT} />
               {projects.map((proj, i) => (
                 <div key={i} style={{ marginBottom: i < projects.length - 1 ? 16 : 0, pageBreakInside: 'avoid' }}>
@@ -166,9 +168,9 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                     <div style={{ fontSize: 10, color: MUTED, fontStyle: 'italic', marginBottom: 4 }}>{proj.description}</div>
                   )}
                   {proj.bullets.filter(Boolean).map((b, j) => (
-                    <div key={j} style={{ display: 'flex', gap: 8, marginBottom: 3, fontSize: 10.5, lineHeight: 1.65, color: BODY }}>
+                    <div key={j} style={{ display: 'flex', gap: 8, marginBottom: 3, fontSize: 10.5, lineHeight: 1.4, color: BODY }}>
                       <span style={{ flexShrink: 0, fontSize: 7, color: ACCENT, marginTop: 4, lineHeight: 1 }}>■</span>
-                      <span>{b}</span>
+                      <div dangerouslySetInnerHTML={{ __html: b }} />
                     </div>
                   ))}
                 </div>
@@ -185,7 +187,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
           {/* Education */}
           {education.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Education" accent={ACCENT} />
               {education.map((s, idx) => {
                 const c = s.content as EducationContent
@@ -210,7 +212,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
           {/* Skills */}
           {skills.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Skills" accent={ACCENT} />
               {skills.map((sk, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6, fontSize: 10.5, color: BODY }}>
@@ -223,7 +225,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
           {/* Languages */}
           {langs.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Languages" accent={ACCENT} />
               {langs.map((l, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6, fontSize: 10.5, color: BODY }}>
@@ -239,7 +241,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
           {/* Certifications */}
           {certs.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Certifications" accent={ACCENT} />
               {certs.map((c, i) => (
                 <div key={i} style={{ marginBottom: 10, pageBreakInside: 'avoid' }}>
@@ -263,8 +265,8 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
 function SectionHeading({ title, accent }: { title: string; accent: string }) {
   return (
-    <div style={{ marginBottom: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
         <div style={{ width: 3, height: 13, backgroundColor: accent, flexShrink: 0 }} />
         <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, color: accent }}>
           {title}

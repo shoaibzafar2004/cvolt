@@ -120,7 +120,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
                   </div>
                 )}
                 {c.bullets.filter(Boolean).map((b, i) => (
-                  <Bullet key={i}>{b}</Bullet>
+                  <Bullet key={i} html={b} />
                 ))}
                 {c.skills && c.skills.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 6px', marginTop: 6 }}>
@@ -162,7 +162,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
               {proj.description && (
                 <div style={{ fontFamily: '"Lora", serif', fontStyle: 'italic', fontSize: 10, color: MUTED, marginTop: 2, marginBottom: 4 }}>{proj.description}</div>
               )}
-              {proj.bullets.filter(Boolean).map((b, j) => <Bullet key={j}>{b}</Bullet>)}
+              {proj.bullets.filter(Boolean).map((b, j) => <Bullet key={j} html={b} />)}
             </Entry>
           ))}
         </Section>
@@ -219,11 +219,14 @@ function Entry({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Bullet({ children }: { children: React.ReactNode }) {
+function Bullet({ children, html }: { children?: React.ReactNode; html?: string }) {
   return (
     <div style={{ display: 'flex', gap: 8, marginBottom: 3, fontFamily: '"Source Sans 3", sans-serif', fontSize: 10.5, lineHeight: 1.55 }}>
       <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
-      <span>{children}</span>
+      {html !== undefined
+        ? <div dangerouslySetInnerHTML={{ __html: html }} />
+        : <span>{children}</span>
+      }
     </div>
   )
 }

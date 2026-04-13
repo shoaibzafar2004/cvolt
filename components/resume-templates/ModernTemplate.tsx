@@ -187,7 +187,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                           {c.bullets.filter(Boolean).map((b, i) => (
                             <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 3, fontSize: 10.5, lineHeight: 1.5 }}>
                               <span style={{ flexShrink: 0, color: MUTED }}>·</span>
-                              <span>{b}</span>
+                              <div dangerouslySetInnerHTML={{ __html: b }} />
                             </div>
                           ))}
                           {c.skills && c.skills.length > 0 && (
@@ -221,7 +221,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                       {proj.bullets.filter(Boolean).map((b, j) => (
                         <div key={j} style={{ display: 'flex', gap: 6, marginTop: 2, fontSize: 10 }}>
                           <span style={{ flexShrink: 0, color: MUTED }}>·</span>
-                          <span>{b}</span>
+                          <div dangerouslySetInnerHTML={{ __html: b }} />
                         </div>
                       ))}
                     </div>

@@ -8,8 +8,8 @@ import type { UseFormRegister, UseFieldArrayRemove, FieldErrors, Control } from 
 import type { Step2FormData } from '@/lib/schemas'
 import { Input } from '@/components/ui/input'
 import { MonthPicker } from '@/components/ui/month-picker'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import BulletEditor from './BulletEditor'
 import { GripVertical, Trash2, X } from 'lucide-react'
 
 interface WorkBlockProps {
@@ -128,13 +128,13 @@ export default function WorkBlock({ index, id, register, control, remove, errors
       <div className="space-y-1">
         <label className="block text-sm font-medium mb-2 pl-4.5">
           Key achievements / responsibilities
-          <span className="text-muted-foreground font-normal ml-1">(one per line)</span>
         </label>
-        <Textarea
-          className="min-h-45 resize-y"
-          placeholder="• Reduced API latency by 40% by..."
-          spellCheck={true}
-          {...register(`workEntries.${index}.bullets.0`)}
+        <Controller
+          control={control}
+          name={`workEntries.${index}.bullets`}
+          render={({ field }) => (
+            <BulletEditor value={field.value} onChange={field.onChange} />
+          )}
         />
       </div>
 

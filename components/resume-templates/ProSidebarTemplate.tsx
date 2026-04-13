@@ -158,7 +158,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   {c.bullets.filter(Boolean).map((b, i) => (
                     <div key={i} style={{ display: 'flex', gap: 7, marginBottom: 3, fontSize: 10.5, lineHeight: 1.6, color: '#333333' }}>
                       <span style={{ flexShrink: 0, color: ACCENT, marginTop: 1 }}>•</span>
-                      <span>{b}</span>
+                      <div dangerouslySetInnerHTML={{ __html: b }} />
                     </div>
                   ))}
                   {/* Skill tags */}
@@ -190,7 +190,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                 {proj.bullets.filter(Boolean).map((b, j) => (
                   <div key={j} style={{ display: 'flex', gap: 7, marginBottom: 3, fontSize: 10.5, lineHeight: 1.6, color: '#333333' }}>
                     <span style={{ flexShrink: 0, color: ACCENT }}>•</span>
-                    <span>{b}</span>
+                    <div dangerouslySetInnerHTML={{ __html: b }} />
                   </div>
                 ))}
               </div>

@@ -86,7 +86,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
                 {c.bullets.filter(Boolean).map((b, i) => (
                   <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 2 }}>
                     <span style={{ color: colors.accent, flexShrink: 0 }}>•</span>
-                    <span>{b}</span>
+                    <div dangerouslySetInnerHTML={{ __html: b }} />
                   </div>
                 ))}
                 {c.skills && c.skills.length > 0 && (
@@ -146,7 +146,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
               {p.bullets.filter(Boolean).map((b, j) => (
                 <div key={j} style={{ display: 'flex', gap: 6, marginBottom: 2 }}>
                   <span style={{ color: colors.accent, flexShrink: 0 }}>•</span>
-                  <span>{b}</span>
+                  <div dangerouslySetInnerHTML={{ __html: b }} />
                 </div>
               ))}
             </div>
