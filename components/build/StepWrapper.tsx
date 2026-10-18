@@ -1,57 +1,81 @@
-'use client'
+"use client";
 
-import { useRef } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useUIStore } from '@/store/uiStore'
-import { Button } from '@/components/ui/button'
+import { useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useUIStore } from "@/store/uiStore";
+import { Button } from "@/components/ui/button";
 import {
-  User, Briefcase, GraduationCap, AlignLeft,
-  ArrowLeft, ArrowRight, Check, LayoutTemplate,
-} from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
-import SectionLine from '@/components/shared/SectionLine'
-import Step1 from './Step1'
-import Step2 from './Step2'
-import Step3 from './Step3'
-import Step4 from './Step4'
+  User,
+  Briefcase,
+  GraduationCap,
+  AlignLeft,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  LayoutTemplate,
+} from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import SectionLine from "@/components/shared/SectionLine";
+import Step1 from "./Step1";
+import Step2 from "./Step2";
+import Step3 from "./Step3";
+import Step4 from "./Step4";
 
 const STEPS = [
-  { step: 1, label: 'Personal info',      sublabel: 'Name, title, contact',    icon: User          },
-  { step: 2, label: 'Work experience',    sublabel: 'Jobs and achievements',    icon: Briefcase     },
-  { step: 3, label: 'Education & skills', sublabel: 'Degrees, skills, extras', icon: GraduationCap },
-  { step: 4, label: 'Summary',            sublabel: 'Professional overview',    icon: AlignLeft     },
-]
+  {
+    step: 1,
+    label: "Personal info",
+    sublabel: "Name, title, contact",
+    icon: User,
+  },
+  {
+    step: 2,
+    label: "Work experience",
+    sublabel: "Jobs and achievements",
+    icon: Briefcase,
+  },
+  {
+    step: 3,
+    label: "Education & skills",
+    sublabel: "Degrees, skills, extras",
+    icon: GraduationCap,
+  },
+  {
+    step: 4,
+    label: "Summary",
+    sublabel: "Professional overview",
+    icon: AlignLeft,
+  },
+];
 
-const TOTAL_STEPS = STEPS.length
+const TOTAL_STEPS = STEPS.length;
 
-export type StepSubmitRef = { submit: () => void }
+export type StepSubmitRef = { submit: () => void };
 
 export default function StepWrapper() {
-  const { currentStep, setStep } = useUIStore()
-  const stepRef = useRef<StepSubmitRef>(null)
-  const searchParams = useSearchParams()
-  const router = useRouter()
+  const { currentStep, setStep } = useUIStore();
+  const stepRef = useRef<StepSubmitRef>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const returnTo = searchParams.get('returnTo')
+  const returnTo = searchParams.get("returnTo");
 
-  const handleNext = () => stepRef.current?.submit()
-  const handleBack = () => setStep(currentStep - 1)
+  const handleNext = () => stepRef.current?.submit();
+  const handleBack = () => setStep(currentStep - 1);
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-muted/30">
-
+    <div className="flex flex-1 overflow-hidden bg-muted/30">
       {/* ── Left — floating steps, no panel ─────────────────── */}
-      <div className="hidden lg:flex w-64 xl:w-88 shrink-0 flex-col py-12 relative">
-
+      <div className="relative hidden w-64 shrink-0 flex-col py-12 lg:flex xl:w-88">
         {/* Section line */}
-        <SectionLine className="left-8 top-12 bottom-12" />
+        <SectionLine className="top-12 bottom-12 left-8" />
 
         {/* Steps */}
-        <div className="pl-22 pr-4 flex flex-col gap-18 mt-4">
+        <div className="mt-4 flex flex-col gap-18 pr-4 pl-22">
           {STEPS.map(({ step, label, sublabel, icon: Icon }) => {
-            const isComplete = currentStep > step
-            const isActive   = currentStep === step
-            const isPending  = currentStep < step
+            const isComplete = currentStep > step;
+            const isActive = currentStep === step;
+            const isPending = currentStep < step;
 
             return (
               <button
@@ -59,73 +83,86 @@ export default function StepWrapper() {
                 type="button"
                 disabled={!isComplete}
                 onClick={() => isComplete && setStep(step)}
-                className="flex items-center gap-3 text-left group disabled:cursor-default"
+                className="group flex items-center gap-3 text-left disabled:cursor-default"
               >
                 {/* Icon circle */}
-                <div className={[
-                  'w-11 h-11 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200',
-                  isComplete && 'border-foreground bg-foreground text-background group-hover:opacity-75',
-                  isActive   && 'border-foreground bg-background text-foreground shadow-sm',
-                  isPending  && 'border-border bg-background/60 text-muted-foreground',
-                ].filter(Boolean).join(' ')}>
-                  {isComplete
-                    ? <Check className="w-4 h-4" />
-                    : <Icon  className="w-4 h-4" />
-                  }
+                <div
+                  className={[
+                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200",
+                    isComplete &&
+                      "border-foreground bg-foreground text-background group-hover:opacity-75",
+                    isActive &&
+                      "border-foreground bg-background text-foreground shadow-sm",
+                    isPending &&
+                      "border-border bg-background/60 text-muted-foreground",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {isComplete ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
                 </div>
 
                 {/* Short connector */}
-                <div className={[
-                  'w-4 h-px shrink-0 transition-colors',
-                  (isComplete || isActive) ? 'bg-foreground/25' : 'bg-border',
-                ].join(' ')} />
+                <div
+                  className={[
+                    "h-px w-4 shrink-0 transition-colors",
+                    isComplete || isActive ? "bg-foreground/25" : "bg-border",
+                  ].join(" ")}
+                />
 
                 {/* Labels */}
                 <div>
-                  <p className={[
-                    'text-sm font-semibold leading-tight',
-                    isPending ? 'text-muted-foreground' : 'text-foreground',
-                  ].join(' ')}>
+                  <p
+                    className={[
+                      "text-sm leading-tight font-semibold",
+                      isPending ? "text-muted-foreground" : "text-foreground",
+                    ].join(" ")}
+                  >
                     {label}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{sublabel}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {sublabel}
+                  </p>
                 </div>
               </button>
-            )
+            );
           })}
         </div>
       </div>
 
       {/* ── Right — form + nav ───────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Mobile top strip */}
-        <div className="lg:hidden flex items-center gap-3 px-4 py-3 border-b bg-background shrink-0">
+        <div className="flex shrink-0 items-center gap-3 border-b bg-background px-4 py-3 lg:hidden">
           {currentStep > 1 && (
             <button
               onClick={handleBack}
-              className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="h-4 w-4" />
             </button>
           )}
-          <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
+          <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
             {currentStep}/{TOTAL_STEPS}
           </span>
-          <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
+          <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full bg-foreground rounded-full transition-all duration-300"
+              className="h-full rounded-full bg-foreground transition-all duration-300"
               style={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }}
             />
           </div>
-          <span className="text-xs font-medium text-foreground shrink-0">
+          <span className="shrink-0 text-xs font-medium text-foreground">
             {STEPS[currentStep - 1].label}
           </span>
         </div>
 
         {/* Scrollable form — card fills the column */}
-        <div className="flex-1 overflow-auto px-4 lg:px-8 xl:px-12 pt-8 pb-4">
-          <h2 className="text-xl font-semibold mb-4 mt-8 px-1">
+        <div className="flex-1 overflow-auto px-4 pt-8 pb-4 lg:px-8 xl:px-12">
+          <h2 className="mt-8 mb-4 px-1 text-xl font-semibold">
             {STEPS[currentStep - 1].label}
           </h2>
           <AnimatePresence mode="wait">
@@ -134,8 +171,12 @@ export default function StepWrapper() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.18, ease: 'easeInOut' }}
-              className={currentStep === 2 || currentStep === 3 ? '' : 'bg-background rounded-2xl border shadow-sm p-6 lg:p-10'}
+              transition={{ duration: 0.18, ease: "easeInOut" }}
+              className={
+                currentStep === 2 || currentStep === 3
+                  ? ""
+                  : "rounded-2xl border bg-background p-6 shadow-sm lg:p-10"
+              }
             >
               {currentStep === 1 && <Step1 ref={stepRef} />}
               {currentStep === 2 && <Step2 ref={stepRef} />}
@@ -146,28 +187,41 @@ export default function StepWrapper() {
         </div>
 
         {/* Navigation — outside the card, Back left · Next right */}
-        <div className="px-4 lg:px-8 xl:px-12 py-5 flex justify-between items-center shrink-0">
+        <div className="flex shrink-0 items-center justify-between px-4 py-5 lg:px-8 xl:px-12">
           {currentStep > 1 ? (
-            <Button variant="outline" size="lg" onClick={handleBack} className="rounded-full">
-              <ArrowLeft className="w-4 h-4" /> Back
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleBack}
+              className="rounded-full"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back
             </Button>
           ) : (
             <div />
           )}
           <Button
             size="lg"
-            onClick={currentStep === TOTAL_STEPS ? () => router.push(returnTo ?? '/templates') : handleNext}
+            onClick={
+              currentStep === TOTAL_STEPS
+                ? () => router.push(returnTo ?? "/templates")
+                : handleNext
+            }
             className="rounded-full"
           >
             {currentStep === TOTAL_STEPS ? (
-              <><LayoutTemplate className="w-4 h-4" /> {returnTo ? 'Back to preview' : 'Browse templates'}</>
+              <>
+                <LayoutTemplate className="h-4 w-4" />{" "}
+                {returnTo ? "Back to preview" : "Browse templates"}
+              </>
             ) : (
-              <>Next <ArrowRight className="w-4 h-4" /></>
+              <>
+                Next <ArrowRight className="h-4 w-4" />
+              </>
             )}
           </Button>
         </div>
-
       </div>
     </div>
-  )
+  );
 }

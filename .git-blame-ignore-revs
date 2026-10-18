@@ -6,3 +6,6 @@ c4fa83f210b2075ea05f8bc8f6ad7bb214aae28c
 
 # style: reformat codebase with Prettier defaults
 45749134b5008a11ae7c25faa2b3fff072049480
+
+# style: format build form files with Prettier
+9ef5fa0c5802388ed6ceb6d3b9190494388e9a1e
