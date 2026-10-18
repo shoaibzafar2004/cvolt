@@ -53,6 +53,10 @@ export const certificationEntrySchema = z.object({
   name: z.string().min(1, "Certification name is required"),
   issuer: z.string().optional(),
   date: z.string().optional(),
+  url: z
+    .union([z.url({ error: "Enter a valid URL" }), z.literal("")])
+    .optional(),
+  skills: z.array(z.string()),
 });
 
 export const languageEntrySchema = z.object({

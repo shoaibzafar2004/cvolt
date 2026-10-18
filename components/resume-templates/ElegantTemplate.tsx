@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import CertExtras from "./CertExtras";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -325,6 +326,12 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 {c.date && (
                   <div style={{ color: MUTED, fontSize: 9 }}>{c.date}</div>
                 )}
+                <CertExtras
+                  cert={c}
+                  linkColor={ACCENT}
+                  mutedColor={MUTED}
+                  fontSize={9}
+                />
               </div>
             ))}
           </LeftSection>

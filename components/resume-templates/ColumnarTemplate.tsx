@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import CertExtras from "./CertExtras";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -475,6 +476,12 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
               {c.issuer && (
                 <div style={{ fontSize: 10.5, color: MUTED }}>{c.issuer}</div>
               )}
+              <CertExtras
+                cert={c}
+                linkColor={ACCENT}
+                mutedColor={MUTED}
+                fontSize={10}
+              />
             </div>
           ))}
         </SectionRow>

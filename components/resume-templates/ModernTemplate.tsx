@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import CertExtras from "./CertExtras";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -327,6 +328,12 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                   <div style={{ fontWeight: 600 }}>{c.name}</div>
                   {c.issuer && <div style={{ color: MUTED }}>{c.issuer}</div>}
                   {c.date && <div style={{ color: MUTED }}>{c.date}</div>}
+                  <CertExtras
+                    cert={c}
+                    linkColor={ACCENT}
+                    mutedColor={MUTED}
+                    fontSize={9}
+                  />
                 </div>
               ))}
             </SideSection>

@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import CertExtras from "./CertExtras";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -642,6 +643,12 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                       {c.issuer}
                     </div>
                   )}
+                  <CertExtras
+                    cert={c}
+                    linkColor={ACCENT}
+                    mutedColor={MUTED}
+                    fontSize={9.5}
+                  />
                 </div>
               ))}
             </div>
