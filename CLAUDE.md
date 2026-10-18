@@ -749,7 +749,7 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 
 ## Git & formatting
 - Never commit to `main` or `develop` directly. Branch off `develop` (`feat/`, `fix/`, `chore/`), PR into `develop`. Only `develop` → `main` PRs update main.
-- Code is formatted by Prettier (no semicolons, single quotes, width 100). Run `npm run format` before committing; CI fails on `format:check`, `lint`, `typecheck` or `build`.
+- Code is formatted by Prettier with its default style (semicolons, double quotes, width 80) plus Tailwind class sorting. Don't hand-format; let Prettier do it. Run `npm run format` before committing; CI fails on `format:check`, `lint`, `typecheck` or `build`.
 
 ## TypeScript
 - No `any`. Use types from types/index.ts.
