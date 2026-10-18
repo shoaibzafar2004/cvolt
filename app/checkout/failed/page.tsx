@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import { Suspense } from 'react'
+import Link from "next/link";
+import { Suspense } from "react";
 
 function FailedContent() {
   return (
@@ -11,8 +11,8 @@ function FailedContent() {
       <div>
         <h1 className="text-2xl font-bold">Payment failed</h1>
         <p className="mt-2 text-muted-foreground">
-          Your card was not charged. This can happen if your card was declined or the session
-          expired.
+          Your card was not charged. This can happen if your card was declined
+          or the session expired.
         </p>
       </div>
 
@@ -30,7 +30,7 @@ function FailedContent() {
         ← Back to templates
       </Link>
     </main>
-  )
+  );
 }
 
 export default function FailedPage() {
@@ -38,5 +38,5 @@ export default function FailedPage() {
     <Suspense>
       <FailedContent />
     </Suspense>
-  )
+  );
 }

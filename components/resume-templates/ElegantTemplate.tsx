@@ -6,40 +6,40 @@ import type {
   CertificationContent,
   LanguageContent,
   ProjectContent,
-} from '@/types'
+} from "@/types";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Inspired by: warm cream bg, large serif name, serif section headings in warm brown,
 // decorative circle entry markers, italic date ranges, simple bullet skills.
 // A4: 794px × 1123px
 
-const BG = '#f5f0e6'
-const DARK = '#2a1f0e'
-const ACCENT = '#7a5c2e'
-const MUTED = '#9c8060'
-const DIVIDER = '#d8c9b0'
-const LEFT_W = 250
-const RIGHT_W = 794 - LEFT_W
+const BG = "#f5f0e6";
+const DARK = "#2a1f0e";
+const ACCENT = "#7a5c2e";
+const MUTED = "#9c8060";
+const DIVIDER = "#d8c9b0";
+const LEFT_W = 250;
+const RIGHT_W = 794 - LEFT_W;
 
 export default function ElegantTemplate({ data }: { data: ResumeData }) {
-  const { personalInfo: p, sections } = data
-  const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder)
+  const { personalInfo: p, sections } = data;
+  const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const work = sorted.filter((s) => s.type === 'work')
-  const education = sorted.filter((s) => s.type === 'education')
-  const skillsSec = sorted.find((s) => s.type === 'skills')
-  const certSec = sorted.find((s) => s.type === 'certifications')
-  const langSec = sorted.find((s) => s.type === 'languages')
-  const projSec = sorted.find((s) => s.type === 'projects')
+  const work = sorted.filter((s) => s.type === "work");
+  const education = sorted.filter((s) => s.type === "education");
+  const skillsSec = sorted.find((s) => s.type === "skills");
+  const certSec = sorted.find((s) => s.type === "certifications");
+  const langSec = sorted.find((s) => s.type === "languages");
+  const projSec = sorted.find((s) => s.type === "projects");
 
-  const skills = skillsSec ? (skillsSec.content as SkillsContent).skills : []
-  const certs = certSec ? (certSec.content as CertificationContent[]) : []
-  const langs = langSec ? (langSec.content as LanguageContent[]) : []
-  const projects = projSec ? (projSec.content as ProjectContent[]) : []
+  const skills = skillsSec ? (skillsSec.content as SkillsContent).skills : [];
+  const certs = certSec ? (certSec.content as CertificationContent[]) : [];
+  const langs = langSec ? (langSec.content as LanguageContent[]) : [];
+  const projects = projSec ? (projSec.content as ProjectContent[]) : [];
 
-  const firstName = (p.name || 'Your Name').split(' ')[0]
-  const lastName = (p.name || '').split(' ').slice(1).join(' ')
-  const initial = (p.name || 'Y')[0].toUpperCase()
+  const firstName = (p.name || "Your Name").split(" ")[0];
+  const lastName = (p.name || "").split(" ").slice(1).join(" ");
+  const initial = (p.name || "Y")[0].toUpperCase();
 
   return (
     <div
@@ -50,8 +50,8 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         fontSize: 11,
         color: DARK,
         backgroundColor: BG,
-        display: 'flex',
-        boxSizing: 'border-box',
+        display: "flex",
+        boxSizing: "border-box",
       }}
     >
       <style
@@ -72,11 +72,11 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
       <div
         style={{
           width: LEFT_W,
-          padding: '40px 24px 40px 28px',
-          boxSizing: 'border-box',
+          padding: "40px 24px 40px 28px",
+          boxSizing: "border-box",
           flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {/* Photo or monogram fallback */}
@@ -84,12 +84,12 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
           style={{
             width: 100,
             height: 100,
-            borderRadius: '50%',
-            overflow: 'hidden',
+            borderRadius: "50%",
+            overflow: "hidden",
             backgroundColor: ACCENT,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             marginBottom: 24,
             flexShrink: 0,
           }}
@@ -98,7 +98,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
             <img
               src={p.photoUrl}
               alt={p.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
             <span
@@ -137,7 +137,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
               lineHeight: 1.1,
             }}
           >
-            {lastName || '\u00A0'}
+            {lastName || "\u00A0"}
           </div>
         </div>
 
@@ -148,7 +148,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
               fontFamily: '"Source Sans 3", sans-serif',
               fontSize: 8.5,
               fontWeight: 600,
-              textTransform: 'uppercase',
+              textTransform: "uppercase",
               letterSpacing: 2,
               color: ACCENT,
               marginBottom: 16,
@@ -159,7 +159,9 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         )}
 
         {/* Divider */}
-        <div style={{ height: 1, backgroundColor: DIVIDER, marginBottom: 22 }} />
+        <div
+          style={{ height: 1, backgroundColor: DIVIDER, marginBottom: 22 }}
+        />
 
         {/* About Me */}
         {p.summary && (
@@ -180,7 +182,13 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
 
         {/* Contact */}
         <LeftSection title="Contact Information">
-          <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 10, lineHeight: 1.9 }}>
+          <div
+            style={{
+              fontFamily: '"Source Sans 3", sans-serif',
+              fontSize: 10,
+              lineHeight: 1.9,
+            }}
+          >
             {p.location && (
               <div>
                 <span style={{ marginRight: 6 }}>◉</span>
@@ -202,13 +210,17 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
             {p.linkedIn && (
               <div>
                 <span style={{ marginRight: 6 }}>⊕</span>
-                <span style={{ color: MUTED, wordBreak: 'break-all' }}>{p.linkedIn}</span>
+                <span style={{ color: MUTED, wordBreak: "break-all" }}>
+                  {p.linkedIn}
+                </span>
               </div>
             )}
             {p.website && (
               <div>
                 <span style={{ marginRight: 6 }}>⊕</span>
-                <span style={{ color: MUTED, wordBreak: 'break-all' }}>{p.website}</span>
+                <span style={{ color: MUTED, wordBreak: "break-all" }}>
+                  {p.website}
+                </span>
               </div>
             )}
           </div>
@@ -221,15 +233,17 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
               <div
                 key={i}
                 style={{
-                  display: 'flex',
+                  display: "flex",
                   gap: 8,
-                  alignItems: 'flex-start',
+                  alignItems: "flex-start",
                   marginBottom: 5,
                   fontFamily: '"Source Sans 3", sans-serif',
                   fontSize: 10,
                 }}
               >
-                <span style={{ color: ACCENT, marginTop: 1, flexShrink: 0 }}>•</span>
+                <span style={{ color: ACCENT, marginTop: 1, flexShrink: 0 }}>
+                  •
+                </span>
                 <span>{sk.name}</span>
               </div>
             ))}
@@ -243,18 +257,22 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
               <div
                 key={i}
                 style={{
-                  display: 'flex',
+                  display: "flex",
                   gap: 8,
-                  alignItems: 'flex-start',
+                  alignItems: "flex-start",
                   marginBottom: 5,
                   fontFamily: '"Source Sans 3", sans-serif',
                   fontSize: 10,
                 }}
               >
-                <span style={{ color: ACCENT, marginTop: 1, flexShrink: 0 }}>•</span>
+                <span style={{ color: ACCENT, marginTop: 1, flexShrink: 0 }}>
+                  •
+                </span>
                 <span>
                   {l.language}
-                  {l.proficiency ? <span style={{ color: MUTED }}> · {l.proficiency}</span> : null}
+                  {l.proficiency ? (
+                    <span style={{ color: MUTED }}> · {l.proficiency}</span>
+                  ) : null}
                 </span>
               </div>
             ))}
@@ -267,11 +285,17 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
             {certs.map((c, i) => (
               <div
                 key={i}
-                style={{ marginBottom: 8, fontFamily: '"Source Sans 3", sans-serif', fontSize: 10 }}
+                style={{
+                  marginBottom: 8,
+                  fontFamily: '"Source Sans 3", sans-serif',
+                  fontSize: 10,
+                }}
               >
                 <div style={{ fontWeight: 600 }}>{c.name}</div>
                 {c.issuer && <div style={{ color: MUTED }}>{c.issuer}</div>}
-                {c.date && <div style={{ color: MUTED, fontSize: 9 }}>{c.date}</div>}
+                {c.date && (
+                  <div style={{ color: MUTED, fontSize: 9 }}>{c.date}</div>
+                )}
               </div>
             ))}
           </LeftSection>
@@ -282,8 +306,8 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
       <div
         style={{
           width: RIGHT_W,
-          padding: '40px 32px 40px 28px',
-          boxSizing: 'border-box',
+          padding: "40px 32px 40px 28px",
+          boxSizing: "border-box",
           borderLeft: `1px solid ${DIVIDER}`,
         }}
       >
@@ -291,11 +315,16 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         {work.length > 0 && (
           <RightSection title="Work History">
             {work.map((s) => {
-              const c = s.content as WorkContent
+              const c = s.content as WorkContent;
               return (
                 <div
                   key={s.id}
-                  style={{ display: 'flex', gap: 14, marginBottom: 20, pageBreakInside: 'avoid' }}
+                  style={{
+                    display: "flex",
+                    gap: 14,
+                    marginBottom: 20,
+                    pageBreakInside: "avoid",
+                  }}
                 >
                   {/* Circle marker */}
                   <div style={{ flexShrink: 0, marginTop: 3 }}>
@@ -303,7 +332,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                       style={{
                         width: 16,
                         height: 16,
-                        borderRadius: '50%',
+                        borderRadius: "50%",
                         border: `2px solid ${ACCENT}`,
                         backgroundColor: BG,
                       }}
@@ -334,7 +363,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           fontFamily: '"Lora", serif',
-                          fontStyle: 'italic',
+                          fontStyle: "italic",
                           fontSize: 10,
                           color: MUTED,
                           marginTop: 2,
@@ -342,14 +371,16 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                         }}
                       >
                         {c.startDate}
-                        {c.endDate || c.current ? ` to ${c.current ? 'Present' : c.endDate}` : ''}
+                        {c.endDate || c.current
+                          ? ` to ${c.current ? "Present" : c.endDate}`
+                          : ""}
                       </div>
                     )}
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
-                          display: 'flex',
+                          display: "flex",
                           gap: 8,
                           marginBottom: 3,
                           fontFamily: '"Source Sans 3", sans-serif',
@@ -363,7 +394,12 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     ))}
                     {c.skills && c.skills.length > 0 && (
                       <div
-                        style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 6px', marginTop: 6 }}
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "4px 6px",
+                          marginTop: 6,
+                        }}
                       >
                         {c.skills.map((skill, i) => (
                           <span
@@ -373,7 +409,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                               color: ACCENT,
                               border: `1px solid ${DIVIDER}`,
                               backgroundColor: BG,
-                              padding: '1px 7px',
+                              padding: "1px 7px",
                               borderRadius: 10,
                               fontFamily: '"Source Sans 3", sans-serif',
                             }}
@@ -385,7 +421,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </RightSection>
         )}
@@ -394,18 +430,23 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         {education.length > 0 && (
           <RightSection title="Education">
             {education.map((s) => {
-              const c = s.content as EducationContent
+              const c = s.content as EducationContent;
               return (
                 <div
                   key={s.id}
-                  style={{ display: 'flex', gap: 14, marginBottom: 18, pageBreakInside: 'avoid' }}
+                  style={{
+                    display: "flex",
+                    gap: 14,
+                    marginBottom: 18,
+                    pageBreakInside: "avoid",
+                  }}
                 >
                   <div style={{ flexShrink: 0, marginTop: 3 }}>
                     <div
                       style={{
                         width: 16,
                         height: 16,
-                        borderRadius: '50%',
+                        borderRadius: "50%",
                         border: `2px solid ${ACCENT}`,
                         backgroundColor: BG,
                       }}
@@ -421,7 +462,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                       }}
                     >
                       {c.degree}
-                      {c.field ? ` in ${c.field}` : ''}
+                      {c.field ? ` in ${c.field}` : ""}
                     </div>
                     <div
                       style={{
@@ -437,7 +478,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           fontFamily: '"Lora", serif',
-                          fontStyle: 'italic',
+                          fontStyle: "italic",
                           fontSize: 10,
                           color: MUTED,
                           marginTop: 2,
@@ -450,7 +491,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     {c.gpa && (
                       <div
                         style={{
-                          display: 'flex',
+                          display: "flex",
                           gap: 8,
                           fontFamily: '"Source Sans 3", sans-serif',
                           fontSize: 10.5,
@@ -462,7 +503,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </RightSection>
         )}
@@ -471,13 +512,16 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         {projects.length > 0 && (
           <RightSection title="Projects">
             {projects.map((proj, i) => (
-              <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 16 }}>
+              <div
+                key={i}
+                style={{ display: "flex", gap: 14, marginBottom: 16 }}
+              >
                 <div style={{ flexShrink: 0, marginTop: 3 }}>
                   <div
                     style={{
                       width: 16,
                       height: 16,
-                      borderRadius: '50%',
+                      borderRadius: "50%",
                       border: `2px solid ${ACCENT}`,
                       backgroundColor: BG,
                     }}
@@ -494,8 +538,10 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   >
                     {proj.name}
                     {proj.url && (
-                      <span style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}>
-                        {' '}
+                      <span
+                        style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}
+                      >
+                        {" "}
                         · {proj.url}
                       </span>
                     )}
@@ -504,7 +550,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         fontFamily: '"Lora", serif',
-                        fontStyle: 'italic',
+                        fontStyle: "italic",
                         fontSize: 10,
                         color: MUTED,
                         marginTop: 2,
@@ -518,7 +564,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     <div
                       key={j}
                       style={{
-                        display: 'flex',
+                        display: "flex",
                         gap: 8,
                         marginBottom: 3,
                         fontFamily: '"Source Sans 3", sans-serif',
@@ -537,10 +583,16 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-function LeftSection({ title, children }: { title: string; children: React.ReactNode }) {
+function LeftSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ marginBottom: 22 }}>
       <div
@@ -556,10 +608,16 @@ function LeftSection({ title, children }: { title: string; children: React.React
       </div>
       {children}
     </div>
-  )
+  );
 }
 
-function RightSection({ title, children }: { title: string; children: React.ReactNode }) {
+function RightSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ marginBottom: 26 }}>
       <div
@@ -575,5 +633,5 @@ function RightSection({ title, children }: { title: string; children: React.Reac
       </div>
       {children}
     </div>
-  )
+  );
 }

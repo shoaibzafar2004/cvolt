@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useUIStore } from '@/store/uiStore'
+import { useUIStore } from "@/store/uiStore";
 
 const FILTERS = [
-  { label: 'All', value: 'all' },
-  { label: 'Clean', value: 'clean' },
-  { label: 'Modern', value: 'modern' },
-  { label: 'Creative', value: 'creative' },
-] as const
+  { label: "All", value: "all" },
+  { label: "Clean", value: "clean" },
+  { label: "Modern", value: "modern" },
+  { label: "Creative", value: "creative" },
+] as const;
 
 export default function FilterBar() {
-  const { activeFilter, setFilter } = useUIStore()
+  const { activeFilter, setFilter } = useUIStore();
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -19,15 +19,15 @@ export default function FilterBar() {
           key={value}
           onClick={() => setFilter(value)}
           className={[
-            'rounded-full border px-4 py-1.5 text-sm transition-colors',
+            "rounded-full border px-4 py-1.5 text-sm transition-colors",
             activeFilter === value
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground',
-          ].join(' ')}
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border text-muted-foreground hover:border-foreground hover:text-foreground",
+          ].join(" ")}
         >
           {label}
         </button>
       ))}
     </div>
-  )
+  );
 }

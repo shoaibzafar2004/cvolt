@@ -1,17 +1,22 @@
-'use client'
+"use client";
 
-import { useState, useMemo, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { Button } from '@/components/ui/button'
-import { useResumeStore } from '@/store/resumeStore'
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { Button } from "@/components/ui/button";
+import { useResumeStore } from "@/store/resumeStore";
 
 interface CheckoutFormProps {
-  clientSecret: string
-  templateId: string
-  publishableKey: string
-  userEmail: string | null
+  clientSecret: string;
+  templateId: string;
+  publishableKey: string;
+  userEmail: string | null;
 }
 
 export default function CheckoutForm({
@@ -20,25 +25,35 @@ export default function CheckoutForm({
   publishableKey,
   userEmail,
 }: CheckoutFormProps) {
-  const router = useRouter()
-  const personalInfo = useResumeStore((s) => s.personalInfo)
+  const router = useRouter();
+  const personalInfo = useResumeStore((s) => s.personalInfo);
 
   useEffect(() => {
     if (!personalInfo.name) {
-      router.replace('/build')
+      router.replace("/build");
     }
-  }, [personalInfo.name, router])
+  }, [personalInfo.name, router]);
 
   // userEmail is always set — checkout page redirects to login if not authenticated
 
   // loadStripe must be stable — memoize so it's not recreated on every render
-  const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey])
+  const stripePromise = useMemo(
+    () => loadStripe(publishableKey),
+    [publishableKey],
+  );
 
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-      <InnerForm templateId={templateId} clientSecret={clientSecret} userEmail={userEmail} />
+    <Elements
+      stripe={stripePromise}
+      options={{ clientSecret, appearance: { theme: "stripe" } }}
+    >
+      <InnerForm
+        templateId={templateId}
+        clientSecret={clientSecret}
+        userEmail={userEmail}
+      />
     </Elements>
-  )
+  );
 }
 
 function InnerForm({
@@ -46,47 +61,50 @@ function InnerForm({
   clientSecret,
   userEmail,
 }: {
-  templateId: string
-  clientSecret: string
-  userEmail: string | null
+  templateId: string;
+  clientSecret: string;
+  userEmail: string | null;
 }) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [email] = useState(userEmail ?? '')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const stripe = useStripe();
+  const elements = useElements();
+  const [email] = useState(userEmail ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!stripe || !elements) return
+    e.preventDefault();
+    if (!stripe || !elements) return;
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
-    const { error: submitError } = await elements.submit()
+    const { error: submitError } = await elements.submit();
     if (submitError) {
-      setError(submitError.message ?? 'Something went wrong')
-      setLoading(false)
-      return
+      setError(submitError.message ?? "Something went wrong");
+      setLoading(false);
+      return;
     }
 
     // Attach email to the PaymentIntent so the webhook can read it from intent.metadata.email
-    await fetch('/api/update-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ intentId: clientSecret.split('_secret_')[0], email }),
-    })
+    await fetch("/api/update-payment-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        intentId: clientSecret.split("_secret_")[0],
+        email,
+      }),
+    });
 
-    const returnUrl = `${window.location.origin}/checkout/processing?templateId=${templateId}&email=${encodeURIComponent(email)}`
+    const returnUrl = `${window.location.origin}/checkout/processing?templateId=${templateId}&email=${encodeURIComponent(email)}`;
 
     const { error: confirmError } = await stripe.confirmPayment({
       elements,
       confirmParams: { return_url: returnUrl, receipt_email: email },
-    })
+    });
 
     if (confirmError) {
-      setError(confirmError.message ?? 'Payment failed')
-      setLoading(false)
+      setError(confirmError.message ?? "Payment failed");
+      setLoading(false);
     }
     // On success Stripe redirects to return_url automatically
   }
@@ -108,12 +126,12 @@ function InnerForm({
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" className="w-full" disabled={!stripe || loading}>
-        {loading ? 'Processing...' : 'Pay $1.50 and download'}
+        {loading ? "Processing..." : "Pay $1.50 and download"}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">
         No subscription. No refunds after PDF download.
       </p>
     </form>
-  )
+  );
 }

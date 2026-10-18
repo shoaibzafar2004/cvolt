@@ -6,42 +6,42 @@ import type {
   CertificationContent,
   LanguageContent,
   ProjectContent,
-} from '@/types'
+} from "@/types";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Elegant banner variant — wide warm brown header band across the top with name +
 // contact info. Two-column body below on cream bg. Photo in banner.
 // A4: 794px × 1123px
 
-const BG = '#f5f0e6'
-const BANNER_BG = '#5c3520'
-const BANNER_MUT = '#c8a882'
-const DARK = '#2a1f0e'
-const ACCENT = '#7a5c2e'
-const MUTED = '#9c8060'
-const DIVIDER = '#d8c9b0'
-const LEFT_W = 240
-const RIGHT_W = 794 - LEFT_W
+const BG = "#f5f0e6";
+const BANNER_BG = "#5c3520";
+const BANNER_MUT = "#c8a882";
+const DARK = "#2a1f0e";
+const ACCENT = "#7a5c2e";
+const MUTED = "#9c8060";
+const DIVIDER = "#d8c9b0";
+const LEFT_W = 240;
+const RIGHT_W = 794 - LEFT_W;
 
 export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
-  const { personalInfo: p, sections } = data
-  const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder)
+  const { personalInfo: p, sections } = data;
+  const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const work = sorted.filter((s) => s.type === 'work')
-  const education = sorted.filter((s) => s.type === 'education')
-  const skillsSec = sorted.find((s) => s.type === 'skills')
-  const certSec = sorted.find((s) => s.type === 'certifications')
-  const langSec = sorted.find((s) => s.type === 'languages')
-  const projSec = sorted.find((s) => s.type === 'projects')
+  const work = sorted.filter((s) => s.type === "work");
+  const education = sorted.filter((s) => s.type === "education");
+  const skillsSec = sorted.find((s) => s.type === "skills");
+  const certSec = sorted.find((s) => s.type === "certifications");
+  const langSec = sorted.find((s) => s.type === "languages");
+  const projSec = sorted.find((s) => s.type === "projects");
 
-  const skills = skillsSec ? (skillsSec.content as SkillsContent).skills : []
-  const certs = certSec ? (certSec.content as CertificationContent[]) : []
-  const langs = langSec ? (langSec.content as LanguageContent[]) : []
-  const projects = projSec ? (projSec.content as ProjectContent[]) : []
+  const skills = skillsSec ? (skillsSec.content as SkillsContent).skills : [];
+  const certs = certSec ? (certSec.content as CertificationContent[]) : [];
+  const langs = langSec ? (langSec.content as LanguageContent[]) : [];
+  const projects = projSec ? (projSec.content as ProjectContent[]) : [];
 
-  const firstName = (p.name || 'Your Name').split(' ')[0]
-  const lastName = (p.name || '').split(' ').slice(1).join(' ')
-  const initial = (p.name || 'Y')[0].toUpperCase()
+  const firstName = (p.name || "Your Name").split(" ")[0];
+  const lastName = (p.name || "").split(" ").slice(1).join(" ");
+  const initial = (p.name || "Y")[0].toUpperCase();
 
   return (
     <div
@@ -52,9 +52,9 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
         fontSize: 11,
         color: DARK,
         backgroundColor: BG,
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <style
@@ -75,9 +75,9 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
       <div
         style={{
           backgroundColor: BANNER_BG,
-          padding: '28px 40px',
-          display: 'flex',
-          alignItems: 'center',
+          padding: "28px 40px",
+          display: "flex",
+          alignItems: "center",
           gap: 24,
         }}
       >
@@ -86,21 +86,21 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           style={{
             width: 80,
             height: 80,
-            borderRadius: '50%',
-            overflow: 'hidden',
+            borderRadius: "50%",
+            overflow: "hidden",
             backgroundColor: ACCENT,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             flexShrink: 0,
-            border: '3px solid rgba(255,255,255,0.15)',
+            border: "3px solid rgba(255,255,255,0.15)",
           }}
         >
           {p.photoUrl ? (
             <img
               src={p.photoUrl}
               alt={p.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
             <span
@@ -119,13 +119,13 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
 
         {/* Name + title */}
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
             <span
               style={{
                 fontFamily: '"Lora", serif',
                 fontSize: 30,
                 fontWeight: 400,
-                color: '#f5ede0',
+                color: "#f5ede0",
                 lineHeight: 1,
               }}
             >
@@ -136,7 +136,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                 fontFamily: '"Lora", serif',
                 fontSize: 30,
                 fontWeight: 700,
-                color: '#f5ede0',
+                color: "#f5ede0",
                 lineHeight: 1,
               }}
             >
@@ -149,7 +149,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                 fontFamily: '"Source Sans 3", sans-serif',
                 fontSize: 9,
                 fontWeight: 600,
-                textTransform: 'uppercase',
+                textTransform: "uppercase",
                 letterSpacing: 2.5,
                 color: BANNER_MUT,
                 marginTop: 8,
@@ -167,25 +167,29 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
             fontSize: 9.5,
             color: BANNER_MUT,
             lineHeight: 2,
-            textAlign: 'right',
+            textAlign: "right",
           }}
         >
           {p.location && <div>◉ {p.location}</div>}
           {p.phone && <div>✆ {p.phone}</div>}
           {p.email && <div>✉ {p.email}</div>}
-          {p.linkedIn && <div style={{ wordBreak: 'break-all' }}>⊕ {p.linkedIn}</div>}
-          {p.website && <div style={{ wordBreak: 'break-all' }}>⊕ {p.website}</div>}
+          {p.linkedIn && (
+            <div style={{ wordBreak: "break-all" }}>⊕ {p.linkedIn}</div>
+          )}
+          {p.website && (
+            <div style={{ wordBreak: "break-all" }}>⊕ {p.website}</div>
+          )}
         </div>
       </div>
 
       {/* ── Two-column body ── */}
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div style={{ display: "flex", flex: 1 }}>
         {/* Left column */}
         <div
           style={{
             width: LEFT_W,
-            padding: '28px 22px 28px 28px',
-            boxSizing: 'border-box',
+            padding: "28px 22px 28px 28px",
+            boxSizing: "border-box",
             borderRight: `1px solid ${DIVIDER}`,
             flexShrink: 0,
           }}
@@ -211,32 +215,44 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           {education.length > 0 && (
             <LeftSection title="Education">
               {education.map((s) => {
-                const c = s.content as EducationContent
+                const c = s.content as EducationContent;
                 return (
                   <div
                     key={s.id}
-                    style={{ display: 'flex', gap: 10, marginBottom: 14, pageBreakInside: 'avoid' }}
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      marginBottom: 14,
+                      pageBreakInside: "avoid",
+                    }}
                   >
                     <div style={{ paddingTop: 4, flexShrink: 0 }}>
                       <div
                         style={{
                           width: 12,
                           height: 12,
-                          borderRadius: '50%',
+                          borderRadius: "50%",
                           border: `2px solid ${ACCENT}`,
                           backgroundColor: BG,
                         }}
                       />
                     </div>
-                    <div style={{ fontFamily: '"Source Sans 3", sans-serif', fontSize: 10 }}>
-                      <div style={{ fontWeight: 700, color: DARK }}>{c.degree}</div>
+                    <div
+                      style={{
+                        fontFamily: '"Source Sans 3", sans-serif',
+                        fontSize: 10,
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, color: DARK }}>
+                        {c.degree}
+                      </div>
                       {c.field && <div style={{ color: MUTED }}>{c.field}</div>}
                       <div style={{ color: DARK }}>{c.institution}</div>
                       {(c.endDate || c.startDate) && (
                         <div
                           style={{
                             fontFamily: '"Lora", serif',
-                            fontStyle: 'italic',
+                            fontStyle: "italic",
                             fontSize: 9.5,
                             color: MUTED,
                             marginTop: 2,
@@ -247,7 +263,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       )}
                     </div>
                   </div>
-                )
+                );
               })}
             </LeftSection>
           )}
@@ -259,18 +275,23 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                 <div
                   key={i}
                   style={{
-                    display: 'flex',
+                    display: "flex",
                     gap: 8,
-                    alignItems: 'flex-start',
+                    alignItems: "flex-start",
                     marginBottom: 6,
                     fontFamily: '"Source Sans 3", sans-serif',
                     fontSize: 10.5,
                   }}
                 >
-                  <span style={{ color: ACCENT, flexShrink: 0, marginTop: 1 }}>•</span>
+                  <span style={{ color: ACCENT, flexShrink: 0, marginTop: 1 }}>
+                    •
+                  </span>
                   <span>
                     {sk.name}
-                    <span style={{ color: MUTED, fontSize: 9.5 }}> · {sk.level}</span>
+                    <span style={{ color: MUTED, fontSize: 9.5 }}>
+                      {" "}
+                      · {sk.level}
+                    </span>
                   </span>
                 </div>
               ))}
@@ -284,9 +305,9 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                 <div
                   key={i}
                   style={{
-                    display: 'flex',
+                    display: "flex",
                     gap: 8,
-                    alignItems: 'flex-start',
+                    alignItems: "flex-start",
                     marginBottom: 5,
                     fontFamily: '"Source Sans 3", sans-serif',
                     fontSize: 10.5,
@@ -322,7 +343,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         fontFamily: '"Lora", serif',
-                        fontStyle: 'italic',
+                        fontStyle: "italic",
                         fontSize: 9.5,
                         color: MUTED,
                       }}
@@ -337,23 +358,34 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
         </div>
 
         {/* Right column */}
-        <div style={{ width: RIGHT_W, padding: '28px 32px 28px 28px', boxSizing: 'border-box' }}>
+        <div
+          style={{
+            width: RIGHT_W,
+            padding: "28px 32px 28px 28px",
+            boxSizing: "border-box",
+          }}
+        >
           {/* Work */}
           {work.length > 0 && (
             <RightSection title="Work History">
               {work.map((s) => {
-                const c = s.content as WorkContent
+                const c = s.content as WorkContent;
                 return (
                   <div
                     key={s.id}
-                    style={{ display: 'flex', gap: 14, marginBottom: 18, pageBreakInside: 'avoid' }}
+                    style={{
+                      display: "flex",
+                      gap: 14,
+                      marginBottom: 18,
+                      pageBreakInside: "avoid",
+                    }}
                   >
                     <div style={{ paddingTop: 4, flexShrink: 0 }}>
                       <div
                         style={{
                           width: 14,
                           height: 14,
-                          borderRadius: '50%',
+                          borderRadius: "50%",
                           border: `2px solid ${ACCENT}`,
                           backgroundColor: BG,
                         }}
@@ -382,7 +414,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                         <div
                           style={{
                             fontFamily: '"Lora", serif',
-                            fontStyle: 'italic',
+                            fontStyle: "italic",
                             fontSize: 10,
                             color: MUTED,
                             marginTop: 2,
@@ -391,15 +423,15 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                         >
                           {c.startDate}
                           {c.startDate && (c.current || c.endDate)
-                            ? ` to ${c.current ? 'Present' : c.endDate}`
-                            : ''}
+                            ? ` to ${c.current ? "Present" : c.endDate}`
+                            : ""}
                         </div>
                       )}
                       {c.bullets.filter(Boolean).map((b, i) => (
                         <div
                           key={i}
                           style={{
-                            display: 'flex',
+                            display: "flex",
                             gap: 8,
                             marginBottom: 3,
                             fontFamily: '"Source Sans 3", sans-serif',
@@ -407,16 +439,18 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                             lineHeight: 1.55,
                           }}
                         >
-                          <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
+                          <span style={{ color: ACCENT, flexShrink: 0 }}>
+                            •
+                          </span>
                           <div dangerouslySetInnerHTML={{ __html: b }} />
                         </div>
                       ))}
                       {c.skills && c.skills.length > 0 && (
                         <div
                           style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '4px 6px',
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "4px 6px",
                             marginTop: 6,
                           }}
                         >
@@ -428,7 +462,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                                 color: ACCENT,
                                 border: `1px solid ${DIVIDER}`,
                                 backgroundColor: BG,
-                                padding: '1px 7px',
+                                padding: "1px 7px",
                                 borderRadius: 10,
                                 fontFamily: '"Source Sans 3", sans-serif',
                               }}
@@ -440,7 +474,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       )}
                     </div>
                   </div>
-                )
+                );
               })}
             </RightSection>
           )}
@@ -449,13 +483,16 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           {projects.length > 0 && (
             <RightSection title="Projects">
               {projects.map((proj, i) => (
-                <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 14 }}>
+                <div
+                  key={i}
+                  style={{ display: "flex", gap: 14, marginBottom: 14 }}
+                >
                   <div style={{ paddingTop: 4, flexShrink: 0 }}>
                     <div
                       style={{
                         width: 14,
                         height: 14,
-                        borderRadius: '50%',
+                        borderRadius: "50%",
                         border: `2px solid ${ACCENT}`,
                         backgroundColor: BG,
                       }}
@@ -471,8 +508,14 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                     >
                       {proj.name}
                       {proj.url && (
-                        <span style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}>
-                          {' '}
+                        <span
+                          style={{
+                            fontWeight: 400,
+                            color: MUTED,
+                            fontSize: 9.5,
+                          }}
+                        >
+                          {" "}
                           · {proj.url}
                         </span>
                       )}
@@ -481,7 +524,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           fontFamily: '"Lora", serif',
-                          fontStyle: 'italic',
+                          fontStyle: "italic",
                           fontSize: 10,
                           color: MUTED,
                           marginTop: 2,
@@ -495,7 +538,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       <div
                         key={j}
                         style={{
-                          display: 'flex',
+                          display: "flex",
                           gap: 8,
                           marginBottom: 3,
                           fontFamily: '"Source Sans 3", sans-serif',
@@ -515,10 +558,16 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-function LeftSection({ title, children }: { title: string; children: React.ReactNode }) {
+function LeftSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ marginBottom: 22 }}>
       <div
@@ -536,10 +585,16 @@ function LeftSection({ title, children }: { title: string; children: React.React
       </div>
       {children}
     </div>
-  )
+  );
 }
 
-function RightSection({ title, children }: { title: string; children: React.ReactNode }) {
+function RightSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ marginBottom: 22 }}>
       <div
@@ -556,5 +611,5 @@ function RightSection({ title, children }: { title: string; children: React.Reac
       <div style={{ height: 1, backgroundColor: DIVIDER, marginBottom: 14 }} />
       {children}
     </div>
-  )
+  );
 }

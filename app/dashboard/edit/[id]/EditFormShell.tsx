@@ -1,23 +1,26 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useResumeStore } from '@/store/resumeStore'
-import StepWrapper from '@/components/build/StepWrapper'
-import type { ResumeData } from '@/types'
+import { useEffect } from "react";
+import { useResumeStore } from "@/store/resumeStore";
+import StepWrapper from "@/components/build/StepWrapper";
+import type { ResumeData } from "@/types";
 
 interface EditFormShellProps {
-  resumeId: string
-  resumeData: ResumeData
+  resumeId: string;
+  resumeData: ResumeData;
 }
 
-export default function EditFormShell({ resumeId, resumeData }: EditFormShellProps) {
-  const store = useResumeStore()
+export default function EditFormShell({
+  resumeId,
+  resumeData,
+}: EditFormShellProps) {
+  const store = useResumeStore();
 
   useEffect(() => {
     // Skip hydration if store already has this resume loaded
-    if (store.resumeId === resumeId) return
-    store.hydrate(resumeData, resumeId)
-  }, [resumeId]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (store.resumeId === resumeId) return;
+    store.hydrate(resumeData, resumeId);
+  }, [resumeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
@@ -28,5 +31,5 @@ export default function EditFormShell({ resumeId, resumeData }: EditFormShellPro
       )}
       <StepWrapper />
     </div>
-  )
+  );
 }

@@ -22,4 +22,4 @@ updates:
     labels: [dependencies, github-actions]
     groups:
       actions:
-        patterns: ['*']
+        patterns: ["*"]

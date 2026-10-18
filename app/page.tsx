@@ -1,62 +1,69 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, Download, CreditCard, FileText } from 'lucide-react'
-import SectionLine from '@/components/shared/SectionLine'
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Download, CreditCard, FileText } from "lucide-react";
+import SectionLine from "@/components/shared/SectionLine";
 
 const HOW_IT_WORKS = [
   {
-    step: '01',
+    step: "01",
     icon: FileText,
-    title: 'Fill in your details',
-    desc: 'Name, experience, education, skills — guided step by step. No account needed to start.',
+    title: "Fill in your details",
+    desc: "Name, experience, education, skills — guided step by step. No account needed to start.",
   },
   {
-    step: '02',
+    step: "02",
     icon: CreditCard,
-    title: 'Pick a template',
-    desc: 'Browse templates with your real data previewed live. See exactly what you get before you pay.',
+    title: "Pick a template",
+    desc: "Browse templates with your real data previewed live. See exactly what you get before you pay.",
   },
   {
-    step: '03',
+    step: "03",
     icon: Download,
-    title: 'Pay once, download',
-    desc: '$1.50 one-time. No subscription. Re-download anytime within 30 days.',
+    title: "Pay once, download",
+    desc: "$1.50 one-time. No subscription. Re-download anytime within 30 days.",
   },
-]
+];
 
 const FAQ = [
   {
-    q: 'Can I edit my resume after paying?',
-    a: 'Yes — sign in with the magic link we email you, go to your dashboard, and edit for free. Re-download is available if your changes are under 10% of the original content.',
+    q: "Can I edit my resume after paying?",
+    a: "Yes — sign in with the magic link we email you, go to your dashboard, and edit for free. Re-download is available if your changes are under 10% of the original content.",
   },
   {
-    q: 'How long until I can download?',
-    a: 'Your PDF is generated in about 10–20 seconds after payment. A download link is also emailed to you.',
+    q: "How long until I can download?",
+    a: "Your PDF is generated in about 10–20 seconds after payment. A download link is also emailed to you.",
   },
   {
-    q: 'What payment methods are accepted?',
-    a: 'Credit and debit cards via Stripe globally. Safepay for Pakistan-based users.',
+    q: "What payment methods are accepted?",
+    a: "Credit and debit cards via Stripe globally. Safepay for Pakistan-based users.",
   },
   {
-    q: 'Is there a refund policy?',
+    q: "Is there a refund policy?",
     a: "No refunds after the PDF is downloaded. If you have a technical issue, contact us and we'll make it right.",
   },
   {
-    q: 'Do I need to create an account?',
-    a: 'No — build and pay without signing up. We email you a magic link after purchase so you can re-download later.',
+    q: "Do I need to create an account?",
+    a: "No — build and pay without signing up. We email you a magic link after purchase so you can re-download later.",
   },
-]
+];
 
-function DotGrid({ className, size = 20 }: { className?: string; size?: number }) {
+function DotGrid({
+  className,
+  size = 20,
+}: {
+  className?: string;
+  size?: number;
+}) {
   return (
     <div
       className={className}
       style={{
-        backgroundImage: 'radial-gradient(circle, currentColor 1.8px, transparent 1.8px)',
+        backgroundImage:
+          "radial-gradient(circle, currentColor 1.8px, transparent 1.8px)",
         backgroundSize: `${size}px ${size}px`,
       }}
     />
-  )
+  );
 }
 
 // Resume card mockup — purely decorative CSS
@@ -69,12 +76,16 @@ function ResumeMockup() {
       {/* Card stack — back card */}
       <div
         className="absolute w-64 overflow-hidden rounded-2xl border bg-card shadow-lg"
-        style={{ transform: 'rotate(6deg) translate(24px, 12px)' }}
+        style={{ transform: "rotate(6deg) translate(24px, 12px)" }}
       >
         <div className="h-10 bg-indigo-200/60 dark:bg-indigo-900/40" />
         <div className="space-y-2 p-4">
           {[60, 90, 75, 50].map((w, i) => (
-            <div key={i} className="h-2 rounded-full bg-muted" style={{ width: `${w}%` }} />
+            <div
+              key={i}
+              className="h-2 rounded-full bg-muted"
+              style={{ width: `${w}%` }}
+            />
           ))}
         </div>
       </div>
@@ -82,7 +93,7 @@ function ResumeMockup() {
       {/* Card — main front */}
       <div
         className="relative z-10 w-64 overflow-hidden rounded-2xl border bg-card shadow-2xl"
-        style={{ transform: 'rotate(-2deg)' }}
+        style={{ transform: "rotate(-2deg)" }}
       >
         {/* Colored header */}
         <div className="flex h-16 flex-col justify-center gap-1.5 bg-indigo-600 px-5 dark:bg-indigo-700">
@@ -137,9 +148,12 @@ function ResumeMockup() {
       {/* Stat pills */}
       <div
         className="absolute bottom-2 -left-4 z-20 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 shadow-lg"
-        style={{ transform: 'rotate(2deg)' }}
+        style={{ transform: "rotate(2deg)" }}
       >
-        <span className="text-xl font-black" style={{ fontFamily: 'var(--font-jost)' }}>
+        <span
+          className="text-xl font-black"
+          style={{ fontFamily: "var(--font-jost)" }}
+        >
           $1.50
         </span>
         <span className="text-xs leading-tight text-muted-foreground">
@@ -151,9 +165,12 @@ function ResumeMockup() {
 
       <div
         className="absolute top-4 -right-4 z-20 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 shadow-lg"
-        style={{ transform: 'rotate(-2deg)' }}
+        style={{ transform: "rotate(-2deg)" }}
       >
-        <span className="text-xl font-black" style={{ fontFamily: 'var(--font-jost)' }}>
+        <span
+          className="text-xl font-black"
+          style={{ fontFamily: "var(--font-jost)" }}
+        >
           3+
         </span>
         <span className="text-xs leading-tight text-muted-foreground">
@@ -163,7 +180,7 @@ function ResumeMockup() {
         </span>
       </div>
     </div>
-  )
+  );
 }
 
 export default function LandingPage() {
@@ -202,8 +219,8 @@ export default function LandingPage() {
             <h1
               className="mb-8 leading-none tracking-tight"
               style={{
-                fontFamily: 'var(--font-jost)',
-                fontSize: 'clamp(3rem, 7vw, 5.5rem)',
+                fontFamily: "var(--font-jost)",
+                fontSize: "clamp(3rem, 7vw, 5.5rem)",
                 fontWeight: 800,
               }}
             >
@@ -211,9 +228,9 @@ export default function LandingPage() {
               <span
                 className="block"
                 style={{
-                  WebkitTextStrokeWidth: '2px',
-                  WebkitTextStrokeColor: 'var(--foreground)',
-                  color: 'transparent',
+                  WebkitTextStrokeWidth: "2px",
+                  WebkitTextStrokeColor: "var(--foreground)",
+                  color: "transparent",
                 }}
               >
                 One payment.
@@ -221,9 +238,9 @@ export default function LandingPage() {
             </h1>
 
             <p className="mb-10 max-w-md text-lg leading-relaxed text-muted-foreground">
-              Build a professional resume, preview it live with your real data, pay{' '}
-              <span className="font-medium text-foreground">$1.50</span>, and download a
-              pixel-perfect PDF instantly.
+              Build a professional resume, preview it live with your real data,
+              pay <span className="font-medium text-foreground">$1.50</span>,
+              and download a pixel-perfect PDF instantly.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -268,7 +285,10 @@ export default function LandingPage() {
             <p className="mb-3 text-xs font-medium tracking-widest text-muted-foreground uppercase">
               Process
             </p>
-            <h2 className="text-4xl font-bold" style={{ fontFamily: 'var(--font-jost)' }}>
+            <h2
+              className="text-4xl font-bold"
+              style={{ fontFamily: "var(--font-jost)" }}
+            >
               Three steps to done
             </h2>
           </div>
@@ -278,21 +298,26 @@ export default function LandingPage() {
             <div className="absolute top-7 right-[calc(16.666%+1rem)] left-[calc(16.666%+1rem)] hidden h-px bg-border sm:block" />
 
             {HOW_IT_WORKS.map(({ step, icon: Icon, title, desc }) => (
-              <div key={step} className="flex flex-col items-center gap-4 text-center">
+              <div
+                key={step}
+                className="flex flex-col items-center gap-4 text-center"
+              >
                 <div className="relative flex flex-col items-center">
                   <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border-2 border-indigo-500/40 bg-indigo-500/8 dark:bg-indigo-500/10">
                     <Icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <span
                     className="absolute -top-3 -right-3 text-xs font-black text-indigo-500/50"
-                    style={{ fontFamily: 'var(--font-jost)' }}
+                    style={{ fontFamily: "var(--font-jost)" }}
                   >
                     {step}
                   </span>
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">{title}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{desc}</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -315,7 +340,10 @@ export default function LandingPage() {
             <p className="mb-3 text-xs font-medium tracking-widest text-muted-foreground uppercase">
               Pricing
             </p>
-            <h2 className="text-4xl font-bold" style={{ fontFamily: 'var(--font-jost)' }}>
+            <h2
+              className="text-4xl font-bold"
+              style={{ fontFamily: "var(--font-jost)" }}
+            >
               <span className="text-indigo-500">Price</span> Board
             </h2>
           </div>
@@ -327,8 +355,9 @@ export default function LandingPage() {
               <div
                 className="pointer-events-none absolute right-3 bottom-3 h-20 w-20 text-muted-foreground/20"
                 style={{
-                  backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1.5px)',
-                  backgroundSize: '12px 12px',
+                  backgroundImage:
+                    "radial-gradient(circle, currentColor 1.5px, transparent 1.5px)",
+                  backgroundSize: "12px 12px",
                 }}
               />
               <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
@@ -337,35 +366,48 @@ export default function LandingPage() {
               <div className="flex items-baseline gap-1">
                 <span
                   className="text-5xl leading-none font-black"
-                  style={{ fontFamily: 'var(--font-jost)' }}
+                  style={{ fontFamily: "var(--font-jost)" }}
                 >
                   10–25
                 </span>
                 <span
                   className="text-3xl font-bold text-indigo-500"
-                  style={{ fontFamily: 'var(--font-jost)' }}
+                  style={{ fontFamily: "var(--font-jost)" }}
                 >
                   $
                 </span>
-                <span className="ml-1 text-sm text-muted-foreground">/ Month</span>
+                <span className="ml-1 text-sm text-muted-foreground">
+                  / Month
+                </span>
               </div>
               <p className="-mt-2 text-sm text-muted-foreground">
-                Locked behind a subscription. Pay every month just to keep access.
+                Locked behind a subscription. Pay every month just to keep
+                access.
               </p>
               <ul className="flex-1 space-y-3 text-sm">
-                {['PDF download', 'Template access'].map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-foreground">
-                    <span className="text-base leading-none font-bold text-indigo-500">✓</span> {f}
+                {["PDF download", "Template access"].map((f) => (
+                  <li
+                    key={f}
+                    className="flex items-center gap-3 text-foreground"
+                  >
+                    <span className="text-base leading-none font-bold text-indigo-500">
+                      ✓
+                    </span>{" "}
+                    {f}
                   </li>
                 ))}
-                {['No subscription', 'No account needed', 'Instant re-download'].map((f) => (
+                {[
+                  "No subscription",
+                  "No account needed",
+                  "Instant re-download",
+                ].map((f) => (
                   <li
                     key={f}
                     className="flex items-center gap-3 text-muted-foreground/60 line-through"
                   >
                     <span className="text-base leading-none font-bold text-muted-foreground/40">
                       ✓
-                    </span>{' '}
+                    </span>{" "}
                     {f}
                   </li>
                 ))}
@@ -373,7 +415,7 @@ export default function LandingPage() {
               <button
                 disabled
                 className="h-12 w-full cursor-not-allowed rounded-full border-2 border-muted-foreground/20 text-sm font-semibold tracking-wide text-muted-foreground"
-                style={{ fontFamily: 'var(--font-jost)' }}
+                style={{ fontFamily: "var(--font-jost)" }}
               >
                 NOT RECOMMENDED
               </button>
@@ -385,8 +427,9 @@ export default function LandingPage() {
               <div
                 className="pointer-events-none absolute right-3 bottom-3 h-20 w-20 text-foreground/10"
                 style={{
-                  backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1.5px)',
-                  backgroundSize: '12px 12px',
+                  backgroundImage:
+                    "radial-gradient(circle, currentColor 1.5px, transparent 1.5px)",
+                  backgroundSize: "12px 12px",
                 }}
               />
               <p className="pt-2 text-xs font-semibold tracking-widest text-foreground uppercase">
@@ -395,37 +438,46 @@ export default function LandingPage() {
               <div className="flex items-baseline gap-1">
                 <span
                   className="text-5xl leading-none font-black"
-                  style={{ fontFamily: 'var(--font-jost)' }}
+                  style={{ fontFamily: "var(--font-jost)" }}
                 >
                   1.50
                 </span>
                 <span
                   className="text-3xl font-bold text-indigo-500"
-                  style={{ fontFamily: 'var(--font-jost)' }}
+                  style={{ fontFamily: "var(--font-jost)" }}
                 >
                   $
                 </span>
-                <span className="ml-1 text-sm text-muted-foreground">One-time</span>
+                <span className="ml-1 text-sm text-muted-foreground">
+                  One-time
+                </span>
               </div>
               <p className="-mt-2 text-sm text-muted-foreground">
-                Pay once, download instantly. Re-download for 30 days. No strings attached.
+                Pay once, download instantly. Re-download for 30 days. No
+                strings attached.
               </p>
               <ul className="flex-1 space-y-3 text-sm">
                 {[
-                  'PDF download',
-                  'All templates included',
-                  'No subscription',
-                  'No account needed',
-                  '30-day re-download',
+                  "PDF download",
+                  "All templates included",
+                  "No subscription",
+                  "No account needed",
+                  "30-day re-download",
                 ].map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-foreground">
-                    <span className="text-base leading-none font-bold text-indigo-500">✓</span> {f}
+                  <li
+                    key={f}
+                    className="flex items-center gap-3 text-foreground"
+                  >
+                    <span className="text-base leading-none font-bold text-indigo-500">
+                      ✓
+                    </span>{" "}
+                    {f}
                   </li>
                 ))}
               </ul>
               <Button
                 className="h-12 w-full rounded-full text-sm font-semibold tracking-wide"
-                style={{ fontFamily: 'var(--font-jost)' }}
+                style={{ fontFamily: "var(--font-jost)" }}
                 nativeButton={false}
                 render={<Link href="/build" />}
               >
@@ -448,7 +500,10 @@ export default function LandingPage() {
             <p className="mb-3 text-xs font-medium tracking-widest text-muted-foreground uppercase">
               FAQ
             </p>
-            <h2 className="text-4xl font-bold" style={{ fontFamily: 'var(--font-jost)' }}>
+            <h2
+              className="text-4xl font-bold"
+              style={{ fontFamily: "var(--font-jost)" }}
+            >
               Questions answered
             </h2>
           </div>
@@ -457,7 +512,9 @@ export default function LandingPage() {
             {FAQ.map(({ q, a }) => (
               <div key={q} className="py-6">
                 <h3 className="mb-2 text-[15px] font-semibold">{q}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{a}</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {a}
+                </p>
               </div>
             ))}
           </div>
@@ -478,15 +535,15 @@ export default function LandingPage() {
           </p>
           <h2
             className="mb-4 text-4xl leading-tight font-bold sm:text-5xl"
-            style={{ fontFamily: 'var(--font-jost)' }}
+            style={{ fontFamily: "var(--font-jost)" }}
           >
             Your resume,
             <br />
             <span
               style={{
-                WebkitTextStrokeWidth: '1.5px',
-                WebkitTextStrokeColor: 'var(--foreground)',
-                color: 'transparent',
+                WebkitTextStrokeWidth: "1.5px",
+                WebkitTextStrokeColor: "var(--foreground)",
+                color: "transparent",
               }}
             >
               ready in minutes.
@@ -506,5 +563,5 @@ export default function LandingPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -1,56 +1,61 @@
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { redirect } from 'next/navigation'
-import { createStripePaymentIntent } from '@/lib/payments'
-import { createClient } from '@/lib/supabase/server'
-import CheckoutForm from './CheckoutForm'
-import TemplateThumbnail from './TemplateThumbnail'
+import { redirect } from "next/navigation";
+import { createStripePaymentIntent } from "@/lib/payments";
+import { createClient } from "@/lib/supabase/server";
+import CheckoutForm from "./CheckoutForm";
+import TemplateThumbnail from "./TemplateThumbnail";
 
 interface Props {
-  searchParams: Promise<{ templateId?: string; slug?: string; name?: string }>
+  searchParams: Promise<{ templateId?: string; slug?: string; name?: string }>;
 }
 
-const PRICE_CENTS = 150
-const CURRENCY = 'usd'
+const PRICE_CENTS = 150;
+const CURRENCY = "usd";
 
 export default async function CheckoutPage({ searchParams }: Props) {
-  const { templateId, slug: slugParam, name: nameParam } = await searchParams
+  const { templateId, slug: slugParam, name: nameParam } = await searchParams;
 
   if (!templateId) {
-    redirect('/templates')
+    redirect("/templates");
   }
 
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   // Fetch template info — slug + name from URL params are fallbacks if DB query fails
   const { data: template } = templateId
-    ? await supabase.from('templates').select('id, name, slug').eq('id', templateId).single()
-    : { data: null }
+    ? await supabase
+        .from("templates")
+        .select("id, name, slug")
+        .eq("id", templateId)
+        .single()
+    : { data: null };
 
-  const displayName = template?.name ?? (nameParam ? decodeURIComponent(nameParam) : null)
-  const displaySlug = template?.slug ?? slugParam ?? null
+  const displayName =
+    template?.name ?? (nameParam ? decodeURIComponent(nameParam) : null);
+  const displaySlug = template?.slug ?? slugParam ?? null;
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   // Require login before checkout — prevents payment being attributed to a wrong email
   if (!user) {
-    redirect(`/login?returnTo=/checkout?templateId=${templateId}`)
+    redirect(`/login?returnTo=/checkout?templateId=${templateId}`);
   }
 
-  const userEmail = user.email ?? null
+  const userEmail = user.email ?? null;
 
   // Create PaymentIntent server-side — never trust client for amount
   const intent = await createStripePaymentIntent({
     amountCents: PRICE_CENTS,
     currency: CURRENCY,
     metadata: {
-      templateId: templateId ?? '',
+      templateId: templateId ?? "",
       ...(user?.id ? { userId: user.id } : {}),
       ...(user?.email ? { email: user.email } : {}),
     },
-  })
+  });
 
   return (
     <main className="mx-auto max-w-lg px-4 py-12">
@@ -70,9 +75,15 @@ export default async function CheckoutPage({ searchParams }: Props) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-semibold">{displayName ?? 'Resume template'}</p>
-          <p className="mt-0.5 text-sm text-muted-foreground">One-time download</p>
-          <p className="text-xs text-muted-foreground">30-day re-download included</p>
+          <p className="truncate text-base font-semibold">
+            {displayName ?? "Resume template"}
+          </p>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            One-time download
+          </p>
+          <p className="text-xs text-muted-foreground">
+            30-day re-download included
+          </p>
         </div>
 
         <p className="shrink-0 text-xl font-bold">$1.50</p>
@@ -80,10 +91,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
       <CheckoutForm
         clientSecret={intent.client_secret!}
-        templateId={templateId ?? ''}
+        templateId={templateId ?? ""}
         userEmail={userEmail}
         publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
       />
     </main>
-  )
+  );
 }

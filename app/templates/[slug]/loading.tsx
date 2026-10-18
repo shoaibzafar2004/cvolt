@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TemplateDetailLoading() {
   return (
@@ -34,5 +34,5 @@ export default function TemplateDetailLoading() {
         <Skeleton className="mx-auto h-4 w-32" />
       </div>
     </div>
-  )
+  );
 }

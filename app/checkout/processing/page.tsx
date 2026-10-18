@@ -1,48 +1,48 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 function ProcessingContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const intentId = searchParams.get('payment_intent')
-  const redirectStatus = searchParams.get('redirect_status')
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const intentId = searchParams.get("payment_intent");
+  const redirectStatus = searchParams.get("redirect_status");
 
   useEffect(() => {
-    if (redirectStatus === 'failed' || !intentId) {
-      router.replace('/checkout/failed')
-      return
+    if (redirectStatus === "failed" || !intentId) {
+      router.replace("/checkout/failed");
+      return;
     }
 
-    let attempts = 0
-    const MAX_ATTEMPTS = 30 // 60 seconds max
+    let attempts = 0;
+    const MAX_ATTEMPTS = 30; // 60 seconds max
 
     const interval = setInterval(async () => {
-      attempts++
+      attempts++;
 
       try {
-        const res = await fetch(`/api/payment-status?intentId=${intentId}`)
-        const data = await res.json()
+        const res = await fetch(`/api/payment-status?intentId=${intentId}`);
+        const data = await res.json();
 
-        if (data.status === 'completed') {
-          clearInterval(interval)
-          router.replace(`/checkout/success?paymentId=${data.paymentId}`)
-        } else if (data.status === 'failed' || attempts >= MAX_ATTEMPTS) {
-          clearInterval(interval)
-          router.replace('/checkout/failed')
+        if (data.status === "completed") {
+          clearInterval(interval);
+          router.replace(`/checkout/success?paymentId=${data.paymentId}`);
+        } else if (data.status === "failed" || attempts >= MAX_ATTEMPTS) {
+          clearInterval(interval);
+          router.replace("/checkout/failed");
         }
       } catch {
         if (attempts >= MAX_ATTEMPTS) {
-          clearInterval(interval)
-          router.replace('/checkout/failed')
+          clearInterval(interval);
+          router.replace("/checkout/failed");
         }
       }
-    }, 2000)
+    }, 2000);
 
-    return () => clearInterval(interval)
-  }, [intentId, redirectStatus, router])
+    return () => clearInterval(interval);
+  }, [intentId, redirectStatus, router]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
@@ -54,7 +54,7 @@ function ProcessingContent() {
         </p>
       </div>
     </main>
-  )
+  );
 }
 
 export default function ProcessingPage() {
@@ -62,5 +62,5 @@ export default function ProcessingPage() {
     <Suspense>
       <ProcessingContent />
     </Suspense>
-  )
+  );
 }

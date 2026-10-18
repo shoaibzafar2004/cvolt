@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TemplatesLoading() {
   return (
@@ -13,7 +13,11 @@ export default function TemplatesLoading() {
         {/* FilterBar — 4 pill buttons */}
         <div className="flex flex-wrap gap-2">
           {[72, 56, 72, 80].map((w, i) => (
-            <Skeleton key={i} className={`h-8 w-${w / 4} rounded-full`} style={{ width: w }} />
+            <Skeleton
+              key={i}
+              className={`h-8 w-${w / 4} rounded-full`}
+              style={{ width: w }}
+            />
           ))}
         </div>
 
@@ -36,5 +40,5 @@ export default function TemplatesLoading() {
         </div>
       </div>
     </main>
-  )
+  );
 }

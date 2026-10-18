@@ -1,20 +1,25 @@
-'use client'
+"use client";
 
-import { useUIStore } from '@/store/uiStore'
-import FilterBar from '@/components/templates/FilterBar'
-import TemplateCard from '@/components/templates/TemplateCard'
-import type { Template, Payment } from '@/types'
+import { useUIStore } from "@/store/uiStore";
+import FilterBar from "@/components/templates/FilterBar";
+import TemplateCard from "@/components/templates/TemplateCard";
+import type { Template, Payment } from "@/types";
 
 interface TemplateGalleryProps {
-  templates: Template[]
-  payments: Payment[]
+  templates: Template[];
+  payments: Payment[];
 }
 
-export default function TemplateGallery({ templates, payments }: TemplateGalleryProps) {
-  const { activeFilter } = useUIStore()
+export default function TemplateGallery({
+  templates,
+  payments,
+}: TemplateGalleryProps) {
+  const { activeFilter } = useUIStore();
 
   const filtered =
-    activeFilter === 'all' ? templates : templates.filter((t) => t.category === activeFilter)
+    activeFilter === "all"
+      ? templates
+      : templates.filter((t) => t.category === activeFilter);
 
   return (
     <div className="space-y-6">
@@ -27,10 +32,14 @@ export default function TemplateGallery({ templates, payments }: TemplateGallery
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((template) => (
-            <TemplateCard key={template.id} template={template} payments={payments} />
+            <TemplateCard
+              key={template.id}
+              template={template}
+              payments={payments}
+            />
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,28 +1,28 @@
-import { createClient } from '@/lib/supabase/server'
-import TemplateGallery from './TemplateGallery'
-import type { Template, Payment } from '@/types'
+import { createClient } from "@/lib/supabase/server";
+import TemplateGallery from "./TemplateGallery";
+import type { Template, Payment } from "@/types";
 
 export default async function TemplatesPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const { data: templates } = await supabase
-    .from('templates')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at')
+    .from("templates")
+    .select("*")
+    .eq("is_active", true)
+    .order("created_at");
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
-  let payments: Payment[] = []
+  let payments: Payment[] = [];
   if (user) {
     const { data } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('status', 'completed')
-    payments = (data ?? []) as Payment[]
+      .from("payments")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("status", "completed");
+    payments = (data ?? []) as Payment[];
   }
 
   const mapped: Template[] = (templates ?? []).map((t) => ({
@@ -33,7 +33,7 @@ export default async function TemplatesPage() {
     isActive: t.is_active,
     category: t.category,
     createdAt: t.created_at,
-  }))
+  }));
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
@@ -45,5 +45,5 @@ export default async function TemplatesPage() {
       </div>
       <TemplateGallery templates={mapped} payments={payments} />
     </main>
-  )
+  );
 }
