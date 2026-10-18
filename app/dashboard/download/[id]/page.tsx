@@ -33,6 +33,7 @@ export default async function DownloadPage({ params }: Props) {
     .eq("id", id)
     .eq("user_id", user.id)
     .eq("status", "completed")
+    .is("deleted_at", null)
     .single();
 
   if (!payment) notFound();

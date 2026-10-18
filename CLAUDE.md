@@ -85,6 +85,7 @@ Six tables. All IDs are UUIDs. **Source of truth: `supabase/migrations/`** — t
 | status | text | 'pending', 'completed', 'failed' |
 | purchased_at | timestamp | |
 | expires_at | timestamp | 30 days from purchase |
+| deleted_at | timestamp | Nullable. Set when the user deletes an expired purchase from the dashboard (row kept for reconciliation; PDF + snapshot are deleted). All payment queries filter `deleted_at is null` |
 
 ### resume_snapshots
 Frozen copy of resume data at time of payment. Prevents edits from breaking purchased downloads.
@@ -215,7 +216,7 @@ cvolt/
 
 | Route | Description |
 |---|---|
-| `/dashboard` | Purchased resumes. Each card shows template thumbnail, purchase date, days left, Edit + Download buttons |
+| `/dashboard` | Purchased resumes. Active: Edit (→ `/dashboard/edit/[resumeId]`) + Download. Expired: Delete only (confirm dialog → `deleteExpiredPurchase` server action in `app/dashboard/actions.ts`) |
 | `/dashboard/edit/[id]` | Same multi-step form as /build but pre-filled. Hydrates Zustand from Supabase on mount |
 | `/dashboard/download/[id]` | Gate: within 30 days + diff under 10%? Serve PDF. Expired? → /checkout. High diff? → /checkout |
 | `/login` | Magic link only. Email input → "Check your inbox" → redirect to /dashboard |
