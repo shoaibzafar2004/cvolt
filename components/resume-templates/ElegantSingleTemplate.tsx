@@ -164,6 +164,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
           {p.phone && <div>✆ {p.phone}</div>}
           {p.email && <div>✉ {p.email}</div>}
           {p.linkedIn && <div>⊕ {p.linkedIn}</div>}
+          {p.github && <div>⊕ {p.github}</div>}
           {p.website && <div>⊕ {p.website}</div>}
         </div>
       </div>

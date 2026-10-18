@@ -19,6 +19,7 @@ const PLACEHOLDER: ResumeData = {
     phone: "+1 555 000 1234",
     location: "San Francisco, CA",
     linkedIn: "linkedin.com/in/alexj",
+    github: "github.com/alexj",
     website: "alexjohnson.dev",
   },
   sections: [

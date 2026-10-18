@@ -220,6 +220,16 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                   </span>
                 </div>
               )}
+              {p.github && (
+                <div
+                  style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
+                >
+                  <span style={{ color: ACCENT, fontSize: 11 }}>⊕</span>
+                  <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
+                    {p.github}
+                  </span>
+                </div>
+              )}
               {p.website && (
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}

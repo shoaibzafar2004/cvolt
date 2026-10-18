@@ -9,6 +9,9 @@ export const personalInfoSchema = z.object({
   linkedIn: z
     .union([z.url({ error: "Enter a valid URL" }), z.literal("")])
     .optional(),
+  github: z
+    .union([z.url({ error: "Enter a valid URL" }), z.literal("")])
+    .optional(),
   website: z
     .union([z.url({ error: "Enter a valid URL" }), z.literal("")])
     .optional(),

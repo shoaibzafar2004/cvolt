@@ -432,6 +432,9 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
               {p.linkedIn && (
                 <ContactRow icon="in" text={p.linkedIn} accent={ACCENT} wrap />
               )}
+              {p.github && (
+                <ContactRow icon="gh" text={p.github} accent={ACCENT} wrap />
+              )}
               {p.website && (
                 <ContactRow icon="⊕" text={p.website} accent={ACCENT} wrap />
               )}
@@ -615,7 +618,7 @@ function ContactRow({
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
-          fontSize: icon === "in" ? 7.5 : 10,
+          fontSize: icon === "in" || icon === "gh" ? 7.5 : 10,
           fontWeight: 700,
           color: "#ffffff",
           lineHeight: 1,

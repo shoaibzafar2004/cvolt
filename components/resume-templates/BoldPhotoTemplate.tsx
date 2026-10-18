@@ -193,6 +193,9 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
               {p.linkedIn && (
                 <div style={{ wordBreak: "break-all" }}>⊕ {p.linkedIn}</div>
               )}
+              {p.github && (
+                <div style={{ wordBreak: "break-all" }}>⊕ {p.github}</div>
+              )}
               {p.website && (
                 <div style={{ wordBreak: "break-all" }}>⊕ {p.website}</div>
               )}

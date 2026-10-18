@@ -214,6 +214,14 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   <span style={{ wordBreak: "break-all" }}>{p.linkedIn}</span>
                 </div>
               )}
+              {p.github && (
+                <div
+                  style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
+                >
+                  <span style={{ color: ACCENT }}>⊕</span>{" "}
+                  <span style={{ wordBreak: "break-all" }}>{p.github}</span>
+                </div>
+              )}
               {p.website && (
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}

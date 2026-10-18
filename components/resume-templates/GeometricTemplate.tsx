@@ -164,6 +164,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
           {p.linkedIn && (
             <ContactRow icon="⊕" text={p.linkedIn} accent={ACCENT} />
           )}
+          {p.github && <ContactRow icon="⊕" text={p.github} accent={ACCENT} />}
           {p.website && (
             <ContactRow icon="⊕" text={p.website} accent={ACCENT} />
           )}

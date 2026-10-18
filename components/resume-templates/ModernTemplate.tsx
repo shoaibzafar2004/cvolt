@@ -219,13 +219,21 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
           )}
 
           {/* Links */}
-          {(p.linkedIn || p.website) && (
+          {(p.linkedIn || p.github || p.website) && (
             <SideSection title="Links">
               {p.linkedIn && (
                 <div style={{ marginBottom: 6 }}>
                   <div style={{ color: MUTED, fontSize: 9 }}>LinkedIn:</div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
                     {p.linkedIn}
+                  </div>
+                </div>
+              )}
+              {p.github && (
+                <div style={{ marginBottom: 6 }}>
+                  <div style={{ color: MUTED, fontSize: 9 }}>GitHub:</div>
+                  <div style={{ fontSize: 9, wordBreak: "break-all" }}>
+                    {p.github}
                   </div>
                 </div>
               )}

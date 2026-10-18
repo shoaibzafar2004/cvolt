@@ -9,6 +9,7 @@ const defaultPersonalInfo: PersonalInfo = {
   phone: "",
   location: "",
   linkedIn: "",
+  github: "",
   website: "",
 };
 
