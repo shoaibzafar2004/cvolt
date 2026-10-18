@@ -215,6 +215,14 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 </span>
               </div>
             )}
+            {p.github && (
+              <div>
+                <span style={{ marginRight: 6 }}>⊕</span>
+                <span style={{ color: MUTED, wordBreak: "break-all" }}>
+                  {p.github}
+                </span>
+              </div>
+            )}
             {p.website && (
               <div>
                 <span style={{ marginRight: 6 }}>⊕</span>

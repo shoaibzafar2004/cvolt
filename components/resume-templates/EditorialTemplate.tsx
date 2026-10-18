@@ -199,6 +199,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
             {p.website && <HeaderContact icon="⊕" text={p.website} />}
             {p.location && <HeaderContact icon="◉" text={p.location} />}
             {p.linkedIn && <HeaderContact icon="in" text={p.linkedIn} />}
+            {p.github && <HeaderContact icon="gh" text={p.github} />}
           </div>
         </div>
       </div>

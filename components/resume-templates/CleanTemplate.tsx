@@ -117,6 +117,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           {personalInfo.phone && <span>✆ {personalInfo.phone}</span>}
           {personalInfo.location && <span>◉ {personalInfo.location}</span>}
           {personalInfo.linkedIn && <span>⊕ {personalInfo.linkedIn}</span>}
+          {personalInfo.github && <span>⊕ {personalInfo.github}</span>}
           {personalInfo.website && <span>⊕ {personalInfo.website}</span>}
         </div>
       </div>

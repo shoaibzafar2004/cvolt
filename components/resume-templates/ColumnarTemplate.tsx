@@ -62,6 +62,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
   if (p.phone) contacts.push(p.phone);
   if (p.website) contacts.push(p.website);
   if (p.linkedIn) contacts.push(p.linkedIn);
+  if (p.github) contacts.push(p.github);
   if (p.location) contacts.push(p.location);
 
   return (

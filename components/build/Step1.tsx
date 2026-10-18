@@ -41,6 +41,7 @@ const Step1 = forwardRef<StepSubmitRef>((_, ref) => {
       phone: store.personalInfo.phone,
       location: store.personalInfo.location,
       linkedIn: store.personalInfo.linkedIn ?? "",
+      github: store.personalInfo.github ?? "",
       website: store.personalInfo.website ?? "",
       photoUrl: store.personalInfo.photoUrl ?? "",
     },
@@ -226,6 +227,14 @@ const Step1 = forwardRef<StepSubmitRef>((_, ref) => {
               placeholder="https://linkedin.com/in/jane"
               spellCheck={false}
               {...register("linkedIn")}
+            />
+          </Field>
+
+          <Field label="GitHub URL" error={errors.github?.message} optional>
+            <Input
+              placeholder="https://github.com/jane"
+              spellCheck={false}
+              {...register("github")}
             />
           </Field>
 
