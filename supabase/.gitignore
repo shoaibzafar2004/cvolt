@@ -6,3 +6,6 @@
 .env.keys
 .env.local
 .env.*.local
+
+# Cloud DB exports (contain user data)
+backup/

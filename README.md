@@ -83,6 +83,17 @@ npx supabase migration new <name>   # creates supabase/migrations/<timestamp>_<n
 npm run db:reset                    # apply from scratch
 ```
 
+## Exporting from the hosted Supabase project
+
+Two scripts copy data out of the original hosted project into `supabase/backup/` (gitignored — it contains user data):
+
+| Command | What it exports |
+|---|---|
+| `bash scripts/export-cloud-db.sh` | Roles, schema and data via `supabase db dump` (prompts for the DB password) |
+| `node scripts/export-cloud-storage.mjs` | All files in the `pdfs` bucket (reads keys from `.env.local.cloud.bak`) |
+
+Note that `npm run db:reset` wipes imported data; re-import from `supabase/backup/` afterwards if needed.
+
 ## Payments (local testing)
 
 Stripe webhooks need to reach your local server. With the [Stripe CLI](https://stripe.com/docs/stripe-cli):
