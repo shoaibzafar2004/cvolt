@@ -8,7 +8,7 @@ See [CLAUDE.md](CLAUDE.md) for the full architecture, database schema, routes an
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 20+ (CI uses the version in `.nvmrc`)
 - Docker (running) — the database runs locally via the Supabase CLI
 - ~4 GB of free RAM for the local Supabase containers
 
@@ -98,7 +98,24 @@ Use the `whsec_...` secret it prints as `STRIPE_WEBHOOK_SECRET`.
 | --------------------------------- | -------------------------------------------- |
 | `npm run build`                   | Production build                             |
 | `npm run lint`                    | ESLint                                       |
+| `npm run typecheck`               | TypeScript check (`tsc --noEmit`)            |
+| `npm run format`                  | Format all files with Prettier               |
+| `npm run format:check`            | Check formatting without writing (CI)        |
 | `node scripts/download-fonts.mjs` | Download template fonts into `public/fonts/` |
+
+## Git workflow
+
+```
+feature branch ──PR──▶ develop ──PR──▶ main
+```
+
+- `main` is release-only. Nothing is committed or merged into it except PRs from `develop`.
+- Every change gets its own branch off `develop` (`feat/…`, `fix/…`, `chore/…`) and a PR into `develop`.
+- Dependabot opens weekly dependency PRs against `develop` (minor/patch grouped, majors separate).
+- CI (`.github/workflows/ci.yml`) runs format check, lint, typecheck and build on every PR to `develop` and `main`.
+- `main-guard` fails any PR into `main` whose source isn't `develop`.
+- Use **merge commits** (not squash) for `develop` → `main`, so both branches keep the same history.
+- After a bulk reformat, add the commit hash to `.git-blame-ignore-revs`. Locally, enable it once with `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
 
 ## Deploying
 

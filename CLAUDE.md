@@ -747,6 +747,10 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 - No impure calls (`Date.now()`, `Math.random()`) directly in a component body; put them in a helper (e.g. `daysUntil()` in lib/utils.ts).
 - Look up template components from `registry` in lib/templates.ts; don't hand-write slug → component switches.
 
+## Git & formatting
+- Never commit to `main` or `develop` directly. Branch off `develop` (`feat/`, `fix/`, `chore/`), PR into `develop`. Only `develop` → `main` PRs update main.
+- Code is formatted by Prettier (no semicolons, single quotes, width 100). Run `npm run format` before committing; CI fails on `format:check`, `lint`, `typecheck` or `build`.
+
 ## TypeScript
 - No `any`. Use types from types/index.ts.
 - ResumeData is the canonical shape everywhere: DB rows, store, template props, PDF route.

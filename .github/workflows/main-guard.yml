@@ -1,0 +1,20 @@
+name: Main guard
+
+# Only `develop` may be merged into `main`. Make this a required status check on `main`.
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  source-branch:
+    name: Source branch is develop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_REF" != "develop" ]; then
+            echo "::error::PRs into main must come from 'develop' (this one is from '$HEAD_REF'). Target 'develop' instead."
+            exit 1
+          fi
