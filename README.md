@@ -40,7 +40,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Local database (Supabase CLI)
 
-The project no longer uses a hosted Supabase project for development. The full Supabase stack (Postgres, Auth, Storage, REST) runs locally in Docker, so no application code differs between local and hosted Supabase — only the env values.
+The full Supabase stack (Postgres, Auth, Storage, REST) runs locally in Docker, so no application code differs between local and hosted Supabase — only the env values.
 
 | Script | What it does |
 |---|---|
@@ -72,8 +72,7 @@ supabase/
 ├── migrations/
 │   ├── 20260101000000_init.sql          # Tables, RLS policies, auth.users → public.users trigger
 │   └── 20260101000001_storage.sql       # Private `pdfs` bucket for generated resumes
-├── seed.sql                             # Template records (runs automatically on start/reset)
-└── schema.sql                           # Reference copy of the original schema (not executed)
+└── seed.sql                             # Template records (runs automatically on start/reset)
 ```
 
 To change the schema, add a new migration instead of editing an existing one:
@@ -82,17 +81,6 @@ To change the schema, add a new migration instead of editing an existing one:
 npx supabase migration new <name>   # creates supabase/migrations/<timestamp>_<name>.sql
 npm run db:reset                    # apply from scratch
 ```
-
-## Exporting from the hosted Supabase project
-
-Two scripts copy data out of the original hosted project into `supabase/backup/` (gitignored — it contains user data):
-
-| Command | What it exports |
-|---|---|
-| `bash scripts/export-cloud-db.sh` | Roles, schema and data via `supabase db dump` (prompts for the DB password) |
-| `node scripts/export-cloud-storage.mjs` | All files in the `pdfs` bucket (reads keys from `.env.local.cloud.bak`) |
-
-Note that `npm run db:reset` wipes imported data; re-import from `supabase/backup/` afterwards if needed.
 
 ## Payments (local testing)
 

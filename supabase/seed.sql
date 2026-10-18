@@ -1,5 +1,5 @@
 -- Seed data for Cvolt
--- Run after schema.sql
+-- Runs automatically after migrations on `supabase start` / `supabase db reset`
 
 insert into public.templates (name, slug, thumbnail_url, is_active, category) values
   ('Clean',          'clean',          '/templates/clean.png',          true, 'clean'),
