@@ -19,6 +19,7 @@ import { Plus as PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Award, Globe, Check } from "lucide-react";
 import type { StepSubmitRef } from "./StepWrapper";
+import TagInput from "./TagInput";
 import type {
   EducationContent,
   SkillsContent,
@@ -29,6 +30,19 @@ import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/lib/supabase/client";
 
 type ToggleKey = "certifications" | "languages";
+
+// Form entry → stored content; empty optional fields are dropped.
+function toCertContent(
+  c: NonNullable<Step4FormData["certifications"]>[number],
+): CertificationContent {
+  return {
+    name: c.name,
+    issuer: c.issuer || undefined,
+    date: c.date || undefined,
+    url: c.url || undefined,
+    skills: c.skills.filter(Boolean),
+  };
+}
 
 const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
   const store = useResumeStore();
@@ -87,12 +101,27 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
             },
           ],
       skills: initialSkills,
-      certifications:
+      // Saved entries carry no form id (and older certs lack url/skills), so
+      // rebuild them here — otherwise validation fails silently on Next.
+      certifications: (
         (store.sections.find((s) => s.type === "certifications")?.content as
-          (CertificationContent & { id: string })[] | undefined) ?? [],
-      languages:
+          CertificationContent[] | undefined) ?? []
+      ).map((c) => ({
+        id: uuidv4(),
+        name: c.name,
+        issuer: c.issuer ?? "",
+        date: c.date ?? "",
+        url: c.url ?? "",
+        skills: c.skills ?? [],
+      })),
+      languages: (
         (store.sections.find((s) => s.type === "languages")?.content as
-          (LanguageContent & { id: string })[] | undefined) ?? [],
+          LanguageContent[] | undefined) ?? []
+      ).map((l) => ({
+        id: uuidv4(),
+        language: l.language,
+        proficiency: l.proficiency ?? "",
+      })),
     },
   });
 
@@ -171,11 +200,8 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
     const certId =
       store.sections.find((s) => s.type === "certifications")?.id ?? uuidv4();
     if (toggles.certifications && data.certifications?.length) {
-      const content: CertificationContent[] = data.certifications.map((c) => ({
-        name: c.name,
-        issuer: c.issuer,
-        date: c.date,
-      }));
+      const content: CertificationContent[] =
+        data.certifications.map(toCertContent);
       store.upsertSection({
         id: certId,
         type: "certifications",
@@ -253,11 +279,7 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
             id: certId,
             resume_id: store.resumeId!,
             section_type: "certifications",
-            content: data.certifications.map((c) => ({
-              name: c.name,
-              issuer: c.issuer,
-              date: c.date,
-            })),
+            content: data.certifications.map(toCertContent),
             display_order: 0,
           });
         }
@@ -560,46 +582,95 @@ const Step4 = forwardRef<StepSubmitRef>((_, ref) => {
         {toggles.certifications && (
           <div className="space-y-4 rounded-2xl border bg-muted/30 p-5">
             <h4 className="text-sm font-medium">Certifications</h4>
-            {certFields.map((field, index) => (
-              <div key={field.id} className="flex items-start gap-2">
-                <div className="grid flex-1 grid-cols-3 gap-2">
-                  <Input
-                    placeholder="Certification name"
-                    {...register(`certifications.${index}.name`)}
-                  />
-                  <Input
-                    placeholder="Issuer (optional)"
-                    {...register(`certifications.${index}.issuer`)}
-                  />
+            {certFields.map((field, index) => {
+              const certErrors = errors.certifications?.[index];
+              return (
+                <div
+                  key={field.id}
+                  className="space-y-3 rounded-xl border bg-background p-4"
+                >
+                  <div className="flex items-start gap-2">
+                    <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
+                      <div className="space-y-1">
+                        <Input
+                          placeholder="Certification name"
+                          aria-invalid={!!certErrors?.name || undefined}
+                          {...register(`certifications.${index}.name`)}
+                        />
+                        {certErrors?.name && (
+                          <p className="pl-4 text-xs text-destructive">
+                            {certErrors.name.message}
+                          </p>
+                        )}
+                      </div>
+                      <Input
+                        placeholder="Issuer (optional)"
+                        {...register(`certifications.${index}.issuer`)}
+                      />
+                      <Controller
+                        control={control}
+                        name={`certifications.${index}.date`}
+                        render={({ field }) => (
+                          <MonthPicker
+                            value={field.value ?? ""}
+                            onChange={field.onChange}
+                            placeholder="Date"
+                          />
+                        )}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Remove certification"
+                      onClick={() => removeCert(index)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                  <div className="space-y-1">
+                    <Input
+                      placeholder="Credential link (optional), e.g. https://www.credly.com/badges/…"
+                      spellCheck={false}
+                      aria-invalid={!!certErrors?.url || undefined}
+                      {...register(`certifications.${index}.url`)}
+                    />
+                    {certErrors?.url && (
+                      <p className="pl-4 text-xs text-destructive">
+                        {certErrors.url.message}
+                      </p>
+                    )}
+                  </div>
                   <Controller
                     control={control}
-                    name={`certifications.${index}.date`}
+                    name={`certifications.${index}.skills`}
                     render={({ field }) => (
-                      <MonthPicker
-                        value={field.value}
+                      <TagInput
+                        label="Skills covered"
+                        placeholder="e.g. AWS, Cloud architecture, IAM"
+                        value={field.value ?? []}
                         onChange={field.onChange}
-                        placeholder="Date"
                       />
                     )}
                   />
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeCert(index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
             <Button
               type="button"
               variant="outline"
               className="w-full gap-2 border-dashed bg-primary/5 text-sm"
               size="sm"
               onClick={() =>
-                appendCert({ id: uuidv4(), name: "", issuer: "", date: "" })
+                appendCert({
+                  id: uuidv4(),
+                  name: "",
+                  issuer: "",
+                  date: "",
+                  url: "",
+                  skills: [],
+                })
               }
             >
               <Plus className="mr-1 h-3 w-3" /> Add

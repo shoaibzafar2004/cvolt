@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import CertExtras from "./CertExtras";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -405,28 +406,30 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           border={colors.border}
         >
           {certs.map((c, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 4,
-              }}
-            >
-              <span style={{ fontWeight: 500 }}>
-                {c.name}
-                {c.issuer ? (
-                  <span style={{ fontWeight: 400, color: colors.muted }}>
-                    {" "}
-                    · {c.issuer}
-                  </span>
-                ) : null}
-              </span>
-              {c.date && (
-                <span style={{ fontSize: 10, color: colors.muted }}>
-                  {c.date}
+            <div key={i} style={{ marginBottom: 4 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontWeight: 500 }}>
+                  {c.name}
+                  {c.issuer ? (
+                    <span style={{ fontWeight: 400, color: colors.muted }}>
+                      {" "}
+                      · {c.issuer}
+                    </span>
+                  ) : null}
                 </span>
-              )}
+                {c.date && (
+                  <span style={{ fontSize: 10, color: colors.muted }}>
+                    {c.date}
+                  </span>
+                )}
+              </div>
+              <CertExtras
+                cert={c}
+                linkColor={colors.accent}
+                mutedColor={colors.muted}
+                fontSize={10}
+                style={{ marginTop: 0 }}
+              />
             </div>
           ))}
         </Section>

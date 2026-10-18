@@ -47,6 +47,8 @@ export interface CertificationContent {
   name: string;
   issuer?: string;
   date?: string;
+  url?: string; // credential / verification link
+  skills?: string[];
 }
 
 export interface LanguageContent {
