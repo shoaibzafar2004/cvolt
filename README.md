@@ -112,6 +112,7 @@ feature branch ──PR──▶ develop ──PR──▶ main
 - `main` is release-only. Nothing is committed or merged into it except PRs from `develop`.
 - Every change gets its own branch off `develop` (`feat/…`, `fix/…`, `chore/…`) and a PR into `develop`.
 - Dependabot opens weekly dependency PRs against `develop` (minor/patch grouped, majors separate).
+- A pre-commit hook (Husky + lint-staged) runs ESLint `--fix` and Prettier on staged files. It installs automatically with `npm install`.
 - CI (`.github/workflows/ci.yml`) runs format check, lint, typecheck and build on every PR to `develop` and `main`.
 - `main-guard` fails any PR into `main` whose source isn't `develop`.
 - Use **merge commits** (not squash) for `develop` → `main`, so both branches keep the same history.
