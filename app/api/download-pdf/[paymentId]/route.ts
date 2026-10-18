@@ -29,6 +29,7 @@ export async function GET(_req: Request, { params }: Props) {
     .eq("id", paymentId)
     .eq("user_id", user.id)
     .eq("status", "completed")
+    .is("deleted_at", null)
     .single();
 
   if (!payment) return new Response("Not found", { status: 404 });

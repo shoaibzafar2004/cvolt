@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import Link from "next/link";
+import DeleteResumeButton from "./DeleteResumeButton";
 import { Download, Pencil, Plus, Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -163,6 +164,7 @@ export default async function DashboardPage() {
     )
     .eq("user_id", user!.id)
     .eq("status", "completed")
+    .is("deleted_at", null)
     .order("purchased_at", { ascending: false });
 
   const snapshotIds = (payments ?? [])
@@ -171,7 +173,7 @@ export default async function DashboardPage() {
   const { data: snapshots } = snapshotIds.length
     ? await serviceClient
         .from("resume_snapshots")
-        .select("id, snapshot_data")
+        .select("id, resume_id, snapshot_data")
         .in("id", snapshotIds)
     : { data: [] };
   const snapshotMap = new Map((snapshots ?? []).map((s) => [s.id, s]));
@@ -301,27 +303,33 @@ export default async function DashboardPage() {
                       </p>
                     </div>
 
-                    {/* Actions */}
+                    {/* Actions — expired purchases can't be downloaded or edited, only removed */}
                     <div className="mt-auto flex gap-2">
-                      <Link
-                        href={`/dashboard/edit/${payment.id}`}
-                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border py-2 text-xs font-medium transition-colors hover:bg-muted"
-                      >
-                        <Pencil className="h-3 w-3" />
-                        Edit
-                      </Link>
-                      <Link
-                        href={`/dashboard/download/${payment.id}`}
-                        className={[
-                          "inline-flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-opacity",
-                          expired
-                            ? "pointer-events-none cursor-not-allowed bg-muted text-muted-foreground"
-                            : "bg-foreground text-background hover:opacity-80",
-                        ].join(" ")}
-                      >
-                        <Download className="h-3 w-3" />
-                        Download
-                      </Link>
+                      {expired ? (
+                        <DeleteResumeButton
+                          paymentId={payment.id}
+                          resumeName={resumeName || "Resume"}
+                        />
+                      ) : (
+                        <>
+                          {snapshot?.resume_id && (
+                            <Link
+                              href={`/dashboard/edit/${snapshot.resume_id}`}
+                              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border py-2 text-xs font-medium transition-colors hover:bg-muted"
+                            >
+                              <Pencil className="h-3 w-3" />
+                              Edit
+                            </Link>
+                          )}
+                          <Link
+                            href={`/dashboard/download/${payment.id}`}
+                            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-foreground py-2 text-xs font-semibold text-background transition-opacity hover:opacity-80"
+                          >
+                            <Download className="h-3 w-3" />
+                            Download
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

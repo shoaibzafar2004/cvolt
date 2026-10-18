@@ -21,7 +21,8 @@ export default async function TemplatesPage() {
       .from("payments")
       .select("*")
       .eq("user_id", user.id)
-      .eq("status", "completed");
+      .eq("status", "completed")
+      .is("deleted_at", null);
     payments = (data ?? []) as Payment[];
   }
 
