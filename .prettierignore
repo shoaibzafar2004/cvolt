@@ -1,8 +1,8 @@
-.next/
-out/
-build/
-node_modules/
-public/
+/.next/
+/out/
+/build/
+/node_modules/
+/public/
 package-lock.json
 next-env.d.ts
 supabase/.temp/
