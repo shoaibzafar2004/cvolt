@@ -196,82 +196,56 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
         >
           {/* Contact */}
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 10, color: MUTED, lineHeight: 2 }}>
+            <div
+              style={{
+                fontSize: 10,
+                color: MUTED,
+                display: "flex",
+                flexDirection: "column",
+                gap: 5,
+              }}
+            >
               {p.phone && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span
-                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
-                  >
-                    <PhoneIcon />
-                  </span>
-                  <span>{p.phone}</span>
-                </div>
+                <ContactLine
+                  icon={<PhoneIcon />}
+                  text={p.phone}
+                  accent={ACCENT}
+                />
               )}
               {p.email && (
-                <div
-                  style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
-                >
-                  <span
-                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
-                  >
-                    <MailIcon />
-                  </span>
-                  <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
-                    {p.email}
-                  </span>
-                </div>
+                <ContactLine
+                  icon={<MailIcon />}
+                  text={p.email}
+                  accent={ACCENT}
+                />
               )}
               {p.location && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span
-                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
-                  >
-                    <PinIcon />
-                  </span>
-                  <span>{p.location}</span>
-                </div>
+                <ContactLine
+                  icon={<PinIcon />}
+                  text={p.location}
+                  accent={ACCENT}
+                />
               )}
               {p.linkedIn && (
-                <div
-                  style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
-                >
-                  <span
-                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
-                  >
-                    <LinkedInIcon />
-                  </span>
-                  <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
-                    {p.linkedIn}
-                  </span>
-                </div>
+                <ContactLine
+                  icon={<LinkedInIcon />}
+                  text={p.linkedIn}
+                  accent={ACCENT}
+                />
               )}
               {p.github && (
-                <div
-                  style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
-                >
-                  <span
-                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
-                  >
-                    <GitHubIcon />
-                  </span>
-                  <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
-                    {p.github}
-                  </span>
-                </div>
+                <ContactLine
+                  icon={<GitHubIcon />}
+                  text={p.github}
+                  accent={ACCENT}
+                />
               )}
               {p.website && (
-                <div
-                  style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
-                >
-                  <span
-                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
-                  >
-                    <GlobeIcon />
-                  </span>
-                  <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
-                    {p.website}
-                  </span>
-                </div>
+                <ContactLine
+                  icon={<GlobeIcon />}
+                  text={p.website}
+                  accent={ACCENT}
+                />
               )}
             </div>
           </div>
@@ -777,6 +751,26 @@ function MainSection({
         {title}
       </div>
       {children}
+    </div>
+  );
+}
+
+// One contact row: accent icon + text, same height for every field.
+function ContactLine({
+  icon,
+  text,
+  accent,
+}: {
+  icon: React.ReactNode;
+  text: string;
+  accent: string;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+      <span style={{ color: accent, fontSize: 11, lineHeight: "15px" }}>
+        {icon}
+      </span>
+      <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>{text}</span>
     </div>
   );
 }
