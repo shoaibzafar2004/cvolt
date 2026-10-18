@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import prettier from "eslint-config-prettier/flat";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -9,11 +10,13 @@ const eslintConfig = defineConfig([
   // Next.js runtime context that is unavailable during PDF generation via
   // ReactDOMServer.renderToStaticMarkup.
   {
-    files: ['components/resume-templates/**'],
+    files: ["components/resume-templates/**"],
     rules: {
-      '@next/next/no-img-element': 'off',
+      "@next/next/no-img-element": "off",
     },
   },
+  // Must stay last among rule configs: turns off rules that conflict with Prettier.
+  prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

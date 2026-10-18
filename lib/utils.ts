@@ -1,19 +1,19 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import type { ResumeData, Section, SectionType } from '@/types'
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import type { ResumeData, Section, SectionType } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export interface DbResume {
-  personal_info: ResumeData['personalInfo']
+  personal_info: ResumeData["personalInfo"];
   resume_sections: Array<{
-    id: string
-    section_type: string
-    content: Section['content']
-    display_order: number
-  }>
+    id: string;
+    section_type: string;
+    content: Section["content"];
+    display_order: number;
+  }>;
 }
 
 // Single source of truth for mapping DB rows → ResumeData.
@@ -29,12 +29,12 @@ export function shapeDbRowToResumeData(row: DbResume): ResumeData {
         content: s.content,
         displayOrder: s.display_order,
       })),
-  }
+  };
 }
 
-const MS_PER_DAY = 1000 * 60 * 60 * 24
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 // Whole days from now until `date`, rounded up. Zero or negative once it has passed.
 export function daysUntil(date: string | Date): number {
-  return Math.ceil((new Date(date).getTime() - Date.now()) / MS_PER_DAY)
+  return Math.ceil((new Date(date).getTime() - Date.now()) / MS_PER_DAY);
 }
