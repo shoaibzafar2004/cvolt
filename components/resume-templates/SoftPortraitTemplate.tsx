@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import CertExtras from "./CertExtras";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -388,6 +389,12 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                   {c.date && (
                     <div style={{ fontSize: 9.5, color: ACCENT }}>{c.date}</div>
                   )}
+                  <CertExtras
+                    cert={c}
+                    linkColor={ACCENT}
+                    mutedColor={MUTED}
+                    fontSize={9.5}
+                  />
                 </div>
               ))}
             </div>

@@ -172,6 +172,8 @@ const PLACEHOLDER: ResumeData = {
           name: "AWS Certified Solutions Architect",
           issuer: "Amazon Web Services",
           date: "2023-04",
+          url: "https://www.credly.com/badges/aws-solutions-architect",
+          skills: ["AWS", "Cloud architecture", "IAM"],
         },
         {
           name: "Professional Scrum Master I",
