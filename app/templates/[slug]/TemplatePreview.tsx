@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useResumeStore } from "@/store/resumeStore";
 import ClientOnlyTemplate from "@/components/resume-templates/ClientOnlyTemplate";
 import ThemePicker from "@/components/templates/ThemePicker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import { TEMPLATE_THEMES } from "@/lib/templates";
 import { BUILD_STEPS } from "@/lib/build-steps";
 import type { Template, ResumeData } from "@/types";
@@ -228,13 +228,59 @@ const PLACEHOLDER: ResumeData = {
   ],
 };
 
-const ZOOM_MIN = 0.5;
+const A4_WIDTH = 794;
+const A4_HEIGHT = 1123;
+// Zoom is the actual scale of the A4 page (1 = 100% = real size).
+const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 1.5;
 const ZOOM_STEP = 0.1;
+// Used for the server render and the first client render, so they match (no hydration
+// mismatch); replaced by the measured fit as soon as the preview panel is laid out.
+const DEFAULT_FIT = 0.75;
+const HEADER_H = 64; // site navbar
+const TOOLBAR_H = 52; // back button + zoom controls, incl. gap
+
+function clampZoom(z: number) {
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(z * 100) / 100));
+}
 
 export default function TemplatePreview({ template }: { template: Template }) {
   const store = useResumeStore();
-  const [zoomFactor, setZoomFactor] = useState(1);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [fitScale, setFitScale] = useState(DEFAULT_FIT);
+  const [measured, setMeasured] = useState(false);
+  // null = follow the fitted size (re-fits when the window resizes)
+  const [zoom, setZoom] = useState<number | null>(null);
+
+  // Fit the whole page into the preview panel: width from the panel itself, height from
+  // the viewport (the panel's own height depends on the zoomed page, so it can't be used).
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const measure = () => {
+      const cs = getComputedStyle(panel);
+      const availW =
+        panel.clientWidth -
+        parseFloat(cs.paddingLeft) -
+        parseFloat(cs.paddingRight);
+      const availH =
+        window.innerHeight -
+        HEADER_H -
+        TOOLBAR_H -
+        parseFloat(cs.paddingTop) -
+        parseFloat(cs.paddingBottom);
+      setFitScale(clampZoom(Math.min(availW / A4_WIDTH, availH / A4_HEIGHT)));
+      setMeasured(true);
+    };
+    // ResizeObserver calls back once right after observe(), so no direct call is needed.
+    const ro = new ResizeObserver(measure);
+    ro.observe(panel);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
 
   const themes = TEMPLATE_THEMES[template.slug] ?? [];
 
@@ -243,19 +289,18 @@ export default function TemplatePreview({ template }: { template: Template }) {
     ? { personalInfo: store.personalInfo, sections: store.sections }
     : PLACEHOLDER;
 
-  const A4_WIDTH = 794;
-  const A4_HEIGHT = 1123;
-  const targetHeight =
-    typeof window !== "undefined" ? window.innerHeight * 0.92 : 920;
-  const baseScale = targetHeight / A4_HEIGHT;
-  const scale = baseScale * zoomFactor;
+  const scale = zoom ?? fitScale;
+  const percent = Math.round(scale * 100);
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col lg:flex-row">
+    <div className="flex flex-col lg:h-[calc(100vh-64px)] lg:flex-row">
       {/* Left — rendered resume */}
-      <div className="flex flex-1 flex-col items-center gap-4 overflow-auto bg-muted/30 p-8">
+      <div
+        ref={panelRef}
+        className="flex flex-col items-center gap-4 bg-muted/30 p-4 sm:p-8 lg:flex-1 lg:overflow-auto"
+      >
         {/* Toolbar: back to gallery · zoom controls */}
-        <div className="grid w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="flex w-full shrink-0 items-center justify-between gap-2 lg:grid lg:grid-cols-[1fr_auto_1fr]">
           <Link
             href="/templates"
             className="inline-flex items-center gap-1.5 justify-self-start rounded-full border bg-background px-3.5 py-1.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted"
@@ -265,42 +310,63 @@ export default function TemplatePreview({ template }: { template: Template }) {
             <span className="sm:hidden">Back</span>
           </Link>
           {/* Zoom controls */}
-          <div className="flex shrink-0 items-center gap-2 rounded-lg border bg-background px-3 py-1.5 shadow-sm">
+          <div className="flex shrink-0 items-center gap-1.5 rounded-lg border bg-background px-2 py-1.5 shadow-sm">
             <Button
               variant="ghost"
               size="sm"
               className="h-7 w-7 p-0"
-              onClick={() =>
-                setZoomFactor((z) =>
-                  Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(1)),
-                )
-              }
-              disabled={zoomFactor <= ZOOM_MIN}
+              aria-label="Zoom out"
+              onClick={() => setZoom(clampZoom(scale - ZOOM_STEP))}
+              disabled={scale <= ZOOM_MIN}
             >
               <ZoomOut className="h-4 w-4" />
             </Button>
-            <span className="w-12 text-center text-xs font-medium text-muted-foreground">
-              {Math.round(zoomFactor * 100)}%
+            <input
+              type="range"
+              aria-label="Zoom"
+              min={ZOOM_MIN * 100}
+              max={ZOOM_MAX * 100}
+              step={1}
+              value={percent}
+              onChange={(e) => setZoom(clampZoom(Number(e.target.value) / 100))}
+              className="h-1.5 w-20 cursor-pointer accent-primary sm:w-28"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              aria-label="Zoom in"
+              onClick={() => setZoom(clampZoom(scale + ZOOM_STEP))}
+              disabled={scale >= ZOOM_MAX}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <span className="w-10 text-center text-xs font-medium text-muted-foreground tabular-nums">
+              {percent}%
             </span>
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() =>
-                setZoomFactor((z) =>
-                  Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(1)),
-                )
-              }
-              disabled={zoomFactor >= ZOOM_MAX}
+              className="h-7 gap-1 px-2 text-xs"
+              aria-label="Fit page to screen"
+              onClick={() => setZoom(null)}
+              disabled={zoom === null}
             >
-              <ZoomIn className="h-4 w-4" />
+              <Maximize2 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Fit</span>
             </Button>
           </div>
         </div>
 
         {/* Scaled resume — zoom affects layout so no blank space below.
             Overlay div sits on top of template (pointer-events:none) to draw dotted page-break lines. */}
-        <div style={{ flexShrink: 0, position: "relative" }}>
+        <div
+          style={{
+            flexShrink: 0,
+            position: "relative",
+            visibility: measured ? "visible" : "hidden",
+          }}
+        >
           <div
             style={{
               zoom: scale,
@@ -324,7 +390,7 @@ export default function TemplatePreview({ template }: { template: Template }) {
       </div>
 
       {/* Right — info + CTA */}
-      <div className="flex w-full shrink-0 flex-col gap-6 border-l bg-card p-8 lg:w-80">
+      <div className="flex w-full shrink-0 flex-col gap-6 border-t bg-card p-6 sm:p-8 lg:w-80 lg:overflow-auto lg:border-t-0 lg:border-l">
         <div className="space-y-2">
           <Badge variant="secondary" className="capitalize">
             {template.category}
