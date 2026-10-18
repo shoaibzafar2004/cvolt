@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { TEMPLATE_THEMES } from "@/lib/templates";
+import { BUILD_STEPS } from "@/lib/build-steps";
 import type { Template, ResumeData } from "@/types";
 
 const PLACEHOLDER: ResumeData = {
@@ -360,17 +361,19 @@ export default function TemplatePreview({ template }: { template: Template }) {
               Edit your resume
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: "Personal info", step: 1 },
-                { label: "Experience", step: 2 },
-                { label: "Education & skills", step: 3 },
-                { label: "Summary", step: 4 },
-              ].map(({ label, step }) => (
+              {BUILD_STEPS.map(({ label, step, icon: Icon }) => (
                 <Link
                   key={step}
                   href={`/build?step=${step}&returnTo=/templates/${template.slug}`}
-                  className="rounded-lg border border-border px-3 py-2 text-center text-xs leading-tight text-foreground transition-colors hover:bg-muted"
+                  className={[
+                    "flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-center text-xs leading-tight text-foreground transition-colors hover:bg-muted",
+                    // Odd count: let the last button span the full row
+                    step === BUILD_STEPS.length && BUILD_STEPS.length % 2 === 1
+                      ? "col-span-2"
+                      : "",
+                  ].join(" ")}
                 >
+                  <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                   {label}
                 </Link>
               ))}

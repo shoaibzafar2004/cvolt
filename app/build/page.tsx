@@ -9,6 +9,7 @@ import { useResumeStore } from "@/store/resumeStore";
 import { createClient } from "@/lib/supabase/client";
 import { shapeDbRowToResumeData, type DbResume } from "@/lib/utils";
 import BuildLoading from "./loading";
+import { TOTAL_STEPS } from "@/lib/build-steps";
 
 // SSR disabled — StepWrapper depends entirely on client-side Zustand state
 // (uiStore.currentStep). SSR-ing it with stale singleton state causes hydration mismatches.
@@ -53,7 +54,7 @@ function BuildInner() {
 
   useEffect(() => {
     const step = Number(searchParams.get("step"));
-    if (step >= 1 && step <= 5) setStep(step);
+    if (step >= 1 && step <= TOTAL_STEPS) setStep(step);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <StepWrapper />;

@@ -4,59 +4,15 @@ import { useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUIStore } from "@/store/uiStore";
 import { Button } from "@/components/ui/button";
-import {
-  User,
-  Briefcase,
-  FolderGit2,
-  GraduationCap,
-  AlignLeft,
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  LayoutTemplate,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, LayoutTemplate } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import SectionLine from "@/components/shared/SectionLine";
+import { BUILD_STEPS, TOTAL_STEPS } from "@/lib/build-steps";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
 import Step4 from "./Step4";
 import Step5 from "./Step5";
-
-const STEPS = [
-  {
-    step: 1,
-    label: "Personal info",
-    sublabel: "Name, title, contact",
-    icon: User,
-  },
-  {
-    step: 2,
-    label: "Work experience",
-    sublabel: "Jobs and achievements",
-    icon: Briefcase,
-  },
-  {
-    step: 3,
-    label: "Projects",
-    sublabel: "Side projects, open source",
-    icon: FolderGit2,
-  },
-  {
-    step: 4,
-    label: "Education & skills",
-    sublabel: "Degrees, skills, extras",
-    icon: GraduationCap,
-  },
-  {
-    step: 5,
-    label: "Summary",
-    sublabel: "Professional overview",
-    icon: AlignLeft,
-  },
-];
-
-const TOTAL_STEPS = STEPS.length;
 
 export type StepSubmitRef = { submit: () => void };
 
@@ -80,7 +36,7 @@ export default function StepWrapper() {
 
         {/* Steps */}
         <div className="mt-4 flex flex-col gap-18 pr-4 pl-22">
-          {STEPS.map(({ step, label, sublabel, icon: Icon }) => {
+          {BUILD_STEPS.map(({ step, label, sublabel, icon: Icon }) => {
             const isComplete = currentStep > step;
             const isActive = currentStep === step;
             const isPending = currentStep < step;
@@ -164,14 +120,14 @@ export default function StepWrapper() {
             />
           </div>
           <span className="shrink-0 text-xs font-medium text-foreground">
-            {STEPS[currentStep - 1].label}
+            {BUILD_STEPS[currentStep - 1].label}
           </span>
         </div>
 
         {/* Scrollable form — card fills the column */}
         <div className="flex-1 overflow-auto px-4 pt-8 pb-4 lg:px-8 xl:px-12">
           <h2 className="mt-8 mb-4 px-1 text-xl font-semibold">
-            {STEPS[currentStep - 1].label}
+            {BUILD_STEPS[currentStep - 1].label}
           </h2>
           <AnimatePresence mode="wait">
             <motion.div
