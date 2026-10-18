@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-interface DbResume {
+export interface DbResume {
   personal_info: ResumeData['personalInfo']
   resume_sections: Array<{
     id: string
@@ -32,3 +32,9 @@ export function shapeDbRowToResumeData(row: DbResume): ResumeData {
   }
 }
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24
+
+// Whole days from now until `date`, rounded up. Zero or negative once it has passed.
+export function daysUntil(date: string | Date): number {
+  return Math.ceil((new Date(date).getTime() - Date.now()) / MS_PER_DAY)
+}

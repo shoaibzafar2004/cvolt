@@ -89,7 +89,7 @@ export const TEMPLATE_THEMES: Record<string, ThemeOption[]> = {
   })),
 }
 
-const registry: Record<string, TemplateComponent> = {
+export const registry: Record<string, TemplateComponent> = {
   clean: CleanTemplate,
   modern: ModernTemplate,
   creative: CreativeTemplate,
