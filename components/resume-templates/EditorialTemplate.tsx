@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type {
   ResumeData,
   WorkContent,
@@ -20,10 +21,13 @@ import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 // A4: 794px × 1123px
 
 const PHOTO_W = 186;
-const H_PAD = 36; // horizontal page padding
-const INNER_W = 794 - H_PAD * 2; // 722
+const PAGE_PAD = 20; // outer frame around the whole page
+const H_PAD = 36; // horizontal padding inside section bodies
+const INNER_W = 794 - PAGE_PAD * 2 - H_PAD * 2; // 682
 const COL_GAP = 28;
-const COL_W = (INNER_W - COL_GAP) / 2; // ~347
+const DIVIDER_W = 1;
+// Two columns separated by a 1px divider; the flex gap applies on both sides of it.
+const COL_W = (INNER_W - COL_GAP * 2 - DIVIDER_W) / 2; // 312.5
 
 const BODY = "#2d2d2d";
 const MUTED = "#666666";
@@ -96,7 +100,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
         fontSize: 11,
         color: BODY,
         boxSizing: "border-box",
-        padding: 20,
+        padding: PAGE_PAD,
       }}
     >
       <style
@@ -246,7 +250,11 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
               })}
             </div>
             <div
-              style={{ width: 1, backgroundColor: "#e0e0e0", flexShrink: 0 }}
+              style={{
+                width: DIVIDER_W,
+                backgroundColor: "#e0e0e0",
+                flexShrink: 0,
+              }}
             />
             <div style={{ width: COL_W, flexShrink: 0 }}>
               {eduRight.map((s) => {
@@ -278,7 +286,11 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
               })}
             </div>
             <div
-              style={{ width: 1, backgroundColor: "#e0e0e0", flexShrink: 0 }}
+              style={{
+                width: DIVIDER_W,
+                backgroundColor: "#e0e0e0",
+                flexShrink: 0,
+              }}
             />
             <div style={{ width: COL_W, flexShrink: 0 }}>
               {workRight.map((s) => {
@@ -307,11 +319,22 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
               projects.slice(0, Math.ceil(projects.length / 2)),
               projects.slice(Math.ceil(projects.length / 2)),
             ].map((col, ci) => (
-              <div key={ci} style={{ width: COL_W, flexShrink: 0 }}>
-                {col.map((proj, i) => (
-                  <ProjectEntry key={i} p={proj} accent={ACCENT} />
-                ))}
-              </div>
+              <Fragment key={ci}>
+                {ci === 1 && (
+                  <div
+                    style={{
+                      width: DIVIDER_W,
+                      backgroundColor: "#e0e0e0",
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
+                <div style={{ width: COL_W, flexShrink: 0 }}>
+                  {col.map((proj, i) => (
+                    <ProjectEntry key={i} p={proj} accent={ACCENT} />
+                  ))}
+                </div>
+              </Fragment>
             ))}
           </div>
         </div>
