@@ -122,8 +122,10 @@ cvolt/
 │   │   └── failed/page.tsx
 │   ├── dashboard/
 │   │   ├── layout.tsx                  # Wraps everything in AuthGate
-│   │   ├── page.tsx
-│   │   ├── edit/[id]/                  # page.tsx (server) → EditFormShell.tsx (client)
+│   │   ├── page.tsx                    # Purchase cards (active: Edit + Download, expired: Delete)
+│   │   ├── actions.ts                  # Server actions: deleteExpiredPurchase
+│   │   ├── DeleteResumeButton.tsx      # Delete + confirm dialog (client)
+│   │   ├── edit/[id]/                  # [id] = resume id. page.tsx (server) → EditFormShell.tsx (client)
 │   │   └── download/[id]/page.tsx      # Re-download gate
 │   ├── api/
 │   │   ├── generate-pdf/route.ts
@@ -142,7 +144,8 @@ cvolt/
 │   │                                   #   BulletEditor (Tiptap), PhotoCropModal
 │   ├── templates/                      # TemplateCard, FilterBar, ThemePicker
 │   ├── resume-templates/               # THE CRITICAL FOLDER — one *Template.tsx per design (14),
-│   │                                   #   plus ClientOnlyTemplate.tsx (client-only render wrapper)
+│   │                                   #   ClientOnlyTemplate.tsx (client-only render wrapper),
+│   │                                   #   ContactIcons.tsx (inline SVG icon set), CertExtras.tsx
 │   ├── ui/                             # shadcn components (badge, button, dialog, input, select,
 │   │                                   #   sheet, skeleton, textarea) + custom month-picker
 │   └── shared/                         # Navbar, Footer, AuthGate, LogoutButton, SectionLine,
@@ -156,6 +159,8 @@ cvolt/
 │   ├── schemas.ts                      # All Zod schemas
 │   ├── payments.ts                     # Stripe + Safepay helpers
 │   ├── templates.ts                    # Registry: slug → component, plus per-template themes
+│   ├── build-steps.ts                  # BUILD_STEPS / TOTAL_STEPS — single source for the /build steps
+│   ├── resume-format.ts                # Template display helpers: dateRange, projectMeta, displayUrl
 │   ├── cropImage.ts                    # Canvas helper for the photo cropper
 │   └── utils.ts                        # cn(), daysUntil(), shapeDbRowToResumeData
 │
@@ -195,13 +200,13 @@ cvolt/
 |---|---|
 | `/` | Landing — hero, value prop, how it works, 3 template previews, pricing, FAQ, footer |
 | `/build` | Multi-step form router. Auto-saves to localStorage on blur, syncs to Supabase on step complete |
-| `/build?step=1` | Personal info — name, job title, email, phone, location, LinkedIn, website |
+| `/build?step=1` | Personal info — name, job title, email, phone, location, LinkedIn, GitHub, website, photo |
 | `/build?step=2` | Work experience — repeatable blocks, rich text bullet points, add/remove/reorder |
 | `/build?step=3` | Projects & open-source contributions (optional) — type, role, link, dates, highlights, tech stack; reorderable |
-| `/build?step=4` | Education + skills + optional extras (certifications, languages). Toggle sections on/off |
+| `/build?step=4` | Education + skills + optional extras (certifications with link + skills, languages). Toggle sections on/off |
 | `/build?step=5` | Professional summary (optional/skippable) + mini preview of completed resume |
 | `/templates` | Gallery — CSS grid, live previews at ~30% zoom with real user data, filter bar |
-| `/templates/[slug]` | Full-size preview — left: rendered resume, right: template info + "Use this — $1.50" CTA |
+| `/templates/[slug]` | Full-size preview — left: rendered resume with back button + zoom (−/slider/+/Fit, 100% = real A4 size), right: template info, theme picker, "Edit your resume" step links, "Use this — $1.50" CTA |
 
 ### Payment flow
 
@@ -276,6 +281,9 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 - Inline styles + CSS vars only. No Tailwind. No exceptions.
 - Fonts via `@font-face` inside each template
 - Section order in every template: Work → Projects → Education (where they share a column). Project date/meta/link formatting comes from `lib/resume-format.ts`
+- Contact rows (phone, email, location, website, LinkedIn, GitHub) use the icons in `ContactIcons.tsx` — never text glyphs (◉ ⊕ ✆). Icons inherit colour and size (`currentColor`, `1em`).
+- Certification link + skills render through `<CertExtras>` with the template's own link/muted colours
+- When adding a field, update every template and verify by rendering all 14 (renderToStaticMarkup) — there is no automated visual test suite
 
 ---
 
@@ -724,8 +732,9 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 
 ## Supabase
 - Development uses local Supabase (`npm run db:start`); there is no hosted dev project.
-- Schema changes go in a NEW file via `npx supabase migration new <name>`. Never edit an applied migration.
-- `npm run db:reset` wipes local data and re-applies migrations + seed.
+- Schema changes go in a NEW file via `npx supabase migration new <name> </dev/null` (without `</dev/null` it waits for SQL on stdin when not run in a terminal). Never edit an applied migration.
+- Apply new migrations locally with `npx supabase migration up` — keeps data. `npm run db:reset` wipes local data and re-applies migrations + seed; don't run it without asking.
+- Payment rows are never hard-deleted; queries on `payments` must filter `deleted_at is null`.
 - Use lib/supabase/client.ts in 'use client' components only.
 - Use lib/supabase/server.ts in server components and API route handlers.
 - Never import the browser client in a server context — it will throw.
