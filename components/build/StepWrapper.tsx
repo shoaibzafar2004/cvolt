@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useUIStore } from "@/store/uiStore";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, LayoutTemplate } from "lucide-react";
@@ -14,13 +14,13 @@ import Step3 from "./Step3";
 import Step4 from "./Step4";
 import Step5 from "./Step5";
 
-export type StepSubmitRef = { submit: () => void };
+// `destination` is only used by the last step, which navigates away after saving.
+export type StepSubmitRef = { submit: (destination?: string) => void };
 
 export default function StepWrapper() {
   const { currentStep, setStep } = useUIStore();
   const stepRef = useRef<StepSubmitRef>(null);
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const returnTo = searchParams.get("returnTo");
 
@@ -165,26 +165,45 @@ export default function StepWrapper() {
           ) : (
             <div />
           )}
-          <Button
-            size="lg"
-            onClick={
-              currentStep === TOTAL_STEPS
-                ? () => router.push(returnTo ?? "/templates")
-                : handleNext
-            }
-            className="rounded-full"
-          >
-            {currentStep === TOTAL_STEPS ? (
-              <>
-                <LayoutTemplate className="h-4 w-4" />{" "}
-                {returnTo ? "Back to preview" : "Browse templates"}
-              </>
-            ) : (
-              <>
-                Next <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </Button>
+          {currentStep === TOTAL_STEPS ? (
+            // Last step: save the summary, then leave. Coming from a template
+            // preview (?returnTo=) offers both the way back and the gallery.
+            <div className="flex items-center gap-2">
+              {returnTo && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => stepRef.current?.submit("/templates")}
+                  className="rounded-full"
+                >
+                  <LayoutTemplate className="h-4 w-4" />
+                  <span className="hidden sm:inline">Browse templates</span>
+                  <span className="sm:hidden">All</span>
+                </Button>
+              )}
+              <Button
+                size="lg"
+                onClick={() =>
+                  stepRef.current?.submit(returnTo ?? "/templates")
+                }
+                className="rounded-full"
+              >
+                {returnTo ? (
+                  <>
+                    Back to preview <ArrowRight className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    <LayoutTemplate className="h-4 w-4" /> Browse templates
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : (
+            <Button size="lg" onClick={handleNext} className="rounded-full">
+              Next <ArrowRight className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>
