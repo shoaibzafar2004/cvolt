@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Font: Libre Franklin — geometric, clean, wide letterforms.
@@ -324,72 +325,134 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
           {projects.length > 0 && (
             <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Projects" accent={ACCENT} />
-              {projects.map((proj, i) => (
-                <div
-                  key={i}
-                  style={{
-                    marginBottom: i < projects.length - 1 ? 16 : 0,
-                    pageBreakInside: "avoid",
-                  }}
-                >
+              {projects.map((proj, i) => {
+                const meta = projectMeta(proj);
+                const dates = projectDates(proj);
+                return (
                   <div
+                    key={i}
                     style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: "#55565c",
-                      marginBottom: 2,
+                      marginBottom: i < projects.length - 1 ? 12 : 0,
+                      pageBreakInside: "avoid",
                     }}
                   >
-                    {proj.name}
-                    {proj.url && (
-                      <span
-                        style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}
-                      >
-                        {" "}
-                        · {proj.url}
-                      </span>
-                    )}
-                  </div>
-                  {proj.description && (
-                    <div
-                      style={{
-                        fontSize: 10,
-                        color: MUTED,
-                        fontStyle: "italic",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {proj.description}
-                    </div>
-                  )}
-                  {proj.bullets.filter(Boolean).map((b, j) => (
-                    <div
-                      key={j}
-                      style={{
-                        display: "flex",
-                        gap: 8,
-                        marginBottom: 3,
-                        fontSize: 10.5,
-                        lineHeight: 1.4,
-                        color: BODY,
-                      }}
-                    >
-                      <span
+                    {/* Date + role/type */}
+                    {(dates || meta) && (
+                      <div
                         style={{
-                          flexShrink: 0,
-                          fontSize: 7,
-                          color: ACCENT,
-                          marginTop: 4,
-                          lineHeight: 1,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          marginBottom: 2,
                         }}
                       >
-                        ■
-                      </span>
-                      <div dangerouslySetInnerHTML={{ __html: b }} />
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.8,
+                            color: ACCENT,
+                          }}
+                        >
+                          {dates}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 10,
+                            color: MUTED,
+                            flexShrink: 0,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {meta}
+                        </span>
+                      </div>
+                    )}
+                    {/* Name */}
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "#55565c",
+                        marginBottom: proj.url ? 1 : 6,
+                      }}
+                    >
+                      {proj.name}
                     </div>
-                  ))}
-                </div>
-              ))}
+                    {proj.url && (
+                      <div
+                        style={{ fontSize: 9.5, color: MUTED, marginBottom: 6 }}
+                      >
+                        {displayUrl(proj.url)}
+                      </div>
+                    )}
+                    {proj.description && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          lineHeight: 1.4,
+                          color: BODY,
+                          marginBottom: 3,
+                        }}
+                      >
+                        {proj.description}
+                      </div>
+                    )}
+                    {/* Bullets — square markers */}
+                    {proj.bullets.filter(Boolean).map((b, j) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          marginBottom: 3,
+                          fontSize: 10.5,
+                          lineHeight: 1.4,
+                          color: BODY,
+                        }}
+                      >
+                        <span
+                          style={{
+                            flexShrink: 0,
+                            fontSize: 7,
+                            color: ACCENT,
+                            marginTop: 4,
+                            lineHeight: 1,
+                          }}
+                        >
+                          ■
+                        </span>
+                        <div dangerouslySetInnerHTML={{ __html: b }} />
+                      </div>
+                    ))}
+                    {proj.techStack && proj.techStack.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "3px 6px",
+                          marginTop: 6,
+                        }}
+                      >
+                        {proj.techStack.map((t, j) => (
+                          <span
+                            key={j}
+                            style={{
+                              fontSize: 9,
+                              color: ACCENT,
+                              border: `1px solid ${ACCENT}`,
+                              padding: "1px 6px",
+                            }}
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

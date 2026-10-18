@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Dark left sidebar (#1a1a1a) + white right column. Same two-column structure.
@@ -416,53 +417,114 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
         {/* Projects */}
         {projects.length > 0 && (
           <MainSection title="Projects" accent={DARK}>
-            {projects.map((proj, i) => (
-              <div
-                key={i}
-                style={{
-                  marginBottom: 12,
-                  paddingLeft: 12,
-                  borderLeft: `2px solid ${MAIN_BORDER}`,
-                }}
-              >
-                <div style={{ fontWeight: 700, fontSize: 11, color: DARK }}>
-                  {proj.name}
-                  {proj.url && (
-                    <span
-                      style={{
-                        fontWeight: 400,
-                        color: MAIN_MUTED,
-                        fontSize: 9,
-                      }}
-                    >
-                      {" "}
-                      · {proj.url}
-                    </span>
-                  )}
-                </div>
-                {proj.description && (
+            {projects.map((proj, i) => {
+              const meta = projectMeta(proj);
+              const dates = projectDates(proj);
+              return (
+                <div
+                  key={i}
+                  style={{
+                    marginBottom: 18,
+                    paddingLeft: 12,
+                    borderLeft: `2px solid ${MAIN_BORDER}`,
+                    pageBreakInside: "avoid",
+                  }}
+                >
                   <div
-                    style={{ color: MAIN_MUTED, fontSize: 10, marginTop: 2 }}
-                  >
-                    {proj.description}
-                  </div>
-                )}
-                {proj.bullets.filter(Boolean).map((b, j) => (
-                  <div
-                    key={j}
                     style={{
-                      display: "flex",
-                      gap: 6,
-                      marginTop: 2,
-                      fontSize: 10,
+                      fontSize: 9,
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: 1,
+                      color: MAIN_MUTED,
                     }}
                   >
-                    <span style={{ flexShrink: 0, color: MAIN_MUTED }}>·</span>
-                    <div dangerouslySetInnerHTML={{ __html: b }} />
+                    {meta || "Project"}
+                    {dates && (
+                      <span style={{ fontWeight: 400, marginLeft: 6 }}>
+                        | {dates}
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
-            ))}
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 10.5,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                      color: DARK,
+                      marginTop: 3,
+                    }}
+                  >
+                    {proj.name}
+                  </div>
+                  {proj.url && (
+                    <div
+                      style={{ fontSize: 9, color: MAIN_MUTED, marginTop: 1 }}
+                    >
+                      {displayUrl(proj.url)}
+                    </div>
+                  )}
+                  <div style={{ marginTop: 6 }}>
+                    {proj.description && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          lineHeight: 1.55,
+                          color: "#333333",
+                          marginBottom: 3,
+                        }}
+                      >
+                        {proj.description}
+                      </div>
+                    )}
+                    {proj.bullets.filter(Boolean).map((b, j) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          marginBottom: 3,
+                          fontSize: 10.5,
+                          lineHeight: 1.55,
+                          color: "#333333",
+                        }}
+                      >
+                        <span style={{ flexShrink: 0, color: MAIN_MUTED }}>
+                          ·
+                        </span>
+                        <div dangerouslySetInnerHTML={{ __html: b }} />
+                      </div>
+                    ))}
+                    {proj.techStack && proj.techStack.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "4px 6px",
+                          marginTop: 6,
+                        }}
+                      >
+                        {proj.techStack.map((t, j) => (
+                          <span
+                            key={j}
+                            style={{
+                              fontSize: 9,
+                              color: "#ffffff",
+                              backgroundColor: MAIN_MUTED,
+                              padding: "1px 7px",
+                              borderRadius: 10,
+                            }}
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </MainSection>
         )}
       </div>

@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Must render identically in browser and via ReactDOMServer.renderToStaticMarkup().
@@ -206,6 +207,95 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
         </Section>
       )}
 
+      {/* Projects */}
+      {projects.length > 0 && (
+        <Section title="Projects" accent={colors.accent} border={colors.border}>
+          {projects.map((p, i) => {
+            const meta = projectMeta(p);
+            const dates = projectDates(p);
+            return (
+              <div
+                key={i}
+                style={{ marginBottom: 14, pageBreakInside: "avoid" }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <span style={{ fontWeight: 600, fontSize: 12 }}>
+                    {p.name}
+                  </span>
+                  {dates && (
+                    <span style={{ fontSize: 10, color: colors.muted }}>
+                      {dates}
+                    </span>
+                  )}
+                </div>
+                {(meta || p.url) && (
+                  <div
+                    style={{
+                      color: colors.muted,
+                      fontSize: 11,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {meta}
+                    {meta && p.url ? " · " : ""}
+                    {p.url && (
+                      <span style={{ color: colors.accent }}>
+                        {displayUrl(p.url)}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {p.description && (
+                  <div style={{ marginBottom: 3 }}>{p.description}</div>
+                )}
+                {p.bullets.filter(Boolean).map((b, j) => (
+                  <div
+                    key={j}
+                    style={{ display: "flex", gap: 6, marginBottom: 2 }}
+                  >
+                    <span style={{ color: colors.accent, flexShrink: 0 }}>
+                      •
+                    </span>
+                    <div dangerouslySetInnerHTML={{ __html: b }} />
+                  </div>
+                ))}
+                {p.techStack && p.techStack.length > 0 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "4px 6px",
+                      marginTop: 6,
+                    }}
+                  >
+                    {p.techStack.map((t, j) => (
+                      <span
+                        key={j}
+                        style={{
+                          fontSize: 9,
+                          color: colors.accent,
+                          border: `1px solid ${colors.accent}`,
+                          padding: "1px 7px",
+                          borderRadius: 10,
+                        }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </Section>
+      )}
+
       {/* Education */}
       {education.length > 0 && (
         <Section
@@ -272,47 +362,6 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
               </span>
             ))}
           </div>
-        </Section>
-      )}
-
-      {/* Projects */}
-      {projects.length > 0 && (
-        <Section title="Projects" accent={colors.accent} border={colors.border}>
-          {projects.map((p, i) => (
-            <div key={i} style={{ marginBottom: 10 }}>
-              <div style={{ fontWeight: 600, fontSize: 12 }}>
-                {p.name}
-                {p.url ? (
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: colors.muted,
-                      fontSize: 10,
-                    }}
-                  >
-                    {" "}
-                    · {p.url}
-                  </span>
-                ) : null}
-              </div>
-              {p.description && (
-                <div
-                  style={{ color: colors.muted, fontSize: 11, marginBottom: 3 }}
-                >
-                  {p.description}
-                </div>
-              )}
-              {p.bullets.filter(Boolean).map((b, j) => (
-                <div
-                  key={j}
-                  style={{ display: "flex", gap: 6, marginBottom: 2 }}
-                >
-                  <span style={{ color: colors.accent, flexShrink: 0 }}>•</span>
-                  <div dangerouslySetInnerHTML={{ __html: b }} />
-                </div>
-              ))}
-            </div>
-          ))}
         </Section>
       )}
 

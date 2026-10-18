@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Inspired by: warm cream bg, large serif name, serif section headings in warm brown,
@@ -434,6 +435,129 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
           </RightSection>
         )}
 
+        {/* Projects */}
+        {projects.length > 0 && (
+          <RightSection title="Projects">
+            {projects.map((proj, i) => {
+              const meta = projectMeta(proj);
+              const dates = projectDates(proj).replace(" – ", " to ");
+              return (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    gap: 14,
+                    marginBottom: 20,
+                    pageBreakInside: "avoid",
+                  }}
+                >
+                  {/* Circle marker */}
+                  <div style={{ flexShrink: 0, marginTop: 3 }}>
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: "50%",
+                        border: `2px solid ${ACCENT}`,
+                        backgroundColor: BG,
+                      }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        fontFamily: '"Source Sans 3", sans-serif',
+                        fontWeight: 700,
+                        fontSize: 11.5,
+                        color: DARK,
+                      }}
+                    >
+                      {proj.name}
+                    </div>
+                    {(meta || proj.url) && (
+                      <div
+                        style={{
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontSize: 10.5,
+                          color: DARK,
+                          marginTop: 1,
+                        }}
+                      >
+                        {meta}
+                        {meta && proj.url ? " · " : ""}
+                        {proj.url && (
+                          <span style={{ color: ACCENT }}>
+                            {displayUrl(proj.url)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {(dates || proj.description) && (
+                      <div
+                        style={{
+                          fontFamily: '"Lora", serif',
+                          fontStyle: "italic",
+                          fontSize: 10,
+                          color: MUTED,
+                          marginTop: 2,
+                          marginBottom: 6,
+                        }}
+                      >
+                        {dates}
+                        {dates && proj.description ? " — " : ""}
+                        {proj.description}
+                      </div>
+                    )}
+                    {proj.bullets.filter(Boolean).map((b, j) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          marginBottom: 3,
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontSize: 10.5,
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
+                        <div dangerouslySetInnerHTML={{ __html: b }} />
+                      </div>
+                    ))}
+                    {proj.techStack && proj.techStack.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "4px 6px",
+                          marginTop: 6,
+                        }}
+                      >
+                        {proj.techStack.map((t, j) => (
+                          <span
+                            key={j}
+                            style={{
+                              fontSize: 9,
+                              color: ACCENT,
+                              border: `1px solid ${DIVIDER}`,
+                              backgroundColor: BG,
+                              padding: "1px 7px",
+                              borderRadius: 10,
+                              fontFamily: '"Source Sans 3", sans-serif',
+                            }}
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </RightSection>
+        )}
+
         {/* Education */}
         {education.length > 0 && (
           <RightSection title="Education">
@@ -513,80 +637,6 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 </div>
               );
             })}
-          </RightSection>
-        )}
-
-        {/* Projects */}
-        {projects.length > 0 && (
-          <RightSection title="Projects">
-            {projects.map((proj, i) => (
-              <div
-                key={i}
-                style={{ display: "flex", gap: 14, marginBottom: 16 }}
-              >
-                <div style={{ flexShrink: 0, marginTop: 3 }}>
-                  <div
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: "50%",
-                      border: `2px solid ${ACCENT}`,
-                      backgroundColor: BG,
-                    }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontFamily: '"Source Sans 3", sans-serif',
-                      fontWeight: 700,
-                      fontSize: 11.5,
-                      color: DARK,
-                    }}
-                  >
-                    {proj.name}
-                    {proj.url && (
-                      <span
-                        style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}
-                      >
-                        {" "}
-                        · {proj.url}
-                      </span>
-                    )}
-                  </div>
-                  {proj.description && (
-                    <div
-                      style={{
-                        fontFamily: '"Lora", serif',
-                        fontStyle: "italic",
-                        fontSize: 10,
-                        color: MUTED,
-                        marginTop: 2,
-                        marginBottom: 4,
-                      }}
-                    >
-                      {proj.description}
-                    </div>
-                  )}
-                  {proj.bullets.filter(Boolean).map((b, j) => (
-                    <div
-                      key={j}
-                      style={{
-                        display: "flex",
-                        gap: 8,
-                        marginBottom: 3,
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontSize: 10.5,
-                        lineHeight: 1.55,
-                      }}
-                    >
-                      <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
-                      <div dangerouslySetInnerHTML={{ __html: b }} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
           </RightSection>
         )}
       </div>

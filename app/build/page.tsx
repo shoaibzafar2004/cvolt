@@ -53,7 +53,7 @@ function BuildInner() {
 
   useEffect(() => {
     const step = Number(searchParams.get("step"));
-    if (step >= 1 && step <= 4) setStep(step);
+    if (step >= 1 && step <= 5) setStep(step);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <StepWrapper />;

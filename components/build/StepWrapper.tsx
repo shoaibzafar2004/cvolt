@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   User,
   Briefcase,
+  FolderGit2,
   GraduationCap,
   AlignLeft,
   ArrowLeft,
@@ -20,6 +21,7 @@ import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
 import Step4 from "./Step4";
+import Step5 from "./Step5";
 
 const STEPS = [
   {
@@ -36,12 +38,18 @@ const STEPS = [
   },
   {
     step: 3,
+    label: "Projects",
+    sublabel: "Side projects, open source",
+    icon: FolderGit2,
+  },
+  {
+    step: 4,
     label: "Education & skills",
     sublabel: "Degrees, skills, extras",
     icon: GraduationCap,
   },
   {
-    step: 4,
+    step: 5,
     label: "Summary",
     sublabel: "Professional overview",
     icon: AlignLeft,
@@ -173,7 +181,7 @@ export default function StepWrapper() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.18, ease: "easeInOut" }}
               className={
-                currentStep === 2 || currentStep === 3
+                currentStep === 2 || currentStep === 3 || currentStep === 4
                   ? ""
                   : "rounded-2xl border bg-background p-6 shadow-sm lg:p-10"
               }
@@ -182,6 +190,7 @@ export default function StepWrapper() {
               {currentStep === 2 && <Step2 ref={stepRef} />}
               {currentStep === 3 && <Step3 ref={stepRef} />}
               {currentStep === 4 && <Step4 ref={stepRef} />}
+              {currentStep === 5 && <Step5 ref={stepRef} />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Elegant single-column — warm cream bg, large serif name, circle entry markers,
@@ -314,6 +315,93 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
         </Section>
       )}
 
+      {/* ── Projects ── */}
+      {projects.length > 0 && (
+        <Section title="Projects">
+          {projects.map((proj, i) => {
+            const meta = projectMeta(proj);
+            const dates = projectDates(proj).replace(" – ", " to ");
+            return (
+              <Entry key={i}>
+                <div
+                  style={{
+                    fontFamily: '"Source Sans 3", sans-serif',
+                    fontWeight: 700,
+                    fontSize: 11.5,
+                  }}
+                >
+                  {proj.name}
+                </div>
+                {(meta || proj.url) && (
+                  <div
+                    style={{
+                      fontFamily: '"Source Sans 3", sans-serif',
+                      fontSize: 10.5,
+                      color: DARK,
+                      marginTop: 1,
+                    }}
+                  >
+                    {meta}
+                    {meta && proj.url ? " · " : ""}
+                    {proj.url && (
+                      <span style={{ color: ACCENT }}>
+                        {displayUrl(proj.url)}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {(dates || proj.description) && (
+                  <div
+                    style={{
+                      fontFamily: '"Lora", serif',
+                      fontStyle: "italic",
+                      fontSize: 10,
+                      color: MUTED,
+                      marginTop: 2,
+                      marginBottom: 5,
+                    }}
+                  >
+                    {dates}
+                    {dates && proj.description ? " — " : ""}
+                    {proj.description}
+                  </div>
+                )}
+                {proj.bullets.filter(Boolean).map((b, j) => (
+                  <Bullet key={j} html={b} />
+                ))}
+                {proj.techStack && proj.techStack.length > 0 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "4px 6px",
+                      marginTop: 6,
+                    }}
+                  >
+                    {proj.techStack.map((t, j) => (
+                      <span
+                        key={j}
+                        style={{
+                          fontSize: 9,
+                          color: ACCENT,
+                          border: `1px solid ${DIVIDER}`,
+                          backgroundColor: BG,
+                          padding: "1px 7px",
+                          borderRadius: 10,
+                          fontFamily: '"Source Sans 3", sans-serif',
+                        }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </Entry>
+            );
+          })}
+        </Section>
+      )}
+
       {/* ── Skills ── */}
       {skills.length > 0 && (
         <Section title="Skills">
@@ -339,50 +427,6 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
               </span>
             ))}
           </div>
-        </Section>
-      )}
-
-      {/* ── Projects ── */}
-      {projects.length > 0 && (
-        <Section title="Projects">
-          {projects.map((proj, i) => (
-            <Entry key={i}>
-              <div
-                style={{
-                  fontFamily: '"Source Sans 3", sans-serif',
-                  fontWeight: 700,
-                  fontSize: 11.5,
-                }}
-              >
-                {proj.name}
-                {proj.url && (
-                  <span
-                    style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}
-                  >
-                    {" "}
-                    · {proj.url}
-                  </span>
-                )}
-              </div>
-              {proj.description && (
-                <div
-                  style={{
-                    fontFamily: '"Lora", serif',
-                    fontStyle: "italic",
-                    fontSize: 10,
-                    color: MUTED,
-                    marginTop: 2,
-                    marginBottom: 4,
-                  }}
-                >
-                  {proj.description}
-                </div>
-              )}
-              {proj.bullets.filter(Boolean).map((b, j) => (
-                <Bullet key={j} html={b} />
-              ))}
-            </Entry>
-          ))}
         </Section>
       )}
 
