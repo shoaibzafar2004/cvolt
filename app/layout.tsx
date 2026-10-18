@@ -24,7 +24,8 @@ const jost = Jost({
 
 export const metadata: Metadata = {
   title: "Cvolt — One resume, one payment",
-  description: "Build a professional resume, pick a template, pay once and download. No subscription.",
+  description:
+    "Build a professional resume, pick a template, pay once and download. No subscription.",
 };
 
 export default function RootLayout({
@@ -38,10 +39,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${jost.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <ThemeProvider>
           <Navbar />
-          <main className="flex-1 flex flex-col">{children}</main>
+          <main className="flex flex-1 flex-col">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

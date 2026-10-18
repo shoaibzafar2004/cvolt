@@ -8,7 +8,7 @@ See [CLAUDE.md](CLAUDE.md) for the full architecture, database schema, routes an
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 20+ (CI uses the version in `.nvmrc`)
 - Docker (running) — the database runs locally via the Supabase CLI
 - ~4 GB of free RAM for the local Supabase containers
 
@@ -22,13 +22,13 @@ cp .env.example .env.local
 
 Fill `.env.local` using the values printed by `npm run db:status`:
 
-| Variable | Local value |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `http://127.0.0.1:54321` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `ANON_KEY` from `db:status` |
-| `SUPABASE_SERVICE_ROLE_KEY` | `SERVICE_ROLE_KEY` from `db:status` |
-| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` |
-| `STRIPE_*`, `SAFEPAY_SECRET_KEY` | Your test-mode keys |
+| Variable                         | Local value                         |
+| -------------------------------- | ----------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`       | `http://127.0.0.1:54321`            |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | `ANON_KEY` from `db:status`         |
+| `SUPABASE_SERVICE_ROLE_KEY`      | `SERVICE_ROLE_KEY` from `db:status` |
+| `NEXT_PUBLIC_APP_URL`            | `http://localhost:3000`             |
+| `STRIPE_*`, `SAFEPAY_SECRET_KEY` | Your test-mode keys                 |
 
 Then start the app:
 
@@ -42,21 +42,21 @@ Open [http://localhost:3000](http://localhost:3000).
 
 The full Supabase stack (Postgres, Auth, Storage, REST) runs locally in Docker, so no application code differs between local and hosted Supabase — only the env values.
 
-| Script | What it does |
-|---|---|
-| `npm run db:start` | Start the stack. Data persists between restarts in Docker volumes. |
-| `npm run db:stop` | Stop the stack and free memory. |
-| `npm run db:status` | Print URLs and keys. |
-| `npm run db:reset` | Wipe the database, re-run all migrations and the seed. |
+| Script              | What it does                                                       |
+| ------------------- | ------------------------------------------------------------------ |
+| `npm run db:start`  | Start the stack. Data persists between restarts in Docker volumes. |
+| `npm run db:stop`   | Stop the stack and free memory.                                    |
+| `npm run db:status` | Print URLs and keys.                                               |
+| `npm run db:reset`  | Wipe the database, re-run all migrations and the seed.             |
 
 **Local services**
 
-| Service | URL |
-|---|---|
-| API | http://127.0.0.1:54321 |
-| Studio (DB admin UI) | http://127.0.0.1:54323 |
-| Mailpit (catches all outgoing email) | http://127.0.0.1:54324 |
-| Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+| Service                              | URL                                                       |
+| ------------------------------------ | --------------------------------------------------------- |
+| API                                  | http://127.0.0.1:54321                                    |
+| Studio (DB admin UI)                 | http://127.0.0.1:54323                                    |
+| Mailpit (catches all outgoing email) | http://127.0.0.1:54324                                    |
+| Postgres                             | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
 **Notes**
 
@@ -94,11 +94,29 @@ Use the `whsec_...` secret it prints as `STRIPE_WEBHOOK_SECRET`.
 
 ## Other scripts
 
-| Command | What it does |
-|---|---|
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
+| Command                           | What it does                                 |
+| --------------------------------- | -------------------------------------------- |
+| `npm run build`                   | Production build                             |
+| `npm run lint`                    | ESLint                                       |
+| `npm run typecheck`               | TypeScript check (`tsc --noEmit`)            |
+| `npm run format`                  | Format all files with Prettier               |
+| `npm run format:check`            | Check formatting without writing (CI)        |
 | `node scripts/download-fonts.mjs` | Download template fonts into `public/fonts/` |
+
+## Git workflow
+
+```
+feature branch ──PR──▶ develop ──PR──▶ main
+```
+
+- `main` is release-only. Nothing is committed or merged into it except PRs from `develop`.
+- Every change gets its own branch off `develop` (`feat/…`, `fix/…`, `chore/…`) and a PR into `develop`.
+- Dependabot opens weekly dependency PRs against `develop` (minor/patch grouped, majors separate).
+- A pre-commit hook (Husky + lint-staged) runs ESLint `--fix` and Prettier on staged files. It installs automatically with `npm install`.
+- CI (`.github/workflows/ci.yml`) runs format check, lint, typecheck and build on every PR to `develop` and `main`.
+- `main-guard` fails any PR into `main` whose source isn't `develop`.
+- Use **merge commits** (not squash) for `develop` → `main`, so both branches keep the same history.
+- After a bulk reformat, add the commit hash to `.git-blame-ignore-revs`. Locally, enable it once with `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
 
 ## Deploying
 

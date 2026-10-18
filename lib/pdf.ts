@@ -1,6 +1,6 @@
-import 'server-only'
-import chromium from '@sparticuz/chromium'
-import puppeteer from 'puppeteer-core'
+import "server-only";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 
 // Accepts pre-rendered HTML string — callers handle react-dom/server themselves.
 // This keeps pdf.ts free of React rendering imports, avoiding Turbopack RSC bundle issues.
@@ -8,7 +8,7 @@ export async function generatePdfFromHtml(html: string): Promise<Buffer> {
   // <base href> resolves /fonts/* relative URLs without navigating to the app first.
   // Navigating to the app URL first was causing Next.js's hydration JS to re-render
   // the page back to the home page after setContent was called.
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const fullHtml = `<!DOCTYPE html>
 <html>
 <head>
@@ -20,25 +20,25 @@ export async function generatePdfFromHtml(html: string): Promise<Buffer> {
   </style>
 </head>
 <body>${html}</body>
-</html>`
+</html>`;
 
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: { width: 794, height: 5000 },
     executablePath: await chromium.executablePath(),
     headless: true,
-  })
+  });
 
   try {
-    const page = await browser.newPage()
-    await page.setContent(fullHtml, { waitUntil: 'networkidle0' })
+    const page = await browser.newPage();
+    await page.setContent(fullHtml, { waitUntil: "networkidle0" });
     const buffer = await page.pdf({
-      format: 'A4',
+      format: "A4",
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    })
-    return Buffer.from(buffer)
+    });
+    return Buffer.from(buffer);
   } finally {
-    await browser.close()
+    await browser.close();
   }
 }
