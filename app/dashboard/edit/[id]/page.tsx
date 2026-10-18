@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { shapeDbRowToResumeData } from '@/lib/utils'
+import { shapeDbRowToResumeData, type DbResume } from '@/lib/utils'
 import EditFormShell from './EditFormShell'
 
 interface Props {
@@ -28,7 +28,7 @@ export default async function EditPage({ params }: Props) {
 
   if (!resume) notFound()
 
-  const resumeData = shapeDbRowToResumeData(resume as Parameters<typeof shapeDbRowToResumeData>[0])
+  const resumeData = shapeDbRowToResumeData(resume as DbResume)
 
   return <EditFormShell resumeId={resume.id} resumeData={resumeData} />
 }

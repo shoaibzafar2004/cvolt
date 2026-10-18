@@ -34,7 +34,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
   const { personalInfo: p, sections } = data
   const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder)
 
-  const { accent: ACCENT, headerBg: HEADER_BG } =
+  const { accent: ACCENT } =
     EDITORIAL_THEMES[p.theme ?? 'olive'] ?? EDITORIAL_THEMES.olive
 
   const work      = sorted.filter((s) => s.type === 'work')

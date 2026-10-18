@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import { useUIStore } from '@/store/uiStore'
 import { useResumeStore } from '@/store/resumeStore'
 import { createClient } from '@/lib/supabase/client'
-import { shapeDbRowToResumeData } from '@/lib/utils'
+import { shapeDbRowToResumeData, type DbResume } from '@/lib/utils'
 import BuildLoading from './loading'
 
 // SSR disabled — StepWrapper depends entirely on client-side Zustand state
@@ -41,7 +41,7 @@ function BuildInner() {
       // Skip if this resume is already loaded in the store
       if (resumeId === resume.id) return
 
-      hydrate(shapeDbRowToResumeData(resume as any), resume.id)
+      hydrate(shapeDbRowToResumeData(resume as DbResume), resume.id)
     }
 
     loadFromDb()

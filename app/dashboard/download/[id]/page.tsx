@@ -1,5 +1,6 @@
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { daysUntil } from '@/lib/utils'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 
@@ -61,9 +62,7 @@ export default async function DownloadPage({ params }: Props) {
   const { data: signed } = await getServiceClient().storage.from('pdfs').createSignedUrl(pdfPath, 60)
   const pdfExists = !!signed?.signedUrl
 
-  const daysLeft = Math.ceil(
-    (new Date(payment.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-  )
+  const daysLeft = daysUntil(payment.expires_at)
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen gap-6 text-center px-4 max-w-md mx-auto">

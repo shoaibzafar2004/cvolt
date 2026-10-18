@@ -16,11 +16,12 @@
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend framework | Next.js 14 (App Router) | Zero-config Vercel deploy, RSC + API routes built in |
+| Frontend framework | Next.js 16 (App Router, Turbopack) + React 19 | Zero-config Vercel deploy, RSC + API routes built in. Next 16 has breaking changes — see AGENTS.md |
 | Hosting | Vercel | Free tier, serverless, no VPS needed |
-| Database + Auth + Storage | Supabase | Relational model fits resume data, PDF storage bucket included, better than Firebase for this shape |
-| Styling | Tailwind CSS + shadcn/ui | Fast, accessible components for forms, modals, progress bars |
+| Database + Auth + Storage | Supabase (local via Supabase CLI in Docker for dev) | Relational model fits resume data, PDF storage bucket included, better than Firebase for this shape |
+| Styling | Tailwind CSS v4 + shadcn/ui (Base UI primitives) + next-themes | Fast, accessible components; light/dark theme |
 | State management | Zustand + React Hook Form | Zustand for global resume data, RHF scoped per step with Zod validation |
+| Rich text / reorder | Tiptap + @dnd-kit | Bullet-point editor, drag-to-reorder entries |
 | PDF generation | @sparticuz/chromium + Puppeteer | Server-side render of real React components = pixel-perfect PDFs |
 | Payments (global) | Stripe | Card payments worldwide |
 | Payments (Pakistan) | Safepay | Local payment coverage for developing market users |
@@ -29,7 +30,7 @@
 
 ## 3. Database Schema
 
-Five tables. All IDs are UUIDs.
+Six tables. All IDs are UUIDs. **Source of truth: `supabase/migrations/`** — this section is a summary.
 
 ### users
 | Column | Type | Notes |
@@ -67,6 +68,7 @@ Five tables. All IDs are UUIDs.
 | slug | text | URL key, maps to React component |
 | thumbnail_url | text | Static image in /public |
 | is_active | boolean | Toggle templates on/off |
+| category | text | 'clean', 'modern' or 'creative' (gallery filter) |
 | created_at | timestamp | |
 
 ### payments
@@ -96,6 +98,8 @@ Frozen copy of resume data at time of payment. Prevents edits from breaking purc
 | char_count | int | For diff calculation |
 | created_at | timestamp | |
 
+**Storage:** private `pdfs` bucket, files at `resumes/{userId}/{paymentId}.pdf`, served via signed URLs from the service-role client.
+
 ---
 
 ## 4. Folder Structure
@@ -103,87 +107,81 @@ Frozen copy of resume data at time of payment. Prevents edits from breaking purc
 ```
 cvolt/
 ├── app/
-│   ├── layout.tsx                  # Root shell, fonts
-│   ├── page.tsx                    # Landing /
-│   ├── build/
-│   │   └── page.tsx                # Step router
+│   ├── layout.tsx                      # Root shell, fonts, ThemeProvider
+│   ├── page.tsx                        # Landing /
+│   ├── not-found.tsx
+│   ├── build/                          # page.tsx (step router), loading.tsx
 │   ├── templates/
-│   │   ├── page.tsx                # Gallery
-│   │   └── [slug]/page.tsx         # Full preview
+│   │   ├── page.tsx                    # Gallery (server) → TemplateGallery.tsx (client)
+│   │   └── [slug]/                     # page.tsx → TemplatePreview.tsx
 │   ├── checkout/
-│   │   ├── page.tsx
+│   │   ├── page.tsx                    # Server shell → CheckoutForm.tsx, TemplateThumbnail.tsx
 │   │   ├── processing/page.tsx
 │   │   ├── success/page.tsx
 │   │   └── failed/page.tsx
 │   ├── dashboard/
+│   │   ├── layout.tsx                  # Wraps everything in AuthGate
 │   │   ├── page.tsx
-│   │   ├── edit/[id]/page.tsx
-│   │   └── download/[id]/page.tsx
+│   │   ├── edit/[id]/                  # page.tsx (server) → EditFormShell.tsx (client)
+│   │   └── download/[id]/page.tsx      # Re-download gate
 │   ├── api/
 │   │   ├── generate-pdf/route.ts
+│   │   ├── download-pdf/[paymentId]/route.ts
+│   │   ├── payment-status/route.ts
+│   │   ├── update-payment-intent/route.ts
 │   │   ├── webhook/stripe/route.ts
 │   │   └── webhook/safepay/route.ts
+│   ├── auth/callback/route.ts          # Magic-link code exchange
 │   ├── login/page.tsx
 │   ├── privacy/page.tsx
-│   ├── terms/page.tsx
-│   └── not-found.tsx
+│   └── terms/page.tsx
 │
 ├── components/
-│   ├── build/
-│   │   ├── StepWrapper.tsx
-│   │   ├── Step1.tsx               # Personal info
-│   │   ├── Step2.tsx               # Work experience
-│   │   ├── Step3.tsx               # Education + skills
-│   │   ├── Step4.tsx               # Summary + preview
-│   │   └── WorkBlock.tsx           # Repeatable entry row
-│   ├── templates/
-│   │   ├── TemplateCard.tsx
-│   │   └── FilterBar.tsx
-│   ├── resume-templates/           # THE CRITICAL FOLDER
-│   │   ├── CleanTemplate.tsx       # Inline styles only, no Tailwind
-│   │   ├── ModernTemplate.tsx
-│   │   └── CreativeTemplate.tsx
-│   ├── ui/                         # shadcn components
-│   │   ├── button.tsx
-│   │   ├── input.tsx
-│   │   └── progress.tsx
-│   └── shared/
-│       ├── Navbar.tsx
-│       ├── Footer.tsx
-│       └── AuthGate.tsx
+│   ├── build/                          # StepWrapper, Step1–4, WorkBlock, BulletEditor (Tiptap), PhotoCropModal
+│   ├── templates/                      # TemplateCard, FilterBar, ThemePicker
+│   ├── resume-templates/               # THE CRITICAL FOLDER — one *Template.tsx per design (14),
+│   │                                   #   plus ClientOnlyTemplate.tsx (client-only render wrapper)
+│   ├── ui/                             # shadcn components (badge, button, dialog, input, select,
+│   │                                   #   sheet, skeleton, textarea) + custom month-picker
+│   └── shared/                         # Navbar, Footer, AuthGate, LogoutButton, SectionLine,
+│                                       #   ThemeProvider, ThemeToggle
 │
 ├── lib/
 │   ├── supabase/
-│   │   ├── client.ts               # Browser client
-│   │   └── server.ts               # RSC + API routes
-│   ├── pdf.ts                      # Puppeteer + chromium
-│   ├── schemas.ts                  # All Zod schemas
-│   ├── payments.ts                 # Stripe + Safepay helpers
-│   ├── templates.ts                # Registry: slug → component
-│   └── utils.ts                    # cn(), date helpers, shapeDbRowToResumeData
+│   │   ├── client.ts                   # Browser client
+│   │   └── server.ts                   # RSC + API routes
+│   ├── pdf.ts                          # Puppeteer + chromium
+│   ├── schemas.ts                      # All Zod schemas
+│   ├── payments.ts                     # Stripe + Safepay helpers
+│   ├── templates.ts                    # Registry: slug → component, plus per-template themes
+│   ├── cropImage.ts                    # Canvas helper for the photo cropper
+│   └── utils.ts                        # cn(), daysUntil(), shapeDbRowToResumeData
 │
 ├── store/
-│   ├── resumeStore.ts              # personalInfo, sections[], resumeId, mode, isDirty
-│   └── uiStore.ts                  # currentStep, activeFilter, loading
+│   ├── resumeStore.ts                  # personalInfo, sections[], resumeId, mode, isDirty
+│   └── uiStore.ts                      # currentStep, activeFilter, loading
 │
-├── types/
-│   └── index.ts                    # ResumeData, WorkEntry, Template, Payment
+├── types/index.ts                      # ResumeData, WorkEntry, Template, Payment
+├── hooks/useMounted.ts                 # true only after hydration (client-only rendering)
 │
-├── hooks/
-│   ├── useResumeDraft.ts
-│   └── useAuth.ts
+├── supabase/
+│   ├── config.toml                     # Local Supabase stack config
+│   ├── migrations/                     # Schema, RLS, triggers, storage bucket — source of truth
+│   └── seed.sql                        # Template records, applied on start/reset
+│
+├── scripts/download-fonts.mjs          # Fetches template fonts into public/fonts/
 │
 └── public/
-    ├── templates/                  # Static thumbnails
-    ├── og-image.png
-    └── favicon.ico
+    ├── fonts/                          # Self-hosted fonts used by resume templates
+    └── templates/                      # Static thumbnails
 ```
 
 **Key rules:**
 - `components/resume-templates/` uses inline styles + CSS vars ONLY. Tailwind never enters this folder. Puppeteer renders these without a Next.js context.
-- `lib/templates.ts` is a simple registry `{ "clean": CleanTemplate, "modern": ModernTemplate }` used by the gallery, detail page, and PDF API route — one source of truth.
+- `lib/templates.ts` is the registry `{ "clean": CleanTemplate, ... }` used by the gallery, detail page, `ClientOnlyTemplate` and PDF API route — one source of truth. Adding a template = new component + registry entry + seed row.
 - Two Supabase clients: `client.ts` for browser, `server.ts` for RSC and API routes.
 - Two Zustand stores: `resumeStore` owns resume data; `uiStore` owns step, filter, loading state.
+- Local development runs the full Supabase stack via the CLI (`npm run db:start`); see README.md for setup, URLs and keys.
 
 ---
 
@@ -322,6 +320,8 @@ Magic link only. Anonymous users can build + pay without an account. Email at ch
 ## 11. Claude Code Plan
 
 Work through these phases in order. Each phase ends in a working, testable state.
+
+> This is the original build plan. Where it differs from the code, the code wins — e.g. the schema lives in `supabase/migrations/` (not `supabase/schema.sql`), there are 14 templates, and `hooks/useAuth.ts` / `useResumeDraft.ts` were never needed.
 
 ---
 
@@ -719,6 +719,9 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 - Fonts via @font-face in a <style> JSX tag inside the component, not via next/font or link.
 
 ## Supabase
+- Development uses local Supabase (`npm run db:start`); there is no hosted dev project.
+- Schema changes go in a NEW file via `npx supabase migration new <name>`. Never edit an applied migration.
+- `npm run db:reset` wipes local data and re-applies migrations + seed.
 - Use lib/supabase/client.ts in 'use client' components only.
 - Use lib/supabase/server.ts in server components and API route handlers.
 - Never import the browser client in a server context — it will throw.
@@ -737,6 +740,12 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 - Never trust client-side payment confirmation.
 - Mark payments complete ONLY inside the webhook handler after signature verification.
 - The webhook creates the snapshot, triggers PDF generation, and sends the magic link.
+
+## React / lint
+- `npm run lint` must report zero errors.
+- Client-only rendering: use `useMounted()` from hooks/useMounted.ts — never `useState` + `useEffect(() => setMounted(true))`.
+- No impure calls (`Date.now()`, `Math.random()`) directly in a component body; put them in a helper (e.g. `daysUntil()` in lib/utils.ts).
+- Look up template components from `registry` in lib/templates.ts; don't hand-write slug → component switches.
 
 ## TypeScript
 - No `any`. Use types from types/index.ts.
