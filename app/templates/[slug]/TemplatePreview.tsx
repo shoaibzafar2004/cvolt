@@ -7,7 +7,7 @@ import ClientOnlyTemplate from "@/components/resume-templates/ClientOnlyTemplate
 import ThemePicker from "@/components/templates/ThemePicker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, ZoomIn, ZoomOut } from "lucide-react";
 import { TEMPLATE_THEMES } from "@/lib/templates";
 import { BUILD_STEPS } from "@/lib/build-steps";
 import type { Template, ResumeData } from "@/types";
@@ -254,37 +254,48 @@ export default function TemplatePreview({ template }: { template: Template }) {
     <div className="flex h-[calc(100vh-64px)] flex-col lg:flex-row">
       {/* Left — rendered resume */}
       <div className="flex flex-1 flex-col items-center gap-4 overflow-auto bg-muted/30 p-8">
-        {/* Zoom controls */}
-        <div className="flex shrink-0 items-center gap-2 rounded-lg border bg-background px-3 py-1.5 shadow-sm">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0"
-            onClick={() =>
-              setZoomFactor((z) =>
-                Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(1)),
-              )
-            }
-            disabled={zoomFactor <= ZOOM_MIN}
+        {/* Toolbar: back to gallery · zoom controls */}
+        <div className="grid w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <Link
+            href="/templates"
+            className="inline-flex items-center gap-1.5 justify-self-start rounded-full border bg-background px-3.5 py-1.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted"
           >
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <span className="w-12 text-center text-xs font-medium text-muted-foreground">
-            {Math.round(zoomFactor * 100)}%
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0"
-            onClick={() =>
-              setZoomFactor((z) =>
-                Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(1)),
-              )
-            }
-            disabled={zoomFactor >= ZOOM_MAX}
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">All templates</span>
+            <span className="sm:hidden">Back</span>
+          </Link>
+          {/* Zoom controls */}
+          <div className="flex shrink-0 items-center gap-2 rounded-lg border bg-background px-3 py-1.5 shadow-sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() =>
+                setZoomFactor((z) =>
+                  Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(1)),
+                )
+              }
+              disabled={zoomFactor <= ZOOM_MIN}
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="w-12 text-center text-xs font-medium text-muted-foreground">
+              {Math.round(zoomFactor * 100)}%
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() =>
+                setZoomFactor((z) =>
+                  Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(1)),
+                )
+              }
+              disabled={zoomFactor >= ZOOM_MAX}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Scaled resume — zoom affects layout so no blank space below.
@@ -380,13 +391,6 @@ export default function TemplatePreview({ template }: { template: Template }) {
             </div>
           </div>
         )}
-
-        <Link
-          href="/templates"
-          className="text-center text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          ← Back to all templates
-        </Link>
 
         {!hasData && (
           <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
