@@ -6,6 +6,13 @@ A one-time-pay resume builder. Users fill in their details, browse templates wit
 
 See [CLAUDE.md](CLAUDE.md) for the full architecture, database schema, routes and build plan.
 
+## Features
+
+- **5-step builder** (`/build`): personal info → work experience → projects & open-source contributions → education, skills, certifications, languages → summary. Drafts autosave to the browser; signed-in users sync to Supabase.
+- **14 templates** with colour themes, previewed live with your own data in the gallery and on a full-size preview page (zoom slider, fit-to-screen).
+- **One-time payment** (Stripe; Safepay planned) → server-rendered, pixel-perfect PDF via Puppeteer.
+- **Dashboard** (magic-link login): re-download or edit purchases within 30 days; delete expired ones.
+
 ## Prerequisites
 
 - Node.js 20+ (CI uses the version in `.nvmrc`)
@@ -71,16 +78,21 @@ supabase/
 ├── config.toml                          # Local stack configuration
 ├── migrations/
 │   ├── 20260101000000_init.sql          # Tables, RLS policies, auth.users → public.users trigger
-│   └── 20260101000001_storage.sql       # Private `pdfs` bucket for generated resumes
+│   ├── 20260101000001_storage.sql       # Private `pdfs` bucket for generated resumes
+│   └── 20261018161730_payments_deleted_at.sql  # Soft-delete for purchases removed from the dashboard
 └── seed.sql                             # Template records (runs automatically on start/reset)
 ```
 
 To change the schema, add a new migration instead of editing an existing one:
 
 ```bash
-npx supabase migration new <name>   # creates supabase/migrations/<timestamp>_<name>.sql
-npm run db:reset                    # apply from scratch
+npx supabase migration new <name> </dev/null   # creates supabase/migrations/<timestamp>_<name>.sql
+npx supabase migration up                      # apply pending migrations, keeping your data
 ```
+
+- `migration new` reads SQL from stdin when not attached to a terminal (scripts, AI agents), so it hangs without `</dev/null`.
+- `npm run db:reset` also applies migrations but **wipes all local data** first — use it only when you want a clean database.
+- Deploying: run `npx supabase db push` against the hosted project so it gets the same migrations.
 
 ## Payments (local testing)
 
