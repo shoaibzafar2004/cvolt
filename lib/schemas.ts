@@ -64,19 +64,29 @@ export const languageEntrySchema = z.object({
 export const projectEntrySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Project name is required"),
-  description: z.string().optional(),
+  kind: z.enum(["project", "contribution"]),
+  role: z.string().optional(),
   url: z
     .union([z.url({ error: "Enter a valid URL" }), z.literal("")])
     .optional(),
+  description: z.string().optional(),
+  techStack: z.array(z.string()),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  current: z.boolean(),
   bullets: z.array(z.string()),
 });
 
+// Projects step — optional, so an empty list is valid.
 export const step3Schema = z.object({
+  projects: z.array(projectEntrySchema),
+});
+
+export const step4Schema = z.object({
   education: z.array(educationEntrySchema),
   skills: z.array(skillItemSchema).min(1, "Add at least one skill"),
   certifications: z.array(certificationEntrySchema).optional(),
   languages: z.array(languageEntrySchema).optional(),
-  projects: z.array(projectEntrySchema).optional(),
 });
 
 export const summarySchema = z.object({
@@ -97,4 +107,5 @@ export type SkillItemData = z.infer<typeof skillItemSchema>;
 export type SkillsFormData = z.infer<typeof skillsSchema>;
 export type Step2FormData = z.infer<typeof step2Schema>;
 export type Step3FormData = z.infer<typeof step3Schema>;
+export type Step4FormData = z.infer<typeof step4Schema>;
 export type SummaryFormData = z.infer<typeof summarySchema>;

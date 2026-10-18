@@ -54,10 +54,19 @@ export interface LanguageContent {
   proficiency?: string;
 }
 
+export type ProjectKind = "project" | "contribution";
+
+// Entries saved before the Projects step existed only have name, description, url and bullets.
 export interface ProjectContent {
   name: string;
-  description?: string;
+  kind?: ProjectKind; // treated as "project" when missing
+  role?: string;
   url?: string;
+  description?: string;
+  techStack?: string[];
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
   bullets: string[];
 }
 
