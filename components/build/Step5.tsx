@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { summarySchema, type SummaryFormData } from "@/lib/schemas";
 import { useResumeStore } from "@/store/resumeStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 import ClientOnlyTemplate from "@/components/resume-templates/ClientOnlyTemplate";
@@ -22,6 +22,7 @@ const MAX_CHARS = 500;
 const Step5 = forwardRef<StepSubmitRef>((_, ref) => {
   const store = useResumeStore();
   const router = useRouter();
+  const returnTo = useSearchParams().get("returnTo");
 
   const {
     register,
@@ -36,10 +37,11 @@ const Step5 = forwardRef<StepSubmitRef>((_, ref) => {
   const summary = watch("summary") ?? "";
 
   useImperativeHandle(ref, () => ({
-    submit: () => handleSubmit(onSubmit)(),
+    submit: (destination = "/templates") =>
+      handleSubmit((data) => onSubmit(data, destination))(),
   }));
 
-  async function onSubmit(data: SummaryFormData) {
+  async function onSubmit(data: SummaryFormData, destination: string) {
     const merged = { ...store.personalInfo, summary: data.summary ?? "" };
     store.setPersonalInfo(merged);
 
@@ -54,11 +56,11 @@ const Step5 = forwardRef<StepSubmitRef>((_, ref) => {
         .eq("id", store.resumeId);
     }
 
-    router.push("/templates");
+    router.push(destination);
   }
 
   function handleSkip() {
-    router.push("/templates");
+    router.push(returnTo ?? "/templates");
   }
 
   return (
