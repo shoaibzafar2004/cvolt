@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -192,25 +200,33 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
           >
             {p.location && (
               <div>
-                <span style={{ marginRight: 6 }}>◉</span>
+                <span style={{ marginRight: 6 }}>
+                  <PinIcon />
+                </span>
                 <span style={{ color: MUTED }}>{p.location}</span>
               </div>
             )}
             {p.phone && (
               <div>
-                <span style={{ marginRight: 6 }}>✆</span>
+                <span style={{ marginRight: 6 }}>
+                  <PhoneIcon />
+                </span>
                 <span style={{ color: MUTED }}>{p.phone}</span>
               </div>
             )}
             {p.email && (
               <div>
-                <span style={{ marginRight: 6 }}>✉</span>
+                <span style={{ marginRight: 6 }}>
+                  <MailIcon />
+                </span>
                 <span style={{ color: MUTED }}>{p.email}</span>
               </div>
             )}
             {p.linkedIn && (
               <div>
-                <span style={{ marginRight: 6 }}>⊕</span>
+                <span style={{ marginRight: 6 }}>
+                  <LinkedInIcon />
+                </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
                   {p.linkedIn}
                 </span>
@@ -218,7 +234,9 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
             )}
             {p.github && (
               <div>
-                <span style={{ marginRight: 6 }}>⊕</span>
+                <span style={{ marginRight: 6 }}>
+                  <GitHubIcon />
+                </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
                   {p.github}
                 </span>
@@ -226,7 +244,9 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
             )}
             {p.website && (
               <div>
-                <span style={{ marginRight: 6 }}>⊕</span>
+                <span style={{ marginRight: 6 }}>
+                  <GlobeIcon />
+                </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
                   {p.website}
                 </span>

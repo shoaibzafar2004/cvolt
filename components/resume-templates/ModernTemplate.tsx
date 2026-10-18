@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -130,9 +138,21 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
               lineHeight: 2,
             }}
           >
-            {p.location && <div>◉ {p.location}</div>}
-            {p.phone && <div>✆ {p.phone}</div>}
-            {p.email && <div>✉ {p.email}</div>}
+            {p.location && (
+              <div>
+                <PinIcon /> {p.location}
+              </div>
+            )}
+            {p.phone && (
+              <div>
+                <PhoneIcon /> {p.phone}
+              </div>
+            )}
+            {p.email && (
+              <div>
+                <MailIcon /> {p.email}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -224,7 +244,10 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
             <SideSection title="Links">
               {p.linkedIn && (
                 <div style={{ marginBottom: 6 }}>
-                  <div style={{ color: MUTED, fontSize: 9 }}>LinkedIn:</div>
+                  <div style={{ color: MUTED, fontSize: 9 }}>
+                    <LinkedInIcon style={{ marginRight: 4 }} />
+                    LinkedIn:
+                  </div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
                     {p.linkedIn}
                   </div>
@@ -232,7 +255,10 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
               )}
               {p.github && (
                 <div style={{ marginBottom: 6 }}>
-                  <div style={{ color: MUTED, fontSize: 9 }}>GitHub:</div>
+                  <div style={{ color: MUTED, fontSize: 9 }}>
+                    <GitHubIcon style={{ marginRight: 4 }} />
+                    GitHub:
+                  </div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
                     {p.github}
                   </div>
@@ -240,7 +266,10 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
               )}
               {p.website && (
                 <div>
-                  <div style={{ color: MUTED, fontSize: 9 }}>Website:</div>
+                  <div style={{ color: MUTED, fontSize: 9 }}>
+                    <GlobeIcon style={{ marginRight: 4 }} />
+                    Website:
+                  </div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
                     {p.website}
                   </div>

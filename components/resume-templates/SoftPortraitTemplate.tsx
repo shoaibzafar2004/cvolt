@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -191,7 +199,11 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
             <div style={{ fontSize: 10, color: MUTED, lineHeight: 2 }}>
               {p.phone && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: ACCENT, fontSize: 11 }}>✆</span>
+                  <span
+                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
+                  >
+                    <PhoneIcon />
+                  </span>
                   <span>{p.phone}</span>
                 </div>
               )}
@@ -199,7 +211,11 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT, fontSize: 11 }}>✉</span>
+                  <span
+                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
+                  >
+                    <MailIcon />
+                  </span>
                   <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
                     {p.email}
                   </span>
@@ -207,7 +223,11 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
               )}
               {p.location && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: ACCENT, fontSize: 11 }}>◉</span>
+                  <span
+                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
+                  >
+                    <PinIcon />
+                  </span>
                   <span>{p.location}</span>
                 </div>
               )}
@@ -215,7 +235,11 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT, fontSize: 11 }}>⊕</span>
+                  <span
+                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
+                  >
+                    <LinkedInIcon />
+                  </span>
                   <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
                     {p.linkedIn}
                   </span>
@@ -225,7 +249,11 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT, fontSize: 11 }}>⊕</span>
+                  <span
+                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
+                  >
+                    <GitHubIcon />
+                  </span>
                   <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
                     {p.github}
                   </span>
@@ -235,7 +263,11 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT, fontSize: 11 }}>⊕</span>
+                  <span
+                    style={{ color: ACCENT, fontSize: 11, lineHeight: "15px" }}
+                  >
+                    <GlobeIcon />
+                  </span>
                   <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
                     {p.website}
                   </span>

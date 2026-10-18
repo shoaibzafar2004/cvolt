@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -157,17 +165,27 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
             minWidth: 200,
           }}
         >
-          {p.phone && <ContactRow icon="✆" text={p.phone} accent={ACCENT} />}
-          {p.email && <ContactRow icon="✉" text={p.email} accent={ACCENT} />}
+          {p.phone && (
+            <ContactRow icon={<PhoneIcon />} text={p.phone} accent={ACCENT} />
+          )}
+          {p.email && (
+            <ContactRow icon={<MailIcon />} text={p.email} accent={ACCENT} />
+          )}
           {p.location && (
-            <ContactRow icon="◉" text={p.location} accent={ACCENT} />
+            <ContactRow icon={<PinIcon />} text={p.location} accent={ACCENT} />
           )}
           {p.linkedIn && (
-            <ContactRow icon="⊕" text={p.linkedIn} accent={ACCENT} />
+            <ContactRow
+              icon={<LinkedInIcon />}
+              text={p.linkedIn}
+              accent={ACCENT}
+            />
           )}
-          {p.github && <ContactRow icon="⊕" text={p.github} accent={ACCENT} />}
+          {p.github && (
+            <ContactRow icon={<GitHubIcon />} text={p.github} accent={ACCENT} />
+          )}
           {p.website && (
-            <ContactRow icon="⊕" text={p.website} accent={ACCENT} />
+            <ContactRow icon={<GlobeIcon />} text={p.website} accent={ACCENT} />
           )}
         </div>
       </div>
@@ -675,7 +693,7 @@ function ContactRow({
   text,
   accent,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   text: string;
   accent: string;
 }) {

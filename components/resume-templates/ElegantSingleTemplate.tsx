@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -161,12 +169,36 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
             textAlign: "right",
           }}
         >
-          {p.location && <div>◉ {p.location}</div>}
-          {p.phone && <div>✆ {p.phone}</div>}
-          {p.email && <div>✉ {p.email}</div>}
-          {p.linkedIn && <div>⊕ {p.linkedIn}</div>}
-          {p.github && <div>⊕ {p.github}</div>}
-          {p.website && <div>⊕ {p.website}</div>}
+          {p.location && (
+            <div>
+              <PinIcon /> {p.location}
+            </div>
+          )}
+          {p.phone && (
+            <div>
+              <PhoneIcon /> {p.phone}
+            </div>
+          )}
+          {p.email && (
+            <div>
+              <MailIcon /> {p.email}
+            </div>
+          )}
+          {p.linkedIn && (
+            <div>
+              <LinkedInIcon /> {p.linkedIn}
+            </div>
+          )}
+          {p.github && (
+            <div>
+              <GitHubIcon /> {p.github}
+            </div>
+          )}
+          {p.website && (
+            <div>
+              <GlobeIcon /> {p.website}
+            </div>
+          )}
         </div>
       </div>
 

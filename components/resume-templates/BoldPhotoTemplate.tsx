@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -186,19 +194,35 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
           {/* Contact */}
           <SideSection title="Contact" accent={ACCENT}>
             <div style={{ fontSize: 10, color: SIDEBAR_TEXT, lineHeight: 1.9 }}>
-              {p.phone && <div>✆ {p.phone}</div>}
-              {p.email && (
-                <div style={{ wordBreak: "break-all" }}>✉ {p.email}</div>
+              {p.phone && (
+                <div>
+                  <PhoneIcon /> {p.phone}
+                </div>
               )}
-              {p.location && <div>◉ {p.location}</div>}
+              {p.email && (
+                <div style={{ wordBreak: "break-all" }}>
+                  <MailIcon /> {p.email}
+                </div>
+              )}
+              {p.location && (
+                <div>
+                  <PinIcon /> {p.location}
+                </div>
+              )}
               {p.linkedIn && (
-                <div style={{ wordBreak: "break-all" }}>⊕ {p.linkedIn}</div>
+                <div style={{ wordBreak: "break-all" }}>
+                  <LinkedInIcon /> {p.linkedIn}
+                </div>
               )}
               {p.github && (
-                <div style={{ wordBreak: "break-all" }}>⊕ {p.github}</div>
+                <div style={{ wordBreak: "break-all" }}>
+                  <GitHubIcon /> {p.github}
+                </div>
               )}
               {p.website && (
-                <div style={{ wordBreak: "break-all" }}>⊕ {p.website}</div>
+                <div style={{ wordBreak: "break-all" }}>
+                  <GlobeIcon /> {p.website}
+                </div>
               )}
             </div>
           </SideSection>
