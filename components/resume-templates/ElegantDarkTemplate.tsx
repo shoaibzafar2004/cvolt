@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -212,22 +220,34 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
             }}
           >
             {p.location && (
-              <div style={{ color: "#f0e8d8" }}>◉ {p.location}</div>
+              <div style={{ color: "#f0e8d8" }}>
+                <PinIcon /> {p.location}
+              </div>
             )}
-            {p.phone && <div>✆ {p.phone}</div>}
+            {p.phone && (
+              <div>
+                <PhoneIcon /> {p.phone}
+              </div>
+            )}
             {p.email && (
-              <div style={{ wordBreak: "break-all" }}>✉ {p.email}</div>
+              <div style={{ wordBreak: "break-all" }}>
+                <MailIcon /> {p.email}
+              </div>
             )}
             {p.linkedIn && (
               <div style={{ wordBreak: "break-all", marginTop: 4 }}>
-                ⊕ {p.linkedIn}
+                <LinkedInIcon /> {p.linkedIn}
               </div>
             )}
             {p.github && (
-              <div style={{ wordBreak: "break-all" }}>⊕ {p.github}</div>
+              <div style={{ wordBreak: "break-all" }}>
+                <GitHubIcon /> {p.github}
+              </div>
             )}
             {p.website && (
-              <div style={{ wordBreak: "break-all" }}>⊕ {p.website}</div>
+              <div style={{ wordBreak: "break-all" }}>
+                <GlobeIcon /> {p.website}
+              </div>
             )}
           </div>
         </SideSection>

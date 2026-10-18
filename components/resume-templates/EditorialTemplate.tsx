@@ -8,6 +8,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -199,12 +207,20 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
           )}
           {/* Contact rows */}
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {p.phone && <HeaderContact icon="✆" text={p.phone} />}
-            {p.email && <HeaderContact icon="✉" text={p.email} />}
-            {p.website && <HeaderContact icon="⊕" text={p.website} />}
-            {p.location && <HeaderContact icon="◉" text={p.location} />}
-            {p.linkedIn && <HeaderContact icon="in" text={p.linkedIn} />}
-            {p.github && <HeaderContact icon="gh" text={p.github} />}
+            {p.phone && <HeaderContact icon={<PhoneIcon />} text={p.phone} />}
+            {p.email && <HeaderContact icon={<MailIcon />} text={p.email} />}
+            {p.website && (
+              <HeaderContact icon={<GlobeIcon />} text={p.website} />
+            )}
+            {p.location && (
+              <HeaderContact icon={<PinIcon />} text={p.location} />
+            )}
+            {p.linkedIn && (
+              <HeaderContact icon={<LinkedInIcon />} text={p.linkedIn} />
+            )}
+            {p.github && (
+              <HeaderContact icon={<GitHubIcon />} text={p.github} />
+            )}
           </div>
         </div>
       </div>
@@ -489,7 +505,13 @@ function SectionBar({ title, accent }: { title: string; accent: string }) {
 }
 
 // ── Header contact row ──
-function HeaderContact({ icon, text }: { icon: string; text: string }) {
+function HeaderContact({
+  icon,
+  text,
+}: {
+  icon: React.ReactNode;
+  text: string;
+}) {
   return (
     <div
       style={{

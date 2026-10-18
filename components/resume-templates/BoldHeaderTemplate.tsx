@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -466,22 +474,50 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
             <ColHeading title="Contact" accent={ACCENT} />
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {p.phone && (
-                <ContactRow icon="✆" text={p.phone} accent={ACCENT} />
+                <ContactRow
+                  icon={<PhoneIcon />}
+                  text={p.phone}
+                  accent={ACCENT}
+                />
               )}
               {p.email && (
-                <ContactRow icon="✉" text={p.email} accent={ACCENT} wrap />
+                <ContactRow
+                  icon={<MailIcon />}
+                  text={p.email}
+                  accent={ACCENT}
+                  wrap
+                />
               )}
               {p.location && (
-                <ContactRow icon="◉" text={p.location} accent={ACCENT} />
+                <ContactRow
+                  icon={<PinIcon />}
+                  text={p.location}
+                  accent={ACCENT}
+                />
               )}
               {p.linkedIn && (
-                <ContactRow icon="in" text={p.linkedIn} accent={ACCENT} wrap />
+                <ContactRow
+                  icon={<LinkedInIcon />}
+                  text={p.linkedIn}
+                  accent={ACCENT}
+                  wrap
+                />
               )}
               {p.github && (
-                <ContactRow icon="gh" text={p.github} accent={ACCENT} wrap />
+                <ContactRow
+                  icon={<GitHubIcon />}
+                  text={p.github}
+                  accent={ACCENT}
+                  wrap
+                />
               )}
               {p.website && (
-                <ContactRow icon="⊕" text={p.website} accent={ACCENT} wrap />
+                <ContactRow
+                  icon={<GlobeIcon />}
+                  text={p.website}
+                  accent={ACCENT}
+                  wrap
+                />
               )}
             </div>
           </div>
@@ -646,7 +682,7 @@ function ContactRow({
   accent,
   wrap,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   text: string;
   accent: string;
   wrap?: boolean;
@@ -663,7 +699,7 @@ function ContactRow({
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
-          fontSize: icon === "in" || icon === "gh" ? 7.5 : 10,
+          fontSize: 10,
           fontWeight: 700,
           color: "#ffffff",
           lineHeight: 1,

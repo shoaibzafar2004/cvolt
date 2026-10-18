@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -114,12 +122,36 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
             color: colors.muted,
           }}
         >
-          {personalInfo.email && <span>✉ {personalInfo.email}</span>}
-          {personalInfo.phone && <span>✆ {personalInfo.phone}</span>}
-          {personalInfo.location && <span>◉ {personalInfo.location}</span>}
-          {personalInfo.linkedIn && <span>⊕ {personalInfo.linkedIn}</span>}
-          {personalInfo.github && <span>⊕ {personalInfo.github}</span>}
-          {personalInfo.website && <span>⊕ {personalInfo.website}</span>}
+          {personalInfo.email && (
+            <span>
+              <MailIcon /> {personalInfo.email}
+            </span>
+          )}
+          {personalInfo.phone && (
+            <span>
+              <PhoneIcon /> {personalInfo.phone}
+            </span>
+          )}
+          {personalInfo.location && (
+            <span>
+              <PinIcon /> {personalInfo.location}
+            </span>
+          )}
+          {personalInfo.linkedIn && (
+            <span>
+              <LinkedInIcon /> {personalInfo.linkedIn}
+            </span>
+          )}
+          {personalInfo.github && (
+            <span>
+              <GitHubIcon /> {personalInfo.github}
+            </span>
+          )}
+          {personalInfo.website && (
+            <span>
+              <GlobeIcon /> {personalInfo.website}
+            </span>
+          )}
         </div>
       </div>
 

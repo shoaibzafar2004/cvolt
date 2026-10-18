@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -191,27 +199,37 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
             <div style={{ fontSize: 10, color: MUTED, lineHeight: 2 }}>
               {p.phone && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: ACCENT }}>✆</span> {p.phone}
+                  <span style={{ color: ACCENT }}>
+                    <PhoneIcon />
+                  </span>{" "}
+                  {p.phone}
                 </div>
               )}
               {p.email && (
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT }}>✉</span>{" "}
+                  <span style={{ color: ACCENT }}>
+                    <MailIcon />
+                  </span>{" "}
                   <span style={{ wordBreak: "break-all" }}>{p.email}</span>
                 </div>
               )}
               {p.location && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: ACCENT }}>◉</span> {p.location}
+                  <span style={{ color: ACCENT }}>
+                    <PinIcon />
+                  </span>{" "}
+                  {p.location}
                 </div>
               )}
               {p.linkedIn && (
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT }}>⊕</span>{" "}
+                  <span style={{ color: ACCENT }}>
+                    <LinkedInIcon />
+                  </span>{" "}
                   <span style={{ wordBreak: "break-all" }}>{p.linkedIn}</span>
                 </div>
               )}
@@ -219,7 +237,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT }}>⊕</span>{" "}
+                  <span style={{ color: ACCENT }}>
+                    <GitHubIcon />
+                  </span>{" "}
                   <span style={{ wordBreak: "break-all" }}>{p.github}</span>
                 </div>
               )}
@@ -227,7 +247,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                 <div
                   style={{ display: "flex", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ color: ACCENT }}>⊕</span>{" "}
+                  <span style={{ color: ACCENT }}>
+                    <GlobeIcon />
+                  </span>{" "}
                   <span style={{ wordBreak: "break-all" }}>{p.website}</span>
                 </div>
               )}

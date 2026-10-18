@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -58,13 +66,13 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
   const projects = projSec ? (projSec.content as ProjectContent[]) : [];
 
   // Build contact items
-  const contacts: string[] = [];
-  if (p.email) contacts.push(p.email);
-  if (p.phone) contacts.push(p.phone);
-  if (p.website) contacts.push(p.website);
-  if (p.linkedIn) contacts.push(p.linkedIn);
-  if (p.github) contacts.push(p.github);
-  if (p.location) contacts.push(p.location);
+  const contacts: { icon: React.ReactNode; text: string }[] = [];
+  if (p.email) contacts.push({ icon: <MailIcon />, text: p.email });
+  if (p.phone) contacts.push({ icon: <PhoneIcon />, text: p.phone });
+  if (p.website) contacts.push({ icon: <GlobeIcon />, text: p.website });
+  if (p.linkedIn) contacts.push({ icon: <LinkedInIcon />, text: p.linkedIn });
+  if (p.github) contacts.push({ icon: <GitHubIcon />, text: p.github });
+  if (p.location) contacts.push({ icon: <PinIcon />, text: p.location });
 
   return (
     <div
@@ -124,8 +132,26 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
         )}
         {/* Contact line */}
         {contacts.length > 0 && (
-          <div style={{ fontSize: 9.5, color: MUTED, letterSpacing: 0.3 }}>
-            {contacts.join("  |  ")}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "4px 14px",
+              fontSize: 9.5,
+              color: MUTED,
+              letterSpacing: 0.3,
+            }}
+          >
+            {contacts.map((c, i) => (
+              <span
+                key={i}
+                style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+              >
+                {c.icon}
+                {c.text}
+              </span>
+            ))}
           </div>
         )}
       </div>

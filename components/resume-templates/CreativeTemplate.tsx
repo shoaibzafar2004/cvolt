@@ -7,6 +7,14 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import {
+  GitHubIcon,
+  GlobeIcon,
+  LinkedInIcon,
+  MailIcon,
+  PhoneIcon,
+  PinIcon,
+} from "./ContactIcons";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -167,22 +175,34 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
         <SideSection title="Contact" accent={ACCENT} border={DARK_BORDER}>
           <div style={{ fontSize: 9.5, lineHeight: 2, color: DARK_MUTED }}>
             {p.location && (
-              <div style={{ color: LIGHT_TEXT }}>◉ {p.location}</div>
+              <div style={{ color: LIGHT_TEXT }}>
+                <PinIcon /> {p.location}
+              </div>
             )}
-            {p.phone && <div>✆ {p.phone}</div>}
+            {p.phone && (
+              <div>
+                <PhoneIcon /> {p.phone}
+              </div>
+            )}
             {p.email && (
-              <div style={{ wordBreak: "break-all" }}>✉ {p.email}</div>
+              <div style={{ wordBreak: "break-all" }}>
+                <MailIcon /> {p.email}
+              </div>
             )}
             {p.linkedIn && (
               <div style={{ wordBreak: "break-all", marginTop: 4 }}>
-                ⊕ {p.linkedIn}
+                <LinkedInIcon /> {p.linkedIn}
               </div>
             )}
             {p.github && (
-              <div style={{ wordBreak: "break-all" }}>⊕ {p.github}</div>
+              <div style={{ wordBreak: "break-all" }}>
+                <GitHubIcon /> {p.github}
+              </div>
             )}
             {p.website && (
-              <div style={{ wordBreak: "break-all" }}>⊕ {p.website}</div>
+              <div style={{ wordBreak: "break-all" }}>
+                <GlobeIcon /> {p.website}
+              </div>
             )}
           </div>
         </SideSection>
