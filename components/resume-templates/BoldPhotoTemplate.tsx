@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Bold split layout: black sidebar (photo + about + skills) + white main column.
@@ -453,6 +454,136 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
             </MainSection>
           )}
 
+          {/* Projects */}
+          {projects.length > 0 && (
+            <MainSection title="Projects" accent={ACCENT}>
+              {projects.map((proj, i) => {
+                const meta = projectMeta(proj);
+                const dates = projectDates(proj).replace("Present", "Now");
+                return (
+                  <div
+                    key={i}
+                    style={{ marginBottom: 16, pageBreakInside: "avoid" }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        marginBottom: 2,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.3,
+                        }}
+                      >
+                        {proj.name}
+                      </span>
+                      {dates && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            fontStyle: "italic",
+                            flexShrink: 0,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {dates}
+                        </span>
+                      )}
+                    </div>
+                    {(meta || proj.url) && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          color: ACCENT,
+                          fontWeight: 600,
+                          marginBottom: 5,
+                        }}
+                      >
+                        {meta}
+                        {meta && proj.url ? " · " : ""}
+                        {proj.url && (
+                          <span style={{ color: MUTED, fontWeight: 400 }}>
+                            {displayUrl(proj.url)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {proj.description && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          lineHeight: 1.55,
+                          color: MUTED,
+                          marginBottom: 3,
+                        }}
+                      >
+                        {proj.description}
+                      </div>
+                    )}
+                    {proj.bullets.filter(Boolean).map((b, j) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: "flex",
+                          gap: 7,
+                          marginBottom: 2.5,
+                          fontSize: 10.5,
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: ACCENT,
+                            flexShrink: 0,
+                            fontWeight: 700,
+                          }}
+                        >
+                          —
+                        </span>
+                        <span
+                          style={{ color: MUTED }}
+                          dangerouslySetInnerHTML={{ __html: b }}
+                        />
+                      </div>
+                    ))}
+                    {proj.techStack && proj.techStack.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "3px 5px",
+                          marginTop: 6,
+                        }}
+                      >
+                        {proj.techStack.map((t, j) => (
+                          <span
+                            key={j}
+                            style={{
+                              fontSize: 9,
+                              color: DARK,
+                              backgroundColor: "#f0f0f0",
+                              padding: "1px 7px",
+                              borderRadius: 3,
+                            }}
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </MainSection>
+          )}
+
           {/* Education */}
           {education.length > 0 && (
             <MainSection title="Education" accent={ACCENT}>
@@ -507,72 +638,6 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
                   </div>
                 );
               })}
-            </MainSection>
-          )}
-
-          {/* Projects */}
-          {projects.length > 0 && (
-            <MainSection title="Projects" accent={ACCENT}>
-              {projects.map((proj, i) => (
-                <div key={i} style={{ marginBottom: 12 }}>
-                  <div
-                    style={{
-                      fontWeight: 700,
-                      fontSize: 11.5,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.3,
-                    }}
-                  >
-                    {proj.name}
-                    {proj.url && (
-                      <span
-                        style={{
-                          fontWeight: 400,
-                          color: MUTED,
-                          fontSize: 9.5,
-                          textTransform: "none",
-                          letterSpacing: 0,
-                        }}
-                      >
-                        {" "}
-                        · {proj.url}
-                      </span>
-                    )}
-                  </div>
-                  {proj.description && (
-                    <div style={{ fontSize: 10, color: MUTED, marginTop: 2 }}>
-                      {proj.description}
-                    </div>
-                  )}
-                  {proj.bullets.filter(Boolean).map((b, j) => (
-                    <div
-                      key={j}
-                      style={{
-                        display: "flex",
-                        gap: 7,
-                        marginBottom: 2.5,
-                        fontSize: 10.5,
-                        lineHeight: 1.55,
-                        marginTop: 3,
-                      }}
-                    >
-                      <span
-                        style={{
-                          color: ACCENT,
-                          flexShrink: 0,
-                          fontWeight: 700,
-                        }}
-                      >
-                        —
-                      </span>
-                      <span
-                        style={{ color: MUTED }}
-                        dangerouslySetInnerHTML={{ __html: b }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
             </MainSection>
           )}
         </div>

@@ -133,32 +133,32 @@ const PLACEHOLDER: ResumeData = {
       content: [
         {
           name: "DevFlow — CI/CD Dashboard",
+          kind: "project",
+          role: "Creator",
           description:
             "Real-time pipeline monitoring tool for engineering teams.",
-          url: "github.com/alex/devflow",
+          url: "https://github.com/alex/devflow",
+          startDate: "Mar 2023",
+          current: true,
+          techStack: ["Next.js", "WebSockets", "PostgreSQL"],
           bullets: [
-            "Built with Next.js, WebSockets, and PostgreSQL; handles 10k concurrent users",
+            "Handles 10k concurrent users with sub-second pipeline updates",
             "Reduced mean time to detect failures from 12 min to 90 sec",
           ],
         },
         {
-          name: "OpenCart Analytics Plugin",
-          description:
-            "Open-source e-commerce analytics extension with 3k+ GitHub stars.",
-          url: "github.com/alex/oc-analytics",
+          name: "vercel/next.js",
+          kind: "contribution",
+          role: "Contributor",
+          description: "React framework for production web apps.",
+          url: "https://github.com/vercel/next.js/pulls?q=author:alex",
+          startDate: "Jan 2024",
+          endDate: "Jun 2024",
+          current: false,
+          techStack: ["TypeScript", "Rust"],
           bullets: [
-            "Tracks funnel drop-off, revenue attribution, and cohort retention",
-            "Adopted by 400+ stores across 30 countries",
-          ],
-        },
-        {
-          name: "ResumeBuilder AI",
-          description:
-            "AI-assisted resume tailoring tool built at a 48-hour hackathon.",
-          url: "resumebuilder.vercel.app",
-          bullets: [
-            "Won 1st place at HackSF 2023 out of 120 teams",
-            "Processed 5k resumes in the first week post-launch",
+            "Fixed a caching bug in the App Router affecting ISR revalidation",
+            "Added tests and docs for the new image optimization config",
           ],
         },
       ],

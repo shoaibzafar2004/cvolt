@@ -46,7 +46,7 @@ Six tables. All IDs are UUIDs. **Source of truth: `supabase/migrations/`** — t
 | id | uuid | PK |
 | user_id | uuid | FK → users |
 | title | text | e.g. "Software Engineer Resume" |
-| personal_info | jsonb | name, email, phone, location, LinkedIn, website |
+| personal_info | jsonb | name, email, phone, location, LinkedIn, GitHub, website |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -137,7 +137,8 @@ cvolt/
 │   └── terms/page.tsx
 │
 ├── components/
-│   ├── build/                          # StepWrapper, Step1–4, WorkBlock, BulletEditor (Tiptap), PhotoCropModal
+│   ├── build/                          # StepWrapper, Step1–5, WorkBlock, ProjectBlock, TagInput,
+│   │                                   #   BulletEditor (Tiptap), PhotoCropModal
 │   ├── templates/                      # TemplateCard, FilterBar, ThemePicker
 │   ├── resume-templates/               # THE CRITICAL FOLDER — one *Template.tsx per design (14),
 │   │                                   #   plus ClientOnlyTemplate.tsx (client-only render wrapper)
@@ -195,8 +196,9 @@ cvolt/
 | `/build` | Multi-step form router. Auto-saves to localStorage on blur, syncs to Supabase on step complete |
 | `/build?step=1` | Personal info — name, job title, email, phone, location, LinkedIn, website |
 | `/build?step=2` | Work experience — repeatable blocks, rich text bullet points, add/remove/reorder |
-| `/build?step=3` | Education + skills + optional extras (certifications, languages, projects). Toggle sections on/off |
-| `/build?step=4` | Professional summary (optional/skippable) + mini preview of completed resume |
+| `/build?step=3` | Projects & open-source contributions (optional) — type, role, link, dates, highlights, tech stack; reorderable |
+| `/build?step=4` | Education + skills + optional extras (certifications, languages). Toggle sections on/off |
+| `/build?step=5` | Professional summary (optional/skippable) + mini preview of completed resume |
 | `/templates` | Gallery — CSS grid, live previews at ~30% zoom with real user data, filter bar |
 | `/templates/[slug]` | Full-size preview — left: rendered resume, right: template info + "Use this — $1.50" CTA |
 
@@ -230,7 +232,7 @@ cvolt/
 
 ## 6. Build Form Flow
 
-4 steps, single direction, progress bar with 4 pills.
+5 steps, single direction, progress bar with 5 pills.
 
 **State architecture:**
 - `useResumeStore` (Zustand) holds: `personalInfo`, `sections[]`, `currentStep`, `resumeId`, `mode` ('create' | 'edit'), `isDirty`, `lastSaved`
@@ -244,11 +246,11 @@ cvolt/
 - On sign-in: merge anon draft into user account
 
 **Validation:**
-- Steps 1–3: validate on Next
-- Step 4: always skippable
+- Steps 1–4: validate on Next (step 3 accepts an empty project list)
+- Step 5: always skippable
 - Schemas: `personalInfoSchema`, `workEntrySchema`, `educationSchema`, `skillsSchema` — all in `lib/schemas.ts`
 
-**After step 4:** Push to `/templates`. Resume data passed via Zustand store.
+**After step 5:** Push to `/templates`. Resume data passed via Zustand store.
 
 **Edit mode (`/dashboard/edit/[id]`):**
 The page is a React Server Component. It fetches the resume server-side, checks auth, and if valid passes the data to a client shell component. The shell runs `useEffect` to call `store.hydrate(data, id)` — skipping the fetch entirely if `store.resumeId === params.id`. Each step's `defaultValues` reads from the store, which is already populated before `useForm` initializes.
@@ -272,6 +274,7 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 - Same component used by gallery, detail page, AND PDF API route
 - Inline styles + CSS vars only. No Tailwind. No exceptions.
 - Fonts via `@font-face` inside each template
+- Section order in every template: Work → Projects → Education (where they share a column). Project date/meta/link formatting comes from `lib/resume-format.ts`
 
 ---
 

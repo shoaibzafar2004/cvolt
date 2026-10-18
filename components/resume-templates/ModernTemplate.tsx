@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Two-column: left sidebar 30% light bg + right main 70%.
@@ -426,59 +427,119 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
           {/* Projects */}
           {projects.length > 0 && (
             <MainSection title="Projects">
-              {projects.map((proj, i) => (
-                <div key={i} style={{ marginBottom: 12 }}>
+              {projects.map((proj, i) => {
+                const meta = projectMeta(proj);
+                const dates = projectDates(proj);
+                const topLine = [meta || "Project", dates]
+                  .filter(Boolean)
+                  .join(" | ");
+                return (
                   <div
-                    style={{
-                      display: "flex",
-                      gap: 8,
-                      alignItems: "flex-start",
-                    }}
+                    key={i}
+                    style={{ marginBottom: 18, pageBreakInside: "avoid" }}
                   >
-                    <span style={{ color: MUTED, flexShrink: 0 }}>
-                      {CIRCLE}
-                    </span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 10.5 }}>
-                        {proj.name}
-                        {proj.url ? (
-                          <span
-                            style={{
-                              fontWeight: 400,
-                              color: MUTED,
-                              fontSize: 9,
-                            }}
-                          >
-                            {" "}
-                            · {proj.url}
-                          </span>
-                        ) : null}
-                      </div>
-                      {proj.description && (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 8,
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <span
+                        style={{ color: MUTED, flexShrink: 0, marginTop: 1 }}
+                      >
+                        {CIRCLE}
+                      </span>
+                      <div style={{ flex: 1 }}>
                         <div
-                          style={{ color: MUTED, fontSize: 10, marginTop: 2 }}
-                        >
-                          {proj.description}
-                        </div>
-                      )}
-                      {proj.bullets.filter(Boolean).map((b, j) => (
-                        <div
-                          key={j}
                           style={{
-                            display: "flex",
-                            gap: 6,
-                            marginTop: 2,
-                            fontSize: 10,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: 1,
+                            color: MUTED,
                           }}
                         >
-                          <span style={{ flexShrink: 0, color: MUTED }}>·</span>
-                          <div dangerouslySetInnerHTML={{ __html: b }} />
+                          {topLine}
                         </div>
-                      ))}
+                        <div
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 10,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.5,
+                            marginTop: 2,
+                          }}
+                        >
+                          {proj.name}
+                        </div>
+                        {proj.url && (
+                          <div
+                            style={{ fontSize: 9, color: MUTED, marginTop: 1 }}
+                          >
+                            {displayUrl(proj.url)}
+                          </div>
+                        )}
+                        <div style={{ marginTop: 5 }}>
+                          {proj.description && (
+                            <div
+                              style={{
+                                fontSize: 10.5,
+                                lineHeight: 1.5,
+                                marginBottom: 3,
+                              }}
+                            >
+                              {proj.description}
+                            </div>
+                          )}
+                          {proj.bullets.filter(Boolean).map((b, j) => (
+                            <div
+                              key={j}
+                              style={{
+                                display: "flex",
+                                gap: 6,
+                                marginBottom: 3,
+                                fontSize: 10.5,
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              <span style={{ flexShrink: 0, color: MUTED }}>
+                                ·
+                              </span>
+                              <div dangerouslySetInnerHTML={{ __html: b }} />
+                            </div>
+                          ))}
+                          {proj.techStack && proj.techStack.length > 0 && (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: "4px 6px",
+                                marginTop: 6,
+                              }}
+                            >
+                              {proj.techStack.map((t, j) => (
+                                <span
+                                  key={j}
+                                  style={{
+                                    fontSize: 9,
+                                    color: MUTED,
+                                    backgroundColor: "#eeeeec",
+                                    padding: "1px 7px",
+                                    borderRadius: 10,
+                                  }}
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </MainSection>
           )}
         </div>

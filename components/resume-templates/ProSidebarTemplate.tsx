@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Classic pro sidebar: light sidebar with rectangular photo, skills + summary.
@@ -448,53 +449,124 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
         {/* Projects */}
         {projects.length > 0 && (
           <MainSection title="Projects" accent={ACCENT}>
-            {projects.map((proj, i) => (
-              <div
-                key={i}
-                style={{ marginBottom: 14, pageBreakInside: "avoid" }}
-              >
-                <div style={{ fontWeight: 700, fontSize: 11.5, color: DARK }}>
-                  {proj.name}
-                  {proj.url && (
-                    <span
-                      style={{ fontWeight: 400, color: MUTED, fontSize: 9.5 }}
-                    >
-                      {" "}
-                      · {proj.url}
-                    </span>
-                  )}
-                </div>
-                {proj.description && (
+            {projects.map((proj, i) => {
+              const meta = projectMeta(proj);
+              const dates = projectDates(proj).replace(" – ", "–");
+              return (
+                <div
+                  key={i}
+                  style={{ marginBottom: 18, pageBreakInside: "avoid" }}
+                >
+                  {/* Name + dates row */}
                   <div
-                    style={{
-                      fontSize: 10,
-                      color: MUTED,
-                      marginTop: 2,
-                      marginBottom: 4,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    {proj.description}
-                  </div>
-                )}
-                {proj.bullets.filter(Boolean).map((b, j) => (
-                  <div
-                    key={j}
                     style={{
                       display: "flex",
-                      gap: 7,
-                      marginBottom: 3,
-                      fontSize: 10.5,
-                      lineHeight: 1.6,
-                      color: "#333333",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
+                      marginBottom: 1,
                     }}
                   >
-                    <span style={{ flexShrink: 0, color: ACCENT }}>•</span>
-                    <div dangerouslySetInnerHTML={{ __html: b }} />
+                    <span
+                      style={{ fontWeight: 700, fontSize: 11.5, color: DARK }}
+                    >
+                      {proj.name}
+                    </span>
+                    {dates && (
+                      <span
+                        style={{
+                          fontSize: 9.5,
+                          color: MUTED,
+                          fontStyle: "italic",
+                          flexShrink: 0,
+                          marginLeft: 8,
+                        }}
+                      >
+                        {dates}
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
-            ))}
+                  {/* Role · type · link */}
+                  {(meta || proj.url) && (
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        color: ACCENT,
+                        fontWeight: 600,
+                        marginBottom: 6,
+                      }}
+                    >
+                      {meta}
+                      {meta && proj.url ? " · " : ""}
+                      {proj.url && (
+                        <span style={{ color: MUTED, fontWeight: 400 }}>
+                          {displayUrl(proj.url)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {proj.description && (
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        lineHeight: 1.6,
+                        color: "#333333",
+                        marginBottom: 3,
+                      }}
+                    >
+                      {proj.description}
+                    </div>
+                  )}
+                  {/* Bullets */}
+                  {proj.bullets.filter(Boolean).map((b, j) => (
+                    <div
+                      key={j}
+                      style={{
+                        display: "flex",
+                        gap: 7,
+                        marginBottom: 3,
+                        fontSize: 10.5,
+                        lineHeight: 1.6,
+                        color: "#333333",
+                      }}
+                    >
+                      <span
+                        style={{ flexShrink: 0, color: ACCENT, marginTop: 1 }}
+                      >
+                        •
+                      </span>
+                      <div dangerouslySetInnerHTML={{ __html: b }} />
+                    </div>
+                  ))}
+                  {/* Tech tags */}
+                  {proj.techStack && proj.techStack.length > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "3px 5px",
+                        marginTop: 6,
+                      }}
+                    >
+                      {proj.techStack.map((t, j) => (
+                        <span
+                          key={j}
+                          style={{
+                            fontSize: 9,
+                            color: ACCENT,
+                            border: `1px solid ${ACCENT}44`,
+                            backgroundColor: `${ACCENT}12`,
+                            padding: "1px 6px",
+                            borderRadius: 3,
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </MainSection>
         )}
 

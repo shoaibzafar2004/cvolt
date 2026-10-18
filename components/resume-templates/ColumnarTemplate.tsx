@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Layout:
@@ -222,6 +223,104 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
       )}
 
       {/* ══════════════════════════════════
+          PROJECTS
+      ══════════════════════════════════ */}
+      {projects.length > 0 && (
+        <SectionRow label="Projects" accent={ACCENT}>
+          {projects.map((proj, i) => {
+            const meta = projectMeta(proj);
+            const dates = projectDates(proj);
+            return (
+              <div
+                key={i}
+                style={{
+                  marginBottom: i < projects.length - 1 ? 16 : 0,
+                  pageBreakInside: "avoid",
+                }}
+              >
+                {/* Name + dates row */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}>
+                    {proj.name}
+                  </div>
+                  {dates && (
+                    <div
+                      style={{
+                        fontSize: 9.5,
+                        color: MUTED,
+                        fontStyle: "italic",
+                        flexShrink: 0,
+                        marginLeft: 10,
+                      }}
+                    >
+                      {dates}
+                    </div>
+                  )}
+                </div>
+                {/* Role · type · link */}
+                {(meta || proj.url) && (
+                  <div
+                    style={{ fontSize: 10.5, color: MUTED, marginBottom: 5 }}
+                  >
+                    {meta}
+                    {meta && proj.url ? " · " : ""}
+                    {displayUrl(proj.url)}
+                  </div>
+                )}
+                {proj.description && (
+                  <div
+                    style={{
+                      fontSize: 10.5,
+                      lineHeight: 1.6,
+                      color: BODY,
+                      marginBottom: 3,
+                    }}
+                  >
+                    {proj.description}
+                  </div>
+                )}
+                {/* Bullets */}
+                {proj.bullets.filter(Boolean).map((b, j) => (
+                  <div
+                    key={j}
+                    style={{
+                      display: "flex",
+                      gap: 7,
+                      marginBottom: 3,
+                      fontSize: 10.5,
+                      lineHeight: 1.6,
+                      color: BODY,
+                    }}
+                  >
+                    <span style={{ flexShrink: 0 }}>•</span>
+                    <div dangerouslySetInnerHTML={{ __html: b }} />
+                  </div>
+                ))}
+                {proj.techStack && proj.techStack.length > 0 && (
+                  <div
+                    style={{
+                      fontSize: 9.5,
+                      color: MUTED,
+                      fontStyle: "italic",
+                      marginTop: 3,
+                    }}
+                  >
+                    Built with {proj.techStack.join(", ")}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </SectionRow>
+      )}
+
+      {/* ══════════════════════════════════
           EDUCATION
       ══════════════════════════════════ */}
       {education.length > 0 && (
@@ -280,63 +379,6 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
               </div>
             );
           })}
-        </SectionRow>
-      )}
-
-      {/* ══════════════════════════════════
-          PROJECTS
-      ══════════════════════════════════ */}
-      {projects.length > 0 && (
-        <SectionRow label="Projects" accent={ACCENT}>
-          {projects.map((proj, i) => (
-            <div
-              key={i}
-              style={{
-                marginBottom: i < projects.length - 1 ? 14 : 0,
-                pageBreakInside: "avoid",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                }}
-              >
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}>
-                  {proj.name}
-                </div>
-                {proj.url && (
-                  <div
-                    style={{ fontSize: 9.5, color: MUTED, fontStyle: "italic" }}
-                  >
-                    {proj.url}
-                  </div>
-                )}
-              </div>
-              {proj.description && (
-                <div style={{ fontSize: 10.5, color: MUTED, marginBottom: 4 }}>
-                  {proj.description}
-                </div>
-              )}
-              {proj.bullets.filter(Boolean).map((b, j) => (
-                <div
-                  key={j}
-                  style={{
-                    display: "flex",
-                    gap: 7,
-                    marginBottom: 3,
-                    fontSize: 10.5,
-                    lineHeight: 1.6,
-                    color: BODY,
-                  }}
-                >
-                  <span style={{ flexShrink: 0 }}>•</span>
-                  <div dangerouslySetInnerHTML={{ __html: b }} />
-                </div>
-              ))}
-            </div>
-          ))}
         </SectionRow>
       )}
 

@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Layout:
@@ -308,50 +309,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
             ].map((col, ci) => (
               <div key={ci} style={{ width: COL_W, flexShrink: 0 }}>
                 {col.map((proj, i) => (
-                  <div
-                    key={i}
-                    style={{ marginBottom: i < col.length - 1 ? 14 : 0 }}
-                  >
-                    <div
-                      style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}
-                    >
-                      {proj.name}
-                    </div>
-                    {proj.url && (
-                      <div
-                        style={{ fontSize: 9.5, color: MUTED, marginBottom: 2 }}
-                      >
-                        {proj.url}
-                      </div>
-                    )}
-                    {proj.description && (
-                      <div
-                        style={{
-                          fontSize: 10,
-                          color: MUTED,
-                          fontStyle: "italic",
-                          marginBottom: 4,
-                        }}
-                      >
-                        {proj.description}
-                      </div>
-                    )}
-                    {proj.bullets.filter(Boolean).map((b, j) => (
-                      <div
-                        key={j}
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          marginBottom: 2,
-                          fontSize: 10.5,
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
-                        <div dangerouslySetInnerHTML={{ __html: b }} />
-                      </div>
-                    ))}
-                  </div>
+                  <ProjectEntry key={i} p={proj} accent={ACCENT} />
                 ))}
               </div>
             ))}
@@ -624,6 +582,98 @@ function WorkEntry({ c, accent }: { c: WorkContent; accent: string }) {
           <div dangerouslySetInnerHTML={{ __html: b }} />
         </div>
       ))}
+    </div>
+  );
+}
+
+function ProjectEntry({ p, accent }: { p: ProjectContent; accent: string }) {
+  const meta = projectMeta(p);
+  const dates = projectDates(p);
+  return (
+    <div style={{ marginBottom: 16, pageBreakInside: "avoid" }}>
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#1a1a1a",
+          textTransform: "uppercase",
+          letterSpacing: 0.3,
+        }}
+      >
+        {p.name}
+      </div>
+      {(meta || dates) && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+          }}
+        >
+          <span style={{ fontSize: 10.5, color: accent, fontWeight: 600 }}>
+            {meta}
+          </span>
+          {dates && (
+            <span
+              style={{
+                fontSize: 9.5,
+                color: "#888888",
+                fontStyle: "italic",
+                flexShrink: 0,
+                marginLeft: 8,
+              }}
+            >
+              {dates}
+            </span>
+          )}
+        </div>
+      )}
+      {p.url && (
+        <div style={{ fontSize: 9.5, color: "#888888" }}>
+          {displayUrl(p.url)}
+        </div>
+      )}
+      <div style={{ height: 5 }} />
+      {p.description && (
+        <div
+          style={{
+            fontSize: 10.5,
+            lineHeight: 1.6,
+            color: "#3d3d3d",
+            marginBottom: 3,
+          }}
+        >
+          {p.description}
+        </div>
+      )}
+      {p.bullets.filter(Boolean).map((b, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            gap: 7,
+            marginBottom: 3,
+            fontSize: 10.5,
+            lineHeight: 1.6,
+            color: "#3d3d3d",
+          }}
+        >
+          <span style={{ color: accent, flexShrink: 0 }}>•</span>
+          <div dangerouslySetInnerHTML={{ __html: b }} />
+        </div>
+      ))}
+      {p.techStack && p.techStack.length > 0 && (
+        <div
+          style={{
+            fontSize: 9.5,
+            color: "#888888",
+            fontStyle: "italic",
+            marginTop: 3,
+          }}
+        >
+          Built with {p.techStack.join(", ")}
+        </div>
+      )}
     </div>
   );
 }

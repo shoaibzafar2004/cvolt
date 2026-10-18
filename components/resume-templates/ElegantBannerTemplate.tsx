@@ -7,6 +7,7 @@ import type {
   LanguageContent,
   ProjectContent,
 } from "@/types";
+import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
 // Elegant banner variant — wide warm brown header band across the top with name +
@@ -485,77 +486,122 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           {/* Projects */}
           {projects.length > 0 && (
             <RightSection title="Projects">
-              {projects.map((proj, i) => (
-                <div
-                  key={i}
-                  style={{ display: "flex", gap: 14, marginBottom: 14 }}
-                >
-                  <div style={{ paddingTop: 4, flexShrink: 0 }}>
-                    <div
-                      style={{
-                        width: 14,
-                        height: 14,
-                        borderRadius: "50%",
-                        border: `2px solid ${ACCENT}`,
-                        backgroundColor: BG,
-                      }}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontWeight: 700,
-                        fontSize: 11.5,
-                      }}
-                    >
-                      {proj.name}
-                      {proj.url && (
-                        <span
+              {projects.map((proj, i) => {
+                const meta = projectMeta(proj);
+                const dates = projectDates(proj).replace(" – ", " to ");
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      gap: 14,
+                      marginBottom: 18,
+                      pageBreakInside: "avoid",
+                    }}
+                  >
+                    <div style={{ paddingTop: 4, flexShrink: 0 }}>
+                      <div
+                        style={{
+                          width: 14,
+                          height: 14,
+                          borderRadius: "50%",
+                          border: `2px solid ${ACCENT}`,
+                          backgroundColor: BG,
+                        }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                        }}
+                      >
+                        {proj.name}
+                      </div>
+                      {(meta || proj.url) && (
+                        <div
                           style={{
-                            fontWeight: 400,
-                            color: MUTED,
-                            fontSize: 9.5,
+                            fontFamily: '"Source Sans 3", sans-serif',
+                            fontSize: 10.5,
+                            marginTop: 1,
                           }}
                         >
-                          {" "}
-                          · {proj.url}
-                        </span>
+                          {meta}
+                          {meta && proj.url ? " · " : ""}
+                          {proj.url && (
+                            <span style={{ color: ACCENT }}>
+                              {displayUrl(proj.url)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {(dates || proj.description) && (
+                        <div
+                          style={{
+                            fontFamily: '"Lora", serif',
+                            fontStyle: "italic",
+                            fontSize: 10,
+                            color: MUTED,
+                            marginTop: 2,
+                            marginBottom: 5,
+                          }}
+                        >
+                          {dates}
+                          {dates && proj.description ? " — " : ""}
+                          {proj.description}
+                        </div>
+                      )}
+                      {proj.bullets.filter(Boolean).map((b, j) => (
+                        <div
+                          key={j}
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            marginBottom: 3,
+                            fontFamily: '"Source Sans 3", sans-serif',
+                            fontSize: 10.5,
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          <span style={{ color: ACCENT, flexShrink: 0 }}>
+                            •
+                          </span>
+                          <div dangerouslySetInnerHTML={{ __html: b }} />
+                        </div>
+                      ))}
+                      {proj.techStack && proj.techStack.length > 0 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "4px 6px",
+                            marginTop: 6,
+                          }}
+                        >
+                          {proj.techStack.map((t, j) => (
+                            <span
+                              key={j}
+                              style={{
+                                fontSize: 9,
+                                color: ACCENT,
+                                border: `1px solid ${DIVIDER}`,
+                                backgroundColor: BG,
+                                padding: "1px 7px",
+                                borderRadius: 10,
+                                fontFamily: '"Source Sans 3", sans-serif',
+                              }}
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
-                    {proj.description && (
-                      <div
-                        style={{
-                          fontFamily: '"Lora", serif',
-                          fontStyle: "italic",
-                          fontSize: 10,
-                          color: MUTED,
-                          marginTop: 2,
-                          marginBottom: 4,
-                        }}
-                      >
-                        {proj.description}
-                      </div>
-                    )}
-                    {proj.bullets.filter(Boolean).map((b, j) => (
-                      <div
-                        key={j}
-                        style={{
-                          display: "flex",
-                          gap: 8,
-                          marginBottom: 3,
-                          fontFamily: '"Source Sans 3", sans-serif',
-                          fontSize: 10.5,
-                          lineHeight: 1.55,
-                        }}
-                      >
-                        <span style={{ color: ACCENT, flexShrink: 0 }}>•</span>
-                        <div dangerouslySetInnerHTML={{ __html: b }} />
-                      </div>
-                    ))}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </RightSection>
           )}
         </div>
