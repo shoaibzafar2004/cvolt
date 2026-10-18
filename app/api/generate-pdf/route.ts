@@ -7,10 +7,7 @@ import type { ResumeData } from '@/types'
 export const maxDuration = 60
 
 function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
 export async function POST(request: Request) {
@@ -63,9 +60,7 @@ export async function POST(request: Request) {
   }
 
   // Return a signed URL valid for 5 minutes
-  const { data: signed } = await supabase.storage
-    .from('pdfs')
-    .createSignedUrl(pdfPath, 300)
+  const { data: signed } = await supabase.storage.from('pdfs').createSignedUrl(pdfPath, 300)
 
   return Response.json({ url: signed?.signedUrl })
 }

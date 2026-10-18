@@ -30,7 +30,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const displayName = template?.name ?? (nameParam ? decodeURIComponent(nameParam) : null)
   const displaySlug = template?.slug ?? slugParam ?? null
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // Require login before checkout — prevents payment being attributed to a wrong email
   if (!user) {
@@ -51,26 +53,29 @@ export default async function CheckoutPage({ searchParams }: Props) {
   })
 
   return (
-    <main className="max-w-lg mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold mb-8">Checkout</h1>
+    <main className="mx-auto max-w-lg px-4 py-12">
+      <h1 className="mb-8 text-2xl font-bold">Checkout</h1>
 
       {/* Order summary */}
-      <div className="border rounded-xl p-4 mb-8 bg-card flex items-center gap-4">
+      <div className="mb-8 flex items-center gap-4 rounded-xl border bg-card p-4">
         {/* Live mini preview */}
-        <div className="rounded-lg border shadow-sm overflow-hidden bg-white shrink-0">
-          {displaySlug
-            ? <TemplateThumbnail slug={displaySlug} />
-            : <div className="w-20 h-28 flex items-center justify-center text-xs text-muted-foreground bg-muted">Preview</div>
-          }
+        <div className="shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm">
+          {displaySlug ? (
+            <TemplateThumbnail slug={displaySlug} />
+          ) : (
+            <div className="flex h-28 w-20 items-center justify-center bg-muted text-xs text-muted-foreground">
+              Preview
+            </div>
+          )}
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-base truncate">{displayName ?? 'Resume template'}</p>
-          <p className="text-sm text-muted-foreground mt-0.5">One-time download</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-base font-semibold">{displayName ?? 'Resume template'}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">One-time download</p>
           <p className="text-xs text-muted-foreground">30-day re-download included</p>
         </div>
 
-        <p className="text-xl font-bold shrink-0">$1.50</p>
+        <p className="shrink-0 text-xl font-bold">$1.50</p>
       </div>
 
       <CheckoutForm

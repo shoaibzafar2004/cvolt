@@ -38,10 +38,10 @@ function LoginForm() {
 
   if (sent) {
     return (
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="text-4xl">📬</div>
         <h2 className="text-xl font-semibold">Check your inbox</h2>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           We sent a magic link to <span className="font-medium text-foreground">{email}</span>.
           Click it to sign in — no password needed.
         </p>
@@ -75,7 +75,7 @@ function LoginForm() {
         {loading ? 'Sending...' : 'Send magic link'}
       </Button>
 
-      <p className="text-xs text-center text-muted-foreground">
+      <p className="text-center text-xs text-muted-foreground">
         No password needed. We&apos;ll email you a secure sign-in link.
       </p>
     </form>
@@ -84,11 +84,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="flex items-center justify-center min-h-screen px-4">
+    <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Sign in to Cvolt</h1>
-          <p className="text-muted-foreground text-sm mt-1">Access your purchased resumes</p>
+          <p className="mt-1 text-sm text-muted-foreground">Access your purchased resumes</p>
         </div>
         <Suspense>
           <LoginForm />

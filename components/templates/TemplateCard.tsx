@@ -7,7 +7,7 @@ import type { Template, Payment, ResumeData } from '@/types'
 
 const CARD_HEIGHT = 340
 const A4_WIDTH = 794
-const SCALE = 0.38  // slightly zoomed — fills card better than fitting exactly to width
+const SCALE = 0.38 // slightly zoomed — fills card better than fitting exactly to width
 
 const PLACEHOLDER: ResumeData = {
   personalInfo: {
@@ -164,7 +164,11 @@ const PLACEHOLDER: ResumeData = {
       type: 'certifications',
       displayOrder: 5,
       content: [
-        { name: 'AWS Certified Solutions Architect', issuer: 'Amazon Web Services', date: '2023-04' },
+        {
+          name: 'AWS Certified Solutions Architect',
+          issuer: 'Amazon Web Services',
+          date: '2023-04',
+        },
         { name: 'Professional Scrum Master I', issuer: 'Scrum.org', date: '2022-01' },
       ],
     },
@@ -214,12 +218,17 @@ export default function TemplateCard({ template, payments }: TemplateCardProps) 
   }
 
   return (
-    <div className="group flex flex-col rounded-xl border bg-card overflow-hidden hover:shadow-md transition-shadow">
+    <div className="group flex flex-col overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md">
       {/* Live preview */}
       <Link
         href={`/templates/${template.slug}`}
         className="block overflow-hidden bg-white"
-        style={{ height: CARD_HEIGHT, display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}
+        style={{
+          height: CARD_HEIGHT,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
       >
         {/* Centered box — width = A4 scaled width, clips vertically */}
         <div
@@ -249,14 +258,14 @@ export default function TemplateCard({ template, payments }: TemplateCardProps) 
       </Link>
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-4 py-3 border-t bg-card">
+      <div className="flex items-center justify-between border-t bg-card px-4 py-3">
         <div>
           <p className="text-sm font-medium">{template.name}</p>
           <p className="text-xs text-muted-foreground capitalize">{template.category}</p>
         </div>
         <Link
           href={ctaHref}
-          className="text-xs font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity whitespace-nowrap"
+          className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium whitespace-nowrap text-primary-foreground transition-opacity hover:opacity-90"
         >
           {ctaLabel}
         </Link>

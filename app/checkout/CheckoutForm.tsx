@@ -14,7 +14,12 @@ interface CheckoutFormProps {
   userEmail: string | null
 }
 
-export default function CheckoutForm({ clientSecret, templateId, publishableKey, userEmail }: CheckoutFormProps) {
+export default function CheckoutForm({
+  clientSecret,
+  templateId,
+  publishableKey,
+  userEmail,
+}: CheckoutFormProps) {
   const router = useRouter()
   const personalInfo = useResumeStore((s) => s.personalInfo)
 
@@ -36,7 +41,15 @@ export default function CheckoutForm({ clientSecret, templateId, publishableKey,
   )
 }
 
-function InnerForm({ templateId, clientSecret, userEmail }: { templateId: string; clientSecret: string; userEmail: string | null }) {
+function InnerForm({
+  templateId,
+  clientSecret,
+  userEmail,
+}: {
+  templateId: string
+  clientSecret: string
+  userEmail: string | null
+}) {
   const stripe = useStripe()
   const elements = useElements()
   const [email] = useState(userEmail ?? '')
@@ -80,14 +93,14 @@ function InnerForm({ templateId, clientSecret, userEmail }: { templateId: string
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex items-center gap-2 text-sm border rounded-lg px-4 py-3 bg-muted/30">
+      <div className="flex items-center gap-2 rounded-lg border bg-muted/30 px-4 py-3 text-sm">
         <span className="text-muted-foreground">Sending receipt to</span>
         <span className="font-medium text-foreground">{userEmail}</span>
       </div>
 
       <div className="space-y-2">
         <label className="text-sm font-medium">Payment</label>
-        <div className="border rounded-lg p-4">
+        <div className="rounded-lg border p-4">
           <PaymentElement />
         </div>
       </div>
@@ -98,7 +111,7 @@ function InnerForm({ templateId, clientSecret, userEmail }: { templateId: string
         {loading ? 'Processing...' : 'Pay $1.50 and download'}
       </Button>
 
-      <p className="text-xs text-center text-muted-foreground">
+      <p className="text-center text-xs text-muted-foreground">
         No subscription. No refunds after PDF download.
       </p>
     </form>

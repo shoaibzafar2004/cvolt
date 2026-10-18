@@ -11,17 +11,21 @@ export default async function EditPage({ params }: Props) {
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect('/login?returnTo=/dashboard')
 
   // Fetch resume that belongs to this user
   const { data: resume } = await supabase
     .from('resumes')
-    .select(`
+    .select(
+      `
       id,
       personal_info,
       resume_sections ( id, section_type, content, display_order )
-    `)
+    `,
+    )
     .eq('id', id)
     .eq('user_id', user.id)
     .single()

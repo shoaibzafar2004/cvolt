@@ -22,13 +22,13 @@ cp .env.example .env.local
 
 Fill `.env.local` using the values printed by `npm run db:status`:
 
-| Variable | Local value |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `http://127.0.0.1:54321` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `ANON_KEY` from `db:status` |
-| `SUPABASE_SERVICE_ROLE_KEY` | `SERVICE_ROLE_KEY` from `db:status` |
-| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` |
-| `STRIPE_*`, `SAFEPAY_SECRET_KEY` | Your test-mode keys |
+| Variable                         | Local value                         |
+| -------------------------------- | ----------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`       | `http://127.0.0.1:54321`            |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | `ANON_KEY` from `db:status`         |
+| `SUPABASE_SERVICE_ROLE_KEY`      | `SERVICE_ROLE_KEY` from `db:status` |
+| `NEXT_PUBLIC_APP_URL`            | `http://localhost:3000`             |
+| `STRIPE_*`, `SAFEPAY_SECRET_KEY` | Your test-mode keys                 |
 
 Then start the app:
 
@@ -42,21 +42,21 @@ Open [http://localhost:3000](http://localhost:3000).
 
 The full Supabase stack (Postgres, Auth, Storage, REST) runs locally in Docker, so no application code differs between local and hosted Supabase — only the env values.
 
-| Script | What it does |
-|---|---|
-| `npm run db:start` | Start the stack. Data persists between restarts in Docker volumes. |
-| `npm run db:stop` | Stop the stack and free memory. |
-| `npm run db:status` | Print URLs and keys. |
-| `npm run db:reset` | Wipe the database, re-run all migrations and the seed. |
+| Script              | What it does                                                       |
+| ------------------- | ------------------------------------------------------------------ |
+| `npm run db:start`  | Start the stack. Data persists between restarts in Docker volumes. |
+| `npm run db:stop`   | Stop the stack and free memory.                                    |
+| `npm run db:status` | Print URLs and keys.                                               |
+| `npm run db:reset`  | Wipe the database, re-run all migrations and the seed.             |
 
 **Local services**
 
-| Service | URL |
-|---|---|
-| API | http://127.0.0.1:54321 |
-| Studio (DB admin UI) | http://127.0.0.1:54323 |
-| Mailpit (catches all outgoing email) | http://127.0.0.1:54324 |
-| Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+| Service                              | URL                                                       |
+| ------------------------------------ | --------------------------------------------------------- |
+| API                                  | http://127.0.0.1:54321                                    |
+| Studio (DB admin UI)                 | http://127.0.0.1:54323                                    |
+| Mailpit (catches all outgoing email) | http://127.0.0.1:54324                                    |
+| Postgres                             | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
 **Notes**
 
@@ -94,10 +94,10 @@ Use the `whsec_...` secret it prints as `STRIPE_WEBHOOK_SECRET`.
 
 ## Other scripts
 
-| Command | What it does |
-|---|---|
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
+| Command                           | What it does                                 |
+| --------------------------------- | -------------------------------------------- |
+| `npm run build`                   | Production build                             |
+| `npm run lint`                    | ESLint                                       |
 | `node scripts/download-fonts.mjs` | Download template fonts into `public/fonts/` |
 
 ## Deploying

@@ -1,9 +1,11 @@
 export default function SectionLine({ className }: { className?: string }) {
   return (
-    <div className={`absolute hidden lg:flex flex-col items-center pointer-events-none ${className ?? ''}`}>
-      <div className="w-7 h-7 rounded-full border-2 border-foreground/25 bg-background shrink-0 shadow-sm" />
-      <div className="flex-1 w-px bg-foreground/12" />
-      <div className="w-7 h-7 rounded-full border-2 border-foreground/25 bg-background shrink-0 shadow-sm" />
+    <div
+      className={`pointer-events-none absolute hidden flex-col items-center lg:flex ${className ?? ''}`}
+    >
+      <div className="h-7 w-7 shrink-0 rounded-full border-2 border-foreground/25 bg-background shadow-sm" />
+      <div className="w-px flex-1 bg-foreground/12" />
+      <div className="h-7 w-7 shrink-0 rounded-full border-2 border-foreground/25 bg-background shadow-sm" />
     </div>
   )
 }

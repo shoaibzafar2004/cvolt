@@ -1,10 +1,5 @@
 export type SectionType =
-  | 'work'
-  | 'education'
-  | 'skills'
-  | 'certifications'
-  | 'languages'
-  | 'projects'
+  'work' | 'education' | 'skills' | 'certifications' | 'languages' | 'projects'
 
 export interface PersonalInfo {
   name: string

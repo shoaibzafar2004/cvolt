@@ -13,20 +13,19 @@ interface TemplateGalleryProps {
 export default function TemplateGallery({ templates, payments }: TemplateGalleryProps) {
   const { activeFilter } = useUIStore()
 
-  const filtered = activeFilter === 'all'
-    ? templates
-    : templates.filter((t) => t.category === activeFilter)
+  const filtered =
+    activeFilter === 'all' ? templates : templates.filter((t) => t.category === activeFilter)
 
   return (
     <div className="space-y-6">
       <FilterBar />
 
       {filtered.length === 0 ? (
-        <p className="text-muted-foreground text-sm py-12 text-center">
+        <p className="py-12 text-center text-sm text-muted-foreground">
           No templates in this category yet.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((template) => (
             <TemplateCard key={template.id} template={template} payments={payments} />
           ))}

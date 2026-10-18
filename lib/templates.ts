@@ -6,14 +6,28 @@ import ModernTemplate from '@/components/resume-templates/ModernTemplate'
 import CreativeTemplate, { CREATIVE_THEMES } from '@/components/resume-templates/CreativeTemplate'
 import ElegantTemplate from '@/components/resume-templates/ElegantTemplate'
 import ElegantSingleTemplate from '@/components/resume-templates/ElegantSingleTemplate'
-import ElegantDarkTemplate, { ELEGANT_DARK_THEMES } from '@/components/resume-templates/ElegantDarkTemplate'
+import ElegantDarkTemplate, {
+  ELEGANT_DARK_THEMES,
+} from '@/components/resume-templates/ElegantDarkTemplate'
 import ElegantBannerTemplate from '@/components/resume-templates/ElegantBannerTemplate'
-import BoldPhotoTemplate, { BOLD_PHOTO_THEMES } from '@/components/resume-templates/BoldPhotoTemplate'
-import ProSidebarTemplate, { PRO_SIDEBAR_THEMES } from '@/components/resume-templates/ProSidebarTemplate'
-import SoftPortraitTemplate, { SOFT_PORTRAIT_THEMES } from '@/components/resume-templates/SoftPortraitTemplate'
-import GeometricTemplate, { GEOMETRIC_THEMES } from '@/components/resume-templates/GeometricTemplate'
-import BoldHeaderTemplate, { BOLD_HEADER_THEMES } from '@/components/resume-templates/BoldHeaderTemplate'
-import EditorialTemplate, { EDITORIAL_THEMES } from '@/components/resume-templates/EditorialTemplate'
+import BoldPhotoTemplate, {
+  BOLD_PHOTO_THEMES,
+} from '@/components/resume-templates/BoldPhotoTemplate'
+import ProSidebarTemplate, {
+  PRO_SIDEBAR_THEMES,
+} from '@/components/resume-templates/ProSidebarTemplate'
+import SoftPortraitTemplate, {
+  SOFT_PORTRAIT_THEMES,
+} from '@/components/resume-templates/SoftPortraitTemplate'
+import GeometricTemplate, {
+  GEOMETRIC_THEMES,
+} from '@/components/resume-templates/GeometricTemplate'
+import BoldHeaderTemplate, {
+  BOLD_HEADER_THEMES,
+} from '@/components/resume-templates/BoldHeaderTemplate'
+import EditorialTemplate, {
+  EDITORIAL_THEMES,
+} from '@/components/resume-templates/EditorialTemplate'
 import ColumnarTemplate, { COLUMNAR_THEMES } from '@/components/resume-templates/ColumnarTemplate'
 
 export type TemplateComponent = ComponentType<{ data: ResumeData }>
@@ -27,13 +41,13 @@ export interface ThemeOption {
 
 // Map from template slug → available color themes. Only present if the template supports theming.
 export const TEMPLATE_THEMES: Record<string, ThemeOption[]> = {
-  'clean': Object.entries(CLEAN_THEMES).map(([key, t]) => ({
+  clean: Object.entries(CLEAN_THEMES).map(([key, t]) => ({
     key,
     label: t.label,
     sidebarBg: t.accent, // accent-only template — use accent for both halves of swatch
     accent: t.accent,
   })),
-  'creative': Object.entries(CREATIVE_THEMES).map(([key, t]) => ({
+  creative: Object.entries(CREATIVE_THEMES).map(([key, t]) => ({
     key,
     label: t.label,
     sidebarBg: t.sidebarBg,
@@ -63,7 +77,7 @@ export const TEMPLATE_THEMES: Record<string, ThemeOption[]> = {
     sidebarBg: t.sidebarBg,
     accent: t.accent,
   })),
-  'geometric': Object.entries(GEOMETRIC_THEMES).map(([key, t]) => ({
+  geometric: Object.entries(GEOMETRIC_THEMES).map(([key, t]) => ({
     key,
     label: t.label,
     sidebarBg: t.sidebarBg,
@@ -75,13 +89,13 @@ export const TEMPLATE_THEMES: Record<string, ThemeOption[]> = {
     sidebarBg: t.sidebarBg,
     accent: t.accent,
   })),
-  'editorial': Object.entries(EDITORIAL_THEMES).map(([key, t]) => ({
+  editorial: Object.entries(EDITORIAL_THEMES).map(([key, t]) => ({
     key,
     label: t.label,
     sidebarBg: t.sidebarBg,
     accent: t.accent,
   })),
-  'columnar': Object.entries(COLUMNAR_THEMES).map(([key, t]) => ({
+  columnar: Object.entries(COLUMNAR_THEMES).map(([key, t]) => ({
     key,
     label: t.label,
     sidebarBg: t.sidebarBg,
@@ -100,10 +114,10 @@ export const registry: Record<string, TemplateComponent> = {
   'bold-photo': BoldPhotoTemplate,
   'pro-sidebar': ProSidebarTemplate,
   'soft-portrait': SoftPortraitTemplate,
-  'geometric': GeometricTemplate,
+  geometric: GeometricTemplate,
   'bold-header': BoldHeaderTemplate,
-  'editorial': EditorialTemplate,
-  'columnar': ColumnarTemplate,
+  editorial: EditorialTemplate,
+  columnar: ColumnarTemplate,
 }
 
 export function getTemplate(slug: string): TemplateComponent {

@@ -31,9 +31,5 @@ export async function createStripePaymentIntent({
 }
 
 export function verifyStripeWebhook(payload: string, sig: string) {
-  return getStripe().webhooks.constructEvent(
-    payload,
-    sig,
-    process.env.STRIPE_WEBHOOK_SECRET!
-  )
+  return getStripe().webhooks.constructEvent(payload, sig, process.env.STRIPE_WEBHOOK_SECRET!)
 }

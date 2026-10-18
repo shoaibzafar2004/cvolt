@@ -199,7 +199,11 @@ const PLACEHOLDER: ResumeData = {
       type: 'certifications',
       displayOrder: 7,
       content: [
-        { name: 'AWS Certified Solutions Architect', issuer: 'Amazon Web Services', date: '2023-04' },
+        {
+          name: 'AWS Certified Solutions Architect',
+          issuer: 'Amazon Web Services',
+          date: '2023-04',
+        },
         { name: 'Professional Scrum Master I', issuer: 'Scrum.org', date: '2022-01' },
       ],
     },
@@ -219,7 +223,6 @@ const ZOOM_MIN = 0.5
 const ZOOM_MAX = 1.5
 const ZOOM_STEP = 0.1
 
-
 export default function TemplatePreview({ template }: { template: Template }) {
   const store = useResumeStore()
   const [zoomFactor, setZoomFactor] = useState(1)
@@ -231,7 +234,6 @@ export default function TemplatePreview({ template }: { template: Template }) {
     ? { personalInfo: store.personalInfo, sections: store.sections }
     : PLACEHOLDER
 
-
   const A4_WIDTH = 794
   const A4_HEIGHT = 1123
   const targetHeight = typeof window !== 'undefined' ? window.innerHeight * 0.92 : 920
@@ -239,11 +241,11 @@ export default function TemplatePreview({ template }: { template: Template }) {
   const scale = baseScale * zoomFactor
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)]">
+    <div className="flex h-[calc(100vh-64px)] flex-col lg:flex-row">
       {/* Left — rendered resume */}
-      <div className="flex-1 overflow-auto bg-muted/30 flex flex-col items-center p-8 gap-4">
+      <div className="flex flex-1 flex-col items-center gap-4 overflow-auto bg-muted/30 p-8">
         {/* Zoom controls */}
-        <div className="flex items-center gap-2 bg-background border rounded-lg px-3 py-1.5 shadow-sm shrink-0">
+        <div className="flex shrink-0 items-center gap-2 rounded-lg border bg-background px-3 py-1.5 shadow-sm">
           <Button
             variant="ghost"
             size="sm"
@@ -253,7 +255,7 @@ export default function TemplatePreview({ template }: { template: Template }) {
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-xs font-medium text-muted-foreground w-12 text-center">
+          <span className="w-12 text-center text-xs font-medium text-muted-foreground">
             {Math.round(zoomFactor * 100)}%
           </span>
           <Button
@@ -287,11 +289,13 @@ export default function TemplatePreview({ template }: { template: Template }) {
       </div>
 
       {/* Right — info + CTA */}
-      <div className="w-full lg:w-80 border-l bg-card flex flex-col p-8 gap-6 shrink-0">
+      <div className="flex w-full shrink-0 flex-col gap-6 border-l bg-card p-8 lg:w-80">
         <div className="space-y-2">
-          <Badge variant="secondary" className="capitalize">{template.category}</Badge>
+          <Badge variant="secondary" className="capitalize">
+            {template.category}
+          </Badge>
           <h1 className="text-2xl font-bold">{template.name}</h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Professional resume template. Download as a pixel-perfect PDF instantly after purchase.
           </p>
         </div>
@@ -306,7 +310,7 @@ export default function TemplatePreview({ template }: { template: Template }) {
         {hasData ? (
           <Link
             href={`/checkout?templateId=${template.id}&slug=${template.slug}&name=${encodeURIComponent(template.name)}`}
-            className="w-full text-center bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
+            className="w-full rounded-lg bg-primary py-3 text-center font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             Use this template
           </Link>
@@ -314,11 +318,11 @@ export default function TemplatePreview({ template }: { template: Template }) {
           <div className="space-y-3">
             <Link
               href={`/build?returnTo=/templates/${template.slug}`}
-              className="w-full text-center bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:opacity-90 transition-opacity block"
+              className="block w-full rounded-lg bg-primary py-3 text-center font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               Fill in your resume first
             </Link>
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-center text-xs text-muted-foreground">
               You need your resume details before purchasing.
             </p>
           </div>
@@ -326,18 +330,20 @@ export default function TemplatePreview({ template }: { template: Template }) {
 
         {hasData && (
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Edit your resume</p>
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Edit your resume
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { label: 'Personal info', step: 1 },
-                { label: 'Experience',    step: 2 },
+                { label: 'Experience', step: 2 },
                 { label: 'Education & skills', step: 3 },
-                { label: 'Summary',       step: 4 },
+                { label: 'Summary', step: 4 },
               ].map(({ label, step }) => (
                 <Link
                   key={step}
                   href={`/build?step=${step}&returnTo=/templates/${template.slug}`}
-                  className="text-xs px-3 py-2 rounded-lg border border-border text-foreground hover:bg-muted transition-colors text-center leading-tight"
+                  className="rounded-lg border border-border px-3 py-2 text-center text-xs leading-tight text-foreground transition-colors hover:bg-muted"
                 >
                   {label}
                 </Link>
@@ -348,13 +354,13 @@ export default function TemplatePreview({ template }: { template: Template }) {
 
         <Link
           href="/templates"
-          className="text-sm text-muted-foreground text-center hover:text-foreground transition-colors"
+          className="text-center text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           ← Back to all templates
         </Link>
 
         {!hasData && (
-          <p className="text-xs text-muted-foreground border rounded-md p-3 bg-muted/40">
+          <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
             Showing sample data. Fill in your details above to preview your real resume.
           </p>
         )}

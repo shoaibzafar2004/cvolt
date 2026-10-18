@@ -11,7 +11,9 @@ export default async function TemplatesPage() {
     .eq('is_active', true)
     .order('created_at')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   let payments: Payment[] = []
   if (user) {
@@ -34,10 +36,12 @@ export default async function TemplatesPage() {
   }))
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10">
+    <main className="mx-auto max-w-7xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-1">Choose a template</h1>
-        <p className="text-muted-foreground">Your resume data is already filled in. Pick the look you want.</p>
+        <h1 className="mb-1 text-3xl font-bold">Choose a template</h1>
+        <p className="text-muted-foreground">
+          Your resume data is already filled in. Pick the look you want.
+        </p>
       </div>
       <TemplateGallery templates={mapped} payments={payments} />
     </main>

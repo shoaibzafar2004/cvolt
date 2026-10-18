@@ -7,10 +7,7 @@ import { createElement } from 'react'
 
 // Use service role client — webhook runs outside user session
 function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
 export async function POST(request: Request) {
@@ -63,17 +60,31 @@ export async function POST(request: Request) {
 
     // 2. Find latest resume for this user
     let { data: resume } = userId
-      ? await supabase.from('resumes').select('id, personal_info').eq('user_id', userId).order('updated_at', { ascending: false }).limit(1).single()
+      ? await supabase
+          .from('resumes')
+          .select('id, personal_info')
+          .eq('user_id', userId)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .single()
       : { data: null }
 
     // 3. Fetch resume sections
     const { data: sections } = resume
-      ? await supabase.from('resume_sections').select('*').eq('resume_id', resume.id).order('display_order')
+      ? await supabase
+          .from('resume_sections')
+          .select('*')
+          .eq('resume_id', resume.id)
+          .order('display_order')
       : { data: [] }
 
     const resumeData: ResumeData = {
       personalInfo: (resume?.personal_info as ResumeData['personalInfo']) ?? {
-        name: '', jobTitle: '', email, phone: '', location: '',
+        name: '',
+        jobTitle: '',
+        email,
+        phone: '',
+        location: '',
       },
       sections: (sections ?? []).map((s) => ({
         id: s.id,
@@ -89,7 +100,9 @@ export async function POST(request: Request) {
         .from('resumes')
         .insert({
           user_id: userId,
-          title: resumeData.personalInfo.name ? `${resumeData.personalInfo.name}'s Resume` : 'My Resume',
+          title: resumeData.personalInfo.name
+            ? `${resumeData.personalInfo.name}'s Resume`
+            : 'My Resume',
           personal_info: resumeData.personalInfo,
         })
         .select('id, personal_info')
@@ -114,7 +127,8 @@ export async function POST(request: Request) {
       .select('id')
       .single()
 
-    if (paymentError || !payment) throw new Error(`Failed to create payment record: ${paymentError?.message}`)
+    if (paymentError || !payment)
+      throw new Error(`Failed to create payment record: ${paymentError?.message}`)
 
     // 5. Step 2: insert snapshot
     if (!resume?.id) throw new Error('Cannot create snapshot: resume record is missing')
@@ -131,7 +145,8 @@ export async function POST(request: Request) {
       .select('id')
       .single()
 
-    if (snapshotError || !snapshot) throw new Error(`Failed to create snapshot: ${snapshotError?.message}`)
+    if (snapshotError || !snapshot)
+      throw new Error(`Failed to create snapshot: ${snapshotError?.message}`)
 
     // 6. Step 3: link snapshot back to payment
     await supabase.from('payments').update({ snapshot_id: snapshot.id }).eq('id', payment.id)

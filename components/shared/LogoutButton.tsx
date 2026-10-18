@@ -25,7 +25,11 @@ export default function LogoutButton({ mobile = false }: { mobile?: boolean }) {
     <Button
       variant="ghost"
       size={mobile ? 'default' : 'sm'}
-      className={mobile ? 'justify-start text-muted-foreground' : 'text-muted-foreground hover:text-foreground font-medium'}
+      className={
+        mobile
+          ? 'justify-start text-muted-foreground'
+          : 'font-medium text-muted-foreground hover:text-foreground'
+      }
       onClick={handleLogout}
     >
       Sign out

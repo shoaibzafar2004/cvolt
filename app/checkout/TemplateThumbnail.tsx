@@ -13,15 +13,47 @@ const PLACEHOLDER: ResumeData = {
     location: 'San Francisco, CA',
   },
   sections: [
-    { id: '1', type: 'work', displayOrder: 0, content: { company: 'Acme Corp', role: 'Senior Engineer', startDate: '2021-06', current: true, bullets: ['Led migration to microservices', 'Reduced API latency by 40%'] } },
-    { id: '2', type: 'education', displayOrder: 1, content: { institution: 'MIT', degree: 'BSc', field: 'Computer Science', startDate: '2013-09', endDate: '2017-05' } },
-    { id: '3', type: 'skills', displayOrder: 2, content: { skills: [{ name: 'TypeScript', level: 'Expert' }, { name: 'React', level: 'Expert' }, { name: 'Node.js', level: 'Advanced' }] } },
+    {
+      id: '1',
+      type: 'work',
+      displayOrder: 0,
+      content: {
+        company: 'Acme Corp',
+        role: 'Senior Engineer',
+        startDate: '2021-06',
+        current: true,
+        bullets: ['Led migration to microservices', 'Reduced API latency by 40%'],
+      },
+    },
+    {
+      id: '2',
+      type: 'education',
+      displayOrder: 1,
+      content: {
+        institution: 'MIT',
+        degree: 'BSc',
+        field: 'Computer Science',
+        startDate: '2013-09',
+        endDate: '2017-05',
+      },
+    },
+    {
+      id: '3',
+      type: 'skills',
+      displayOrder: 2,
+      content: {
+        skills: [
+          { name: 'TypeScript', level: 'Expert' },
+          { name: 'React', level: 'Expert' },
+          { name: 'Node.js', level: 'Advanced' },
+        ],
+      },
+    },
   ],
 }
 
 const A4_WIDTH = 794
-const SCALE = 0.1   // tiny — fits in a 80×80 thumbnail
-
+const SCALE = 0.1 // tiny — fits in a 80×80 thumbnail
 
 export default function TemplateThumbnail({ slug }: { slug: string }) {
   const store = useResumeStore()

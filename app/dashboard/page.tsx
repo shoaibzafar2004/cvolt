@@ -8,49 +8,85 @@ export const dynamic = 'force-dynamic'
 function getServiceClient() {
   return createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 }
 
 function daysRemaining(expiresAt: string): number {
-  return Math.max(0, Math.ceil((new Date(expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  return Math.max(
+    0,
+    Math.ceil((new Date(expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+  )
 }
 
 // Mini resume mockup thumbnail — purely decorative, matches template slug colours
 function TemplateMockup({ slug, name }: { slug?: string; name?: string }) {
   const isModern = slug === 'modern'
   const isCreative = slug === 'creative'
-  const accentBg = isCreative
-    ? '#7c3aed'
-    : isModern
-    ? '#1e293b'
-    : '#4f46e5'
+  const accentBg = isCreative ? '#7c3aed' : isModern ? '#1e293b' : '#4f46e5'
 
   return (
     <div
       style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
         background: '#f8fafc',
       }}
     >
       {/* Header bar */}
       <div style={{ background: accentBg, padding: '12px 14px 10px' }}>
-        <div style={{ height: 7, width: '60%', borderRadius: 4, background: 'rgba(255,255,255,0.85)', marginBottom: 5 }} />
-        <div style={{ height: 4, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.45)' }} />
+        <div
+          style={{
+            height: 7,
+            width: '60%',
+            borderRadius: 4,
+            background: 'rgba(255,255,255,0.85)',
+            marginBottom: 5,
+          }}
+        />
+        <div
+          style={{ height: 4, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.45)' }}
+        />
       </div>
 
       {/* Body lines */}
-      <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+      <div
+        style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}
+      >
         {/* Section label */}
-        <div style={{ height: 3, width: '30%', borderRadius: 3, background: accentBg, opacity: 0.6 }} />
+        <div
+          style={{ height: 3, width: '30%', borderRadius: 3, background: accentBg, opacity: 0.6 }}
+        />
         {[70, 90, 55, 80].map((w, i) => (
-          <div key={i} style={{ height: 3, width: `${w}%`, borderRadius: 3, background: '#cbd5e1' }} />
+          <div
+            key={i}
+            style={{ height: 3, width: `${w}%`, borderRadius: 3, background: '#cbd5e1' }}
+          />
         ))}
-        <div style={{ height: 3, width: '25%', borderRadius: 3, background: accentBg, opacity: 0.6, marginTop: 4 }} />
+        <div
+          style={{
+            height: 3,
+            width: '25%',
+            borderRadius: 3,
+            background: accentBg,
+            opacity: 0.6,
+            marginTop: 4,
+          }}
+        />
         <div style={{ display: 'flex', gap: 5 }}>
           {[38, 28, 44].map((w, i) => (
-            <div key={i} style={{ height: 12, width: w, borderRadius: 6, background: isCreative ? '#ede9fe' : '#e0e7ff' }} />
+            <div
+              key={i}
+              style={{
+                height: 12,
+                width: w,
+                borderRadius: 6,
+                background: isCreative ? '#ede9fe' : '#e0e7ff',
+              }}
+            />
           ))}
         </div>
       </div>
@@ -58,7 +94,15 @@ function TemplateMockup({ slug, name }: { slug?: string; name?: string }) {
       {/* Template name pill at bottom */}
       <div style={{ padding: '0 14px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: accentBg }} />
-        <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        <span
+          style={{
+            fontSize: 8,
+            color: '#94a3b8',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}
+        >
           {name ?? slug}
         </span>
       </div>
@@ -68,13 +112,17 @@ function TemplateMockup({ slug, name }: { slug?: string; name?: string }) {
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const serviceClient = getServiceClient()
 
   const { data: payments } = await serviceClient
     .from('payments')
-    .select('id, purchased_at, expires_at, status, snapshot_id, templates ( name, slug, thumbnail_url )')
+    .select(
+      'id, purchased_at, expires_at, status, snapshot_id, templates ( name, slug, thumbnail_url )',
+    )
     .eq('user_id', user!.id)
     .eq('status', 'completed')
     .order('purchased_at', { ascending: false })
@@ -87,27 +135,28 @@ export default async function DashboardPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
-
       {/* ── Page header ─────────────────────────────── */}
       <div className="border-b bg-muted/30">
-        <div className="max-w-5xl mx-auto px-6 py-10">
-          <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Dashboard</p>
+        <div className="mx-auto max-w-5xl px-6 py-10">
+          <p className="mb-2 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            Dashboard
+          </p>
           <div className="flex items-end justify-between gap-4">
             <div>
               <h1
-                className="text-3xl font-bold leading-tight"
+                className="text-3xl leading-tight font-bold"
                 style={{ fontFamily: 'var(--font-jost)' }}
               >
                 My resumes
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">{user!.email}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{user!.email}</p>
             </div>
             <Link
               href="/build"
-              className="inline-flex items-center gap-2 text-sm font-semibold bg-foreground text-background px-5 py-2.5 rounded-full hover:opacity-85 transition-opacity whitespace-nowrap"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-background transition-opacity hover:opacity-85"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="h-3.5 w-3.5" />
               New resume
             </Link>
           </div>
@@ -115,58 +164,59 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Content ─────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className="mx-auto max-w-5xl px-6 py-10">
         {!payments?.length ? (
-
           /* ── Empty state ── */
           <div className="flex flex-col items-center justify-center py-28 text-center">
-            <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6">
-              <Download className="w-7 h-7 text-indigo-500" />
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500/10">
+              <Download className="h-7 w-7 text-indigo-500" />
             </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: 'var(--font-jost)' }}>
+            <h2 className="mb-2 text-xl font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
               No purchased resumes yet
             </h2>
-            <p className="text-sm text-muted-foreground mb-8 max-w-xs">
+            <p className="mb-8 max-w-xs text-sm text-muted-foreground">
               Build your resume for free, then pay $1.50 to download a pixel-perfect PDF.
             </p>
             <Link
               href="/build"
-              className="inline-flex items-center gap-2 text-sm font-semibold bg-foreground text-background px-6 py-3 rounded-full hover:opacity-85 transition-opacity"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition-opacity hover:opacity-85"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
               Build your first resume →
             </Link>
           </div>
-
         ) : (
-
           /* ── Resume grid ── */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {payments.map((payment) => {
-              const template = Array.isArray(payment.templates) ? payment.templates[0] : payment.templates
+              const template = Array.isArray(payment.templates)
+                ? payment.templates[0]
+                : payment.templates
               const days = daysRemaining(payment.expires_at)
               const expired = days === 0
               const snapshot = payment.snapshot_id ? snapshotMap.get(payment.snapshot_id) : null
-              const resumeName = (snapshot?.snapshot_data as { personalInfo?: { name?: string } } | null)?.personalInfo?.name
+              const resumeName = (
+                snapshot?.snapshot_data as { personalInfo?: { name?: string } } | null
+              )?.personalInfo?.name
 
               return (
                 <div
                   key={payment.id}
-                  className="group bg-card border rounded-2xl overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200"
+                  className="group flex flex-col overflow-hidden rounded-2xl border bg-card transition-shadow duration-200 hover:shadow-md"
                 >
                   {/* ── Thumbnail ── */}
-                  <div className="h-44 overflow-hidden border-b relative">
+                  <div className="relative h-44 overflow-hidden border-b">
                     <TemplateMockup slug={template?.slug} name={template?.name} />
 
                     {/* Expiry overlay badge */}
                     <div className="absolute top-3 right-3">
                       {expired ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider bg-destructive/90 text-destructive-foreground px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        <span className="text-destructive-foreground inline-flex items-center gap-1 rounded-full bg-destructive/90 px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase backdrop-blur-sm">
                           Expired
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider bg-background/85 text-foreground px-2.5 py-1 rounded-full backdrop-blur-sm border">
-                          <Clock className="w-2.5 h-2.5 text-indigo-500" />
+                        <span className="inline-flex items-center gap-1 rounded-full border bg-background/85 px-2.5 py-1 text-[10px] font-semibold tracking-wider text-foreground uppercase backdrop-blur-sm">
+                          <Clock className="h-2.5 w-2.5 text-indigo-500" />
                           {days}d left
                         </span>
                       )}
@@ -174,35 +224,43 @@ export default async function DashboardPage() {
                   </div>
 
                   {/* ── Info ── */}
-                  <div className="p-5 flex flex-col gap-4 flex-1">
+                  <div className="flex flex-1 flex-col gap-4 p-5">
                     <div>
-                      <p className="font-semibold leading-tight" style={{ fontFamily: 'var(--font-jost)' }}>
+                      <p
+                        className="leading-tight font-semibold"
+                        style={{ fontFamily: 'var(--font-jost)' }}
+                      >
                         {resumeName || 'Resume'}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5 capitalize">
-                        {template?.name ?? '—'} template · {new Date(payment.purchased_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      <p className="mt-0.5 text-xs text-muted-foreground capitalize">
+                        {template?.name ?? '—'} template ·{' '}
+                        {new Date(payment.purchased_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
                       </p>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 mt-auto">
+                    <div className="mt-auto flex gap-2">
                       <Link
                         href={`/dashboard/edit/${payment.id}`}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium border rounded-full py-2 hover:bg-muted transition-colors"
+                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border py-2 text-xs font-medium transition-colors hover:bg-muted"
                       >
-                        <Pencil className="w-3 h-3" />
+                        <Pencil className="h-3 w-3" />
                         Edit
                       </Link>
                       <Link
                         href={`/dashboard/download/${payment.id}`}
                         className={[
-                          'flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold rounded-full py-2 transition-opacity',
+                          'inline-flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-opacity',
                           expired
-                            ? 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'
+                            ? 'pointer-events-none cursor-not-allowed bg-muted text-muted-foreground'
                             : 'bg-foreground text-background hover:opacity-80',
                         ].join(' ')}
                       >
-                        <Download className="w-3 h-3" />
+                        <Download className="h-3 w-3" />
                         Download
                       </Link>
                     </div>
@@ -211,7 +269,6 @@ export default async function DashboardPage() {
               )
             })}
           </div>
-
         )}
       </div>
     </main>

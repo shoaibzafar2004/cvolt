@@ -13,15 +13,15 @@ export default function FilterBar() {
   const { activeFilter, setFilter } = useUIStore()
 
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex flex-wrap gap-2">
       {FILTERS.map(({ label, value }) => (
         <button
           key={value}
           onClick={() => setFilter(value)}
           className={[
-            'px-4 py-1.5 rounded-full text-sm border transition-colors',
+            'rounded-full border px-4 py-1.5 text-sm transition-colors',
             activeFilter === value
-              ? 'bg-primary text-primary-foreground border-primary'
+              ? 'border-primary bg-primary text-primary-foreground'
               : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground',
           ].join(' ')}
         >

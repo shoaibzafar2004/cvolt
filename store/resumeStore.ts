@@ -39,8 +39,7 @@ export const useResumeStore = create<ResumeStore>()(
       isDirty: false,
       lastSaved: null,
 
-      setPersonalInfo: (info) =>
-        set({ personalInfo: info, isDirty: true }),
+      setPersonalInfo: (info) => set({ personalInfo: info, isDirty: true }),
 
       upsertSection: (section) =>
         set((state) => {
@@ -98,6 +97,6 @@ export const useResumeStore = create<ResumeStore>()(
         personalInfo: state.personalInfo,
         sections: state.sections,
       }),
-    }
-  )
+    },
+  ),
 )

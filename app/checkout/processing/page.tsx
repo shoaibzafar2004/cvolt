@@ -45,11 +45,11 @@ function ProcessingContent() {
   }, [intentId, redirectStatus, router])
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen gap-6 text-center px-4">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       <div>
         <h1 className="text-xl font-semibold">Preparing your resume…</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           This usually takes 10–20 seconds. Please don&apos;t close this tab.
         </p>
       </div>

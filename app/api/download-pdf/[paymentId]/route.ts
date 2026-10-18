@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 function getServiceClient() {
   return createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 }
 
@@ -17,7 +17,9 @@ export async function GET(_req: Request, { params }: Props) {
   const { paymentId } = await params
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect(`/login?returnTo=/api/download-pdf/${paymentId}`)
 
   // Verify payment belongs to user and is completed
@@ -56,8 +58,8 @@ export async function GET(_req: Request, { params }: Props) {
 
   const pdfUserId = payment.user_id ?? user.id
   const pdfPath = `resumes/${pdfUserId}/${paymentId}.pdf`
-  const { data: signed } = await getServiceClient().storage
-    .from('pdfs')
+  const { data: signed } = await getServiceClient()
+    .storage.from('pdfs')
     .createSignedUrl(pdfPath, 60)
 
   if (!signed?.signedUrl) return new Response('PDF not found', { status: 404 })

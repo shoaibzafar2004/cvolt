@@ -8,7 +8,9 @@ interface AuthGateProps {
 
 export default async function AuthGate({ children, returnTo }: AuthGateProps) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     const params = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''
