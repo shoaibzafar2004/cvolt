@@ -13,7 +13,7 @@ const buttonVariants = cva(
         default:
           "border-primary bg-primary text-primary-foreground hover:bg-background hover:text-foreground",
         outline:
-          "border-indigo-500 text-indigo-500 hover:bg-indigo-500 hover:text-white dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-400",
+          "border-indigo-500 text-indigo-500 hover:bg-indigo-500 hover:text-white dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-500 dark:hover:text-white",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
