@@ -30,8 +30,9 @@ function ProcessingContent() {
           clearInterval(interval);
           router.replace(`/checkout/success?paymentId=${data.paymentId}`);
         } else if (data.status === "failed" || attempts >= MAX_ATTEMPTS) {
+          // Card was charged (Stripe redirected here) but the PDF isn't ready
           clearInterval(interval);
-          router.replace("/checkout/failed");
+          router.replace("/checkout/failed?reason=processing");
         }
       } catch {
         if (attempts >= MAX_ATTEMPTS) {

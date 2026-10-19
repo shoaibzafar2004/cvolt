@@ -31,7 +31,8 @@ async function SuccessContent({ paymentId }: { paymentId: string }) {
       <div>
         <h1 className="text-2xl font-bold">Payment confirmed!</h1>
         <p className="mt-2 text-muted-foreground">
-          Your resume PDF is ready. Check your email for a download link too.
+          Your resume PDF is ready. You can re-download it from your dashboard
+          for 30 days.
         </p>
       </div>
 

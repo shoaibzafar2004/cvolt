@@ -312,7 +312,7 @@ API route: `POST /api/generate-pdf`
 1. User submits checkout form
 2. Payment intent created server-side
 3. Stripe/Safepay webhook fires on success
-4. Webhook: create payment record → freeze resume snapshot → generate PDF → upload to storage → send magic link
+4. Webhook: create (or reuse) payment record → freeze resume snapshot → generate PDF → upload to storage → mark completed
 5. Processing page polls status → redirects to /success
 6. /success shows download button + 30-day countdown
 
@@ -752,7 +752,7 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 ## Payments
 - Never trust client-side payment confirmation.
 - Mark payments complete ONLY inside the webhook handler after signature verification.
-- The webhook creates the snapshot, triggers PDF generation, and sends the magic link.
+- The webhook creates the snapshot (of `metadata.resumeId`), triggers PDF generation, and marks the payment `completed` (or `failed` on error). It is idempotent per `stripe_payment_id` — Stripe retries reuse the same row.
 
 ## React / lint
 - `npm run lint` must report zero errors.
