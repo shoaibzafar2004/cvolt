@@ -56,6 +56,18 @@ export const PRO_SIDEBAR_THEMES: Record<
 };
 
 const DARK = "#1c1c1c";
+
+// PDF pagination: padding repeats at the top/bottom of every printed page
+const PAGE_PAD_Y = 36;
+const PAGE_PADDING: React.CSSProperties = {
+  boxDecorationBreak: "clone",
+  WebkitBoxDecorationBreak: "clone",
+};
+// Headings and entry headers never end a page on their own
+const KEEP_WITH_NEXT: React.CSSProperties = {
+  breakInside: "avoid",
+  breakAfter: "avoid",
+};
 const MUTED = "#6b7280";
 
 export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
@@ -101,6 +113,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; src: url('/fonts/source-sans-700.woff2') format('woff2'); }
+        @media print {
+          html { background: linear-gradient(to right, ${SIDEBAR_BG} ${SIDEBAR_W - 1}px, ${SIDEBAR_BORDER} ${SIDEBAR_W - 1}px, ${SIDEBAR_BORDER} ${SIDEBAR_W}px, #ffffff ${SIDEBAR_W}px) !important; }
+        }
       `,
         }}
       />
@@ -189,7 +204,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
 
         <div
           style={{
-            padding: "16px 22px",
+            ...PAGE_PADDING,
+            padding: `${PAGE_PAD_Y}px 22px`,
+            marginTop: 16 - PAGE_PAD_Y,
             display: "flex",
             flexDirection: "column",
             gap: 0,
@@ -365,7 +382,8 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
         style={{
           width: MAIN_W,
           backgroundColor: "#ffffff",
-          padding: "36px 36px",
+          ...PAGE_PADDING,
+          padding: `${PAGE_PAD_Y}px 36px`,
           boxSizing: "border-box",
         }}
       >
@@ -375,51 +393,50 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
             {work.map((s) => {
               const c = s.content as WorkContent;
               return (
-                <div
-                  key={s.id}
-                  style={{ marginBottom: 18, pageBreakInside: "avoid" }}
-                >
-                  {/* Role + dates row */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "baseline",
-                      marginBottom: 1,
-                    }}
-                  >
-                    <span
-                      style={{ fontWeight: 700, fontSize: 11.5, color: DARK }}
+                <div key={s.id} style={{ marginBottom: 18 }}>
+                  <div style={KEEP_WITH_NEXT}>
+                    {/* Role + dates row */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        marginBottom: 1,
+                      }}
                     >
-                      {c.role}
-                    </span>
-                    {(c.startDate || c.endDate || c.current) && (
                       <span
-                        style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          fontStyle: "italic",
-                          flexShrink: 0,
-                          marginLeft: 8,
-                        }}
+                        style={{ fontWeight: 700, fontSize: 11.5, color: DARK }}
                       >
-                        {c.startDate}
-                        {c.startDate && (c.current || c.endDate)
-                          ? `–${c.current ? "Present" : c.endDate}`
-                          : ""}
+                        {c.role}
                       </span>
-                    )}
-                  </div>
-                  {/* Company */}
-                  <div
-                    style={{
-                      fontSize: 10.5,
-                      color: ACCENT,
-                      fontWeight: 600,
-                      marginBottom: 6,
-                    }}
-                  >
-                    {c.company}
+                      {(c.startDate || c.endDate || c.current) && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            fontStyle: "italic",
+                            flexShrink: 0,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {c.startDate}
+                          {c.startDate && (c.current || c.endDate)
+                            ? `–${c.current ? "Present" : c.endDate}`
+                            : ""}
+                        </span>
+                      )}
+                    </div>
+                    {/* Company */}
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        color: ACCENT,
+                        fontWeight: 600,
+                        marginBottom: 6,
+                      }}
+                    >
+                      {c.company}
+                    </div>
                   </div>
                   {/* Bullets */}
                   {c.bullets.filter(Boolean).map((b, i) => (
@@ -427,6 +444,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                       key={i}
                       style={{
                         display: "flex",
+                        breakInside: "avoid",
                         gap: 7,
                         marginBottom: 3,
                         fontSize: 10.5,
@@ -447,6 +465,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         display: "flex",
+                        breakInside: "avoid",
                         flexWrap: "wrap",
                         gap: "3px 5px",
                         marginTop: 6,
@@ -482,75 +501,75 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
               const meta = projectMeta(proj);
               const dates = projectDates(proj).replace(" – ", "–");
               return (
-                <div
-                  key={i}
-                  style={{ marginBottom: 18, pageBreakInside: "avoid" }}
-                >
-                  {/* Name + dates row */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "baseline",
-                      marginBottom: 1,
-                    }}
-                  >
-                    <span
-                      style={{ fontWeight: 700, fontSize: 11.5, color: DARK }}
-                    >
-                      {proj.name}
-                    </span>
-                    {dates && (
-                      <span
-                        style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          fontStyle: "italic",
-                          flexShrink: 0,
-                          marginLeft: 8,
-                        }}
-                      >
-                        {dates}
-                      </span>
-                    )}
-                  </div>
-                  {/* Role · type · link */}
-                  {(meta || proj.url) && (
+                <div key={i} style={{ marginBottom: 18 }}>
+                  <div style={KEEP_WITH_NEXT}>
+                    {/* Name + dates row */}
                     <div
                       style={{
-                        fontSize: 10.5,
-                        color: ACCENT,
-                        fontWeight: 600,
-                        marginBottom: 6,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        marginBottom: 1,
                       }}
                     >
-                      {meta}
-                      {meta && proj.url ? " · " : ""}
-                      {proj.url && (
-                        <span style={{ color: MUTED, fontWeight: 400 }}>
-                          {displayUrl(proj.url)}
+                      <span
+                        style={{ fontWeight: 700, fontSize: 11.5, color: DARK }}
+                      >
+                        {proj.name}
+                      </span>
+                      {dates && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            fontStyle: "italic",
+                            flexShrink: 0,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {dates}
                         </span>
                       )}
                     </div>
-                  )}
-                  {proj.description && (
-                    <div
-                      style={{
-                        fontSize: 10.5,
-                        lineHeight: 1.6,
-                        color: "#333333",
-                        marginBottom: 3,
-                      }}
-                    >
-                      {proj.description}
-                    </div>
-                  )}
+                    {/* Role · type · link */}
+                    {(meta || proj.url) && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          color: ACCENT,
+                          fontWeight: 600,
+                          marginBottom: 6,
+                        }}
+                      >
+                        {meta}
+                        {meta && proj.url ? " · " : ""}
+                        {proj.url && (
+                          <span style={{ color: MUTED, fontWeight: 400 }}>
+                            {displayUrl(proj.url)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {proj.description && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          lineHeight: 1.6,
+                          color: "#333333",
+                          marginBottom: 3,
+                        }}
+                      >
+                        {proj.description}
+                      </div>
+                    )}
+                  </div>
                   {/* Bullets */}
                   {proj.bullets.filter(Boolean).map((b, j) => (
                     <div
                       key={j}
                       style={{
                         display: "flex",
+                        breakInside: "avoid",
                         gap: 7,
                         marginBottom: 3,
                         fontSize: 10.5,
@@ -571,6 +590,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         display: "flex",
+                        breakInside: "avoid",
                         flexWrap: "wrap",
                         gap: "3px 5px",
                         marginTop: 6,
@@ -607,7 +627,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
               return (
                 <div
                   key={s.id}
-                  style={{ marginBottom: 14, pageBreakInside: "avoid" }}
+                  style={{ marginBottom: 14, breakInside: "avoid" }}
                 >
                   <div
                     style={{
@@ -672,6 +692,7 @@ function SideSection({
     <div style={{ marginBottom: 20 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 9,
           fontWeight: 700,
           textTransform: "uppercase",
@@ -702,6 +723,7 @@ function MainSection({
     <div style={{ marginBottom: 24 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 13,
           fontWeight: 700,
           color: "#1c1c1c",
