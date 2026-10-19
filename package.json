@@ -44,7 +44,7 @@
     "puppeteer-core": "^25.14.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "react-easy-crop": "^5.5.7",
+    "react-easy-crop": "^6.2.4",
     "react-hook-form": "^7.90.0",
     "server-only": "^0.0.1",
     "shadcn": "^4.22.0",
