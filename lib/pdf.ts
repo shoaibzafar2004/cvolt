@@ -31,7 +31,11 @@ export async function generatePdfFromHtml(html: string): Promise<Buffer> {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(fullHtml, { waitUntil: "networkidle0" });
+    // "load" covers images (the photo); @font-face fonts only start loading
+    // once text uses them, so also wait for document.fonts.ready.
+    // (Puppeteer 25 dropped the networkidle options for setContent.)
+    await page.setContent(fullHtml, { waitUntil: "load" });
+    await page.evaluate(() => document.fonts.ready);
     const buffer = await page.pdf({
       format: "A4",
       printBackground: true,
