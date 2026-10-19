@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import ResumeDraftLoader from "@/components/shared/ResumeDraftLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider>
+          <ResumeDraftLoader />
           <Navbar />
           <main className="flex flex-1 flex-col">{children}</main>
           <Footer />
