@@ -17,6 +17,10 @@ interface ResumeStore {
   resumeId: string | null;
   /** Set while editing a purchased resume (its payment id); null for drafts */
   purchaseId: string | null;
+  /** Template of that purchase — free re-edits always render with it */
+  purchaseTemplateId: string | null;
+  /** Bumped by every hydrate(); lets a page wait for its own hydrate (not persisted) */
+  hydrateCount: number;
   mode: "create" | "edit";
   personalInfo: PersonalInfo;
   sections: Section[];
@@ -27,7 +31,11 @@ interface ResumeStore {
   upsertSection: (section: Section) => void;
   removeSection: (id: string) => void;
   reorderSections: (type: SectionType, orderedIds: string[]) => void;
-  hydrate: (data: ResumeData, id: string, purchaseId?: string | null) => void;
+  hydrate: (
+    data: ResumeData,
+    id: string,
+    purchase?: { paymentId: string; templateId: string } | null,
+  ) => void;
   reset: () => void;
   markSaved: () => void;
 }
@@ -37,6 +45,8 @@ export const useResumeStore = create<ResumeStore>()(
     (set) => ({
       resumeId: null,
       purchaseId: null,
+      purchaseTemplateId: null,
+      hydrateCount: 0,
       mode: "create" as const,
       personalInfo: defaultPersonalInfo,
       sections: [],
@@ -71,21 +81,24 @@ export const useResumeStore = create<ResumeStore>()(
           isDirty: true,
         })),
 
-      hydrate: (data, id, purchaseId = null) =>
-        set({
+      hydrate: (data, id, purchase = null) =>
+        set((state) => ({
           resumeId: id,
-          purchaseId,
+          purchaseId: purchase?.paymentId ?? null,
+          purchaseTemplateId: purchase?.templateId ?? null,
+          hydrateCount: state.hydrateCount + 1,
           mode: "edit",
           personalInfo: data.personalInfo,
           sections: data.sections,
           isDirty: false,
           lastSaved: null,
-        }),
+        })),
 
       reset: () =>
         set({
           resumeId: null,
           purchaseId: null,
+          purchaseTemplateId: null,
           mode: "create",
           personalInfo: defaultPersonalInfo,
           sections: [],
@@ -101,6 +114,7 @@ export const useResumeStore = create<ResumeStore>()(
       partialize: (state) => ({
         resumeId: state.resumeId,
         purchaseId: state.purchaseId,
+        purchaseTemplateId: state.purchaseTemplateId,
         personalInfo: state.personalInfo,
         sections: state.sections,
       }),

@@ -20,6 +20,8 @@ interface CheckoutFormProps {
   userEmail: string | null;
   /** Resume chosen in the URL (owner-checked server-side); else the store's draft */
   resumeId: string | null;
+  /** The resume in the URL is a purchased one (re-edit bought as new) */
+  fromPurchase: boolean;
 }
 
 export default function CheckoutForm({
@@ -28,8 +30,11 @@ export default function CheckoutForm({
   publishableKey,
   userEmail,
   resumeId,
+  fromPurchase,
 }: CheckoutFormProps) {
   const router = useRouter();
+  const editingPurchase = useResumeStore((s) => Boolean(s.purchaseId));
+  const asNewResume = fromPurchase || (!resumeId && editingPurchase);
   const personalInfo = useResumeStore((s) => s.personalInfo);
   const draftReady = useUIStore((s) => s.draftReady);
 
@@ -50,17 +55,26 @@ export default function CheckoutForm({
   );
 
   return (
-    <Elements
-      stripe={stripePromise}
-      options={{ clientSecret, appearance: { theme: "stripe" } }}
-    >
-      <InnerForm
-        templateId={templateId}
-        clientSecret={clientSecret}
-        userEmail={userEmail}
-        resumeId={resumeId}
-      />
-    </Elements>
+    <>
+      {asNewResume && (
+        <p className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+          This will be added to your dashboard as a <strong>new resume</strong>{" "}
+          with your edits. The purchase you edited goes back to the version you
+          originally bought.
+        </p>
+      )}
+      <Elements
+        stripe={stripePromise}
+        options={{ clientSecret, appearance: { theme: "stripe" } }}
+      >
+        <InnerForm
+          templateId={templateId}
+          clientSecret={clientSecret}
+          userEmail={userEmail}
+          resumeId={resumeId}
+        />
+      </Elements>
+    </>
   );
 }
 

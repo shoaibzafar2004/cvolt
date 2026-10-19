@@ -130,8 +130,7 @@ cvolt/
 │   │   ├── edit/[id]/                  # [id] = resume id. page.tsx (server) → EditFormShell.tsx (client)
 │   │   └── download/[id]/page.tsx      # Re-download / free re-edit gate
 │   ├── api/
-│   │   ├── generate-pdf/route.ts
-│   │   ├── download-pdf/[paymentId]/route.ts
+│   │   ├── download-pdf/[paymentId]/route.ts   # Serves the PDF; re-renders after a free re-edit
 │   │   ├── payment-status/route.ts
 │   │   ├── update-payment-intent/route.ts
 │   │   ├── webhook/stripe/route.ts
@@ -295,19 +294,16 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 
 ## 8. PDF Generation
 
-API route: `POST /api/generate-pdf`
+`renderAndStorePdf()` in `lib/purchases.ts` — called by the Stripe webhook (new purchase) and by `GET /api/download-pdf/[paymentId]` (free re-edit, when `payments.pdf_hash` is stale). There is no public "generate PDF" endpoint.
 
 ```
-1. Receive { resumeId, templateId, paymentId }
-2. Verify payment is completed in DB
-3. Load resume snapshot data
-4. Look up component from lib/templates.ts registry
-5. ReactDOMServer.renderToStaticMarkup(<Template data={data} />)
-6. Wrap in full HTML document with @font-face styles in <head>
-7. Launch @sparticuz/chromium + Puppeteer
-8. page.setContent(html) → page.pdf({ format: 'A4', printBackground: true })
-9. Upload PDF buffer to Supabase Storage
-10. Return signed download URL
+1. Look up the component from lib/templates.ts registry (by template slug)
+2. ReactDOMServer.renderToStaticMarkup(<Template data={data} />)
+3. lib/pdf.ts wraps it in a full HTML document (<base href> for /fonts)
+4. Launch @sparticuz/chromium + Puppeteer
+5. page.setContent(html) → page.pdf({ format: 'A4', printBackground: true })
+6. Upload to the private `pdfs` bucket at resumes/{userId}/{paymentId}.pdf (upsert)
+7. Store payments.pdf_hash (template + resume content) for staleness checks
 ```
 
 ---
@@ -327,6 +323,8 @@ API route: `POST /api/generate-pdf`
 **Re-download / free re-edit gate (`/dashboard/download/[id]`, enforced again in `/api/download-pdf/[paymentId]`):**
 - Within 30 days of purchase, and word-level change ≤10% of the purchased snapshot (cumulative, `lib/resume-diff.ts`) → free: the PDF is re-rendered when `payments.pdf_hash` no longer matches, then served.
 - Otherwise → "Buy as a new resume": paying creates a new purchase with the edited content, and the original purchase reverts to what was bought.
+- A purchase always renders with its own template (`payments.template_id`). Colour theme (`personalInfo.theme`) changes on that template are free and don't count toward the 10%. Picking a different template while editing a purchase is a new purchase (new resume) — the gallery, template page and checkout say so (`resumeStore.purchaseId` / `purchaseTemplateId`).
+- `ThemePicker` saves the theme to the resume row as well as the store — PDFs are rendered from the DB copy.
 
 ---
 

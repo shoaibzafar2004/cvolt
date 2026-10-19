@@ -61,7 +61,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const { data: ownedResume } = resumeParam
     ? await supabase
         .from("resumes")
-        .select("id")
+        .select("id, purchased")
         .eq("id", resumeParam)
         .eq("user_id", user.id)
         .maybeSingle()
@@ -117,6 +117,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
         templateId={templateId ?? ""}
         userEmail={userEmail}
         resumeId={resumeId}
+        fromPurchase={Boolean(ownedResume?.purchased)}
         publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
       />
     </main>

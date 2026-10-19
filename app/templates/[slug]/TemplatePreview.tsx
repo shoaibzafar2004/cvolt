@@ -248,6 +248,10 @@ function clampZoom(z: number) {
 
 export default function TemplatePreview({ template }: { template: Template }) {
   const store = useResumeStore();
+  // Editing a purchase: its own template is a free update, others a new purchase
+  const editingPurchase = Boolean(store.purchaseId);
+  const isPurchaseTemplate =
+    editingPurchase && store.purchaseTemplateId === template.id;
   const panelRef = useRef<HTMLDivElement>(null);
   const [fitScale, setFitScale] = useState(DEFAULT_FIT);
   const [measured, setMeasured] = useState(false);
@@ -406,14 +410,33 @@ export default function TemplatePreview({ template }: { template: Template }) {
 
         {themes.length > 0 && <ThemePicker themes={themes} />}
 
+        {editingPurchase && (
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+            {isPurchaseTemplate
+              ? "You're editing a resume you bought with this template. Colour changes and small edits (up to 10%) are free within 30 days."
+              : "You're editing a purchased resume. Using this template is a new purchase: it's added to your dashboard as a new resume, and the one you're editing goes back to the version you bought."}
+          </p>
+        )}
+
         <div className="space-y-1">
-          <p className="text-3xl font-bold">$1.50</p>
+          <p className="text-3xl font-bold">
+            {isPurchaseTemplate ? "Free" : "$1.50"}
+          </p>
           <p className="text-xs text-muted-foreground">
-            One-time payment · 30-day re-download
+            {isPurchaseTemplate
+              ? "Update to a resume you already bought"
+              : "One-time payment · 30-day re-download"}
           </p>
         </div>
 
-        {hasData ? (
+        {isPurchaseTemplate ? (
+          <Link
+            href={`/dashboard/download/${store.purchaseId}`}
+            className="w-full rounded-lg bg-primary py-3 text-center font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Get updated PDF
+          </Link>
+        ) : hasData ? (
           <Link
             href={`/checkout?templateId=${template.id}&slug=${template.slug}&name=${encodeURIComponent(template.name)}`}
             className="w-full rounded-lg bg-primary py-3 text-center font-medium text-primary-foreground transition-opacity hover:opacity-90"

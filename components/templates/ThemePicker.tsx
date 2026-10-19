@@ -1,6 +1,7 @@
 "use client";
 
 import { useResumeStore } from "@/store/resumeStore";
+import { createClient } from "@/lib/supabase/client";
 import type { ThemeOption } from "@/lib/templates";
 
 interface Props {
@@ -11,8 +12,18 @@ export default function ThemePicker({ themes }: Props) {
   const store = useResumeStore();
   const current = store.personalInfo.theme ?? themes[0]?.key;
 
-  function select(key: string) {
-    store.setPersonalInfo({ ...store.personalInfo, theme: key });
+  async function select(key: string) {
+    const merged = { ...store.personalInfo, theme: key };
+    store.setPersonalInfo(merged);
+    // PDFs are rendered from the saved resume, so save the colour too —
+    // otherwise checking out straight from here prints the default colour.
+    // (Signed-out drafts have no resumeId; RLS limits this to the owner.)
+    if (store.resumeId) {
+      await createClient()
+        .from("resumes")
+        .update({ personal_info: merged })
+        .eq("id", store.resumeId);
+    }
   }
 
   return (
