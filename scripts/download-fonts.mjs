@@ -78,6 +78,10 @@ const FONTS = [
     file: "source-sans-600.woff2",
     url: "https://fonts.gstatic.com/s/sourcesans3/v15/nwpBtKy2OAdR1K-IwhWudF-R3woAa8opPOrG97lwqDlO9C4Ym4fB3Ts.woff2",
   },
+  {
+    file: "source-sans-700.woff2",
+    url: "https://fonts.gstatic.com/s/sourcesans3/v20/nwpStKy2OAdR1K-IwhWudF-R3wEaZfrc.woff2",
+  },
 ];
 
 await mkdir(OUT, { recursive: true });
