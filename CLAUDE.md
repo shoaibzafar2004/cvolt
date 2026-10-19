@@ -146,7 +146,9 @@ cvolt/
 │   ├── templates/                      # TemplateCard, FilterBar, ThemePicker
 │   ├── resume-templates/               # THE CRITICAL FOLDER — one *Template.tsx per design (14),
 │   │                                   #   ClientOnlyTemplate.tsx (client-only render wrapper),
-│   │                                   #   ContactIcons.tsx (inline SVG icon set), CertExtras.tsx
+│   │                                   #   ContactIcons.tsx (inline SVG icon set), CertExtras.tsx,
+│   │                                   #   ResumeLink.tsx (clickable links in PDFs),
+│   │                                   #   pagination.ts (shared print page-break styles)
 │   ├── ui/                             # shadcn components (badge, button, dialog, input, select,
 │   │                                   #   sheet, skeleton, textarea) + custom month-picker
 │   └── shared/                         # Navbar, Footer, AuthGate, LogoutButton, SectionLine,
@@ -169,8 +171,8 @@ cvolt/
 │   └── utils.ts                        # cn(), daysUntil(), shapeDbRowToResumeData
 │
 ├── store/
-│   ├── resumeStore.ts                  # personalInfo, sections[], resumeId, mode, isDirty
-│   └── uiStore.ts                      # currentStep, activeFilter, loading
+│   ├── resumeStore.ts                  # personalInfo, sections[], resumeId, purchaseId, purchaseTemplateId, mode, isDirty
+│   └── uiStore.ts                      # currentStep, activeFilter, loading, draftReady
 │
 ├── types/index.ts                      # ResumeData, WorkEntry, Template, Payment
 ├── hooks/useMounted.ts                 # true only after hydration (client-only rendering)
@@ -181,6 +183,9 @@ cvolt/
 │   └── seed.sql                        # Template records, applied on start/reset
 │
 ├── scripts/download-fonts.mjs          # Fetches template fonts into public/fonts/
+│
+├── tests/                              # unit/ (Vitest), integration/ (real Supabase), fixtures.ts
+├── vitest.config.ts                    # Unit tests; vitest.integration.config.ts for integration
 │
 └── public/
     ├── fonts/                          # Self-hosted fonts used by resume templates
@@ -203,7 +208,7 @@ cvolt/
 | Route | Description |
 |---|---|
 | `/` | Landing — hero, value prop, how it works, 3 template previews, pricing, FAQ, footer |
-| `/build` | Multi-step form router. Auto-saves to localStorage on blur, syncs to Supabase on step complete |
+| `/build` | Multi-step form router for drafts. Auto-saves to localStorage on blur, syncs to Supabase on step complete. `?new=1` starts a fresh draft ("New resume"); a purchased resume left in the store is swapped for the latest draft |
 | `/build?step=1` | Personal info — name, job title, email, phone, location, LinkedIn, GitHub, website, photo |
 | `/build?step=2` | Work experience — repeatable blocks, rich text bullet points, add/remove/reorder |
 | `/build?step=3` | Projects & open-source contributions (optional) — type, role, link, dates, highlights, tech stack; reorderable |
@@ -216,9 +221,9 @@ cvolt/
 
 | Route | Description |
 |---|---|
-| `/checkout` | Order summary, email input, Stripe or Safepay selector, submit |
-| `/checkout/processing` | Spinner while payment confirms and PDF generates. Auto-redirects to /success |
-| `/success` | Download button + "Check your email" message + 30-day countdown |
+| `/checkout` | Requires login. Order summary + Stripe Payment Element (Safepay not live yet). `?resumeId=` buys that resume (owner-checked) — used for "Buy as a new resume"; otherwise the store's draft |
+| `/checkout/processing` | Polls `/api/payment-status` while the webhook creates the purchase + PDF. Redirects to /checkout/success (or /checkout/failed) |
+| `/checkout/success` | Download button + 30-day re-download note |
 | `/checkout/failed` | Error reason shown. "Try again" preserves form state |
 
 ### Authenticated (requires login)
@@ -226,7 +231,7 @@ cvolt/
 | Route | Description |
 |---|---|
 | `/dashboard` | Purchased resumes. Active: Edit (→ `/dashboard/edit/[resumeId]`) + Download. Expired: Delete only (confirm dialog → `deleteExpiredPurchase` server action in `app/dashboard/actions.ts`) |
-| `/dashboard/edit/[id]` | Same multi-step form as /build but pre-filled. Hydrates Zustand from Supabase on mount |
+| `/dashboard/edit/[id]` | `[id]` = a purchase's own resume. Same multi-step form as /build, loaded from the server; finishes with "Save & get PDF" → its download page |
 | `/dashboard/download/[id]` | Gate: within 30 days + word diff ≤10% vs the purchased snapshot? Serve the PDF, re-rendered with the edits. Otherwise offer "Buy as a new resume" → /checkout?resumeId= |
 | `/login` | Magic link only. Email input → "Check your inbox" → redirect to /dashboard |
 
@@ -245,7 +250,7 @@ cvolt/
 5 steps, single direction, progress bar with 5 pills.
 
 **State architecture:**
-- `useResumeStore` (Zustand) holds: `personalInfo`, `sections[]`, `currentStep`, `resumeId`, `mode` ('create' | 'edit'), `isDirty`, `lastSaved`
+- `useResumeStore` (Zustand) holds: `personalInfo`, `sections[]`, `resumeId`, `purchaseId` + `purchaseTemplateId` (set only while editing a purchase), `mode` ('create' | 'edit'), `isDirty`, `lastSaved`, `hydrateCount`. `currentStep` lives in `uiStore`
 - Each step mounts its own `useForm()` with a Zod schema passed as `zodResolver`
 - On Next: RHF `handleSubmit` validates → merges into Zustand → step + 1
 - On Back: no validation, data already in Zustand
@@ -264,7 +269,7 @@ cvolt/
 **After step 5:** Push to `/templates`. Resume data passed via Zustand store.
 
 **Edit mode (`/dashboard/edit/[id]`):**
-The page is a React Server Component. It fetches the resume server-side, checks auth, and if valid passes the data to a client shell component. The shell runs `useEffect` to call `store.hydrate(data, id)` — skipping the fetch entirely if `store.resumeId === params.id`. Each step's `defaultValues` reads from the store, which is already populated before `useForm` initializes.
+The page is a React Server Component. It fetches the purchased resume server-side (drafts redirect to /build), checks auth, looks up its payment + template, and passes them to `EditFormShell`. Once `uiStore.draftReady` is set, the shell always calls `store.hydrate(data, id, { paymentId, templateId })` — the browser copy can be stale — and only mounts the steps after that hydrate (`hydrateCount`), so each step's `defaultValues` are the server data.
 
 ---
 
@@ -288,6 +293,8 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 - Section order in every template: Work → Projects → Education (where they share a column). Project date/meta/link formatting comes from `lib/resume-format.ts`
 - Contact rows (phone, email, location, website, LinkedIn, GitHub) use the icons in `ContactIcons.tsx` — never text glyphs (◉ ⊕ ✆). Icons inherit colour and size (`currentColor`, `1em`).
 - Certification link + skills render through `<CertExtras>` with the template's own link/muted colours
+- Every email, phone, URL (contact rows, project links) renders through `<ResumeLink>` so it is a live link in the PDF. Never wrap a template preview in `<a>`/`<Link>` — use an overlay link (nested `<a>` is invalid HTML)
+- PDF page breaks use `pagination.ts`: work/project entries may split between bullets (`NO_SPLIT` on bullets/tag rows, `KEEP_WITH_PREV` on the first bullet, `KEEP_WITH_NEXT` on entry headers and section titles), `REPEAT_PADDING` on page columns so continuation pages get margins, and `printPageBackground()` for coloured columns
 - When adding a field, update every template and add it to `tests/fixtures.ts` — `tests/unit/templates.test.tsx` renders all 14 with renderToStaticMarkup (full + minimal data, links, no nested `<a>`, no `class=`). Layout/pagination still needs a visual check: there is no automated visual test suite
 
 ---
@@ -315,8 +322,8 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 2. Payment intent created server-side
 3. Stripe/Safepay webhook fires on success
 4. Webhook: create (or reuse) payment record → copy the resume being bought into a new purchased resume → freeze snapshot → generate PDF → upload → mark completed → if the source was a re-edited purchase, revert it to its own snapshot
-5. Processing page polls status → redirects to /success
-6. /success shows download button + 30-day countdown
+5. Processing page polls status → redirects to /checkout/success
+6. /checkout/success shows the download button + 30-day re-download note
 
 **Purchases own their resume.** Every completed payment gets its own resume (`resumes.purchased = true`); the /build draft and other purchases are never affected by editing it. Dashboard "Edit" edits that purchase's resume (`/dashboard/edit/[resumeId]`, finishing at its download page); "New resume" is `/build?new=1`.
 
@@ -330,7 +337,7 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 
 ## 10. Auth Flow
 
-Magic link only. Anonymous users can build + pay without an account. Email at checkout doubles as auth trigger. Draft merges into account on sign-in. `AuthGate` server component wraps all `/dashboard/*` routes.
+Magic link only. Anyone can build without an account (draft in localStorage); checkout requires signing in, so every purchase belongs to an account. The webhook sends no email. `AuthGate` server component wraps all `/dashboard/*` routes.
 
 ---
 
@@ -772,7 +779,7 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 
 ## Tests
 - Unit tests: Vitest, `tests/unit/**/*.test.ts(x)`, run with `npm test`. Shared resume fixtures in `tests/fixtures.ts`. `@/` resolves to the repo root; `server-only` is stubbed so server helpers (e.g. `lib/purchases.ts`) can be tested.
-- Integration tests: `npm run test:integration` (`tests/integration/`, `vitest.integration.config.ts`) call the real route handlers (Stripe webhook, `/api/download-pdf`) against the local Supabase stack — start it first (`npm run db:start`); URLs/keys come from `supabase status`. Webhook events are signed with Stripe's `generateTestHeaderString`; only the cookie-based `getUser()` is mocked. Each run uses a throwaway user and deletes everything it created. CI runs them in the Integration tests job (`supabase start` in Docker).
+- Integration tests: `npm run test:integration` (`tests/integration/`, `vitest.integration.config.ts`) call the real route handlers (Stripe webhook, `/api/download-pdf`) against the local Supabase stack — start it first (`npm run db:start`); URLs/keys come from `supabase status`. Webhook events are HMAC-signed the way Stripe signs them; only the cookie-based `getUser()` is mocked. Each run uses a throwaway user and deletes everything it created. CI runs them in the Integration tests job (`supabase start` in Docker).
 - Tests never ship: nothing in `app/` imports `tests/`, so they aren't bundled, and `.vercelignore` keeps them out of deployments.
 - Add or update tests with any change to `lib/resume-diff.ts`, `lib/purchases.ts` (pure helpers), `lib/resume-format.ts`, schemas or templates.
 
@@ -793,6 +800,7 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 - [ ] `vercel.json` maxDuration: 60 set for PDF route
 - [ ] All env vars set in Vercel dashboard (not just .env.local)
 - [ ] Template thumbnails in `/public/templates/`
+- [ ] All migrations applied to production (`npx supabase db push`) — includes `payments_stripe_id_unique` and `purchase_owns_resume`
 - [ ] `supabase/seed.sql` run against production DB
 - [ ] End-to-end test: build → gallery → checkout → PDF → download
 - [ ] Test magic link login and returnTo redirect

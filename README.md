@@ -2,16 +2,17 @@
 
 A one-time-pay resume builder. Users fill in their details, browse templates with their own data previewed live, pay once, and download a PDF. No subscription.
 
-**Stack:** Next.js (App Router) · Supabase (Postgres, Auth, Storage) · Tailwind + shadcn/ui · Zustand + React Hook Form + Zod · Puppeteer PDF generation · Stripe / Safepay
+**Stack:** Next.js (App Router) · Supabase (Postgres, Auth, Storage) · Tailwind + shadcn/ui · Zustand + React Hook Form + Zod · Puppeteer PDF generation · Stripe (Safepay planned) · Vitest
 
 See [CLAUDE.md](CLAUDE.md) for the full architecture, database schema, routes and build plan.
 
 ## Features
 
-- **5-step builder** (`/build`): personal info → work experience → projects & open-source contributions → education, skills, certifications, languages → summary. Drafts autosave to the browser; signed-in users sync to Supabase.
+- **5-step builder** (`/build`): personal info → work experience → projects & open-source contributions → education, skills, certifications, languages → summary. No account needed to build: drafts autosave to the browser, and signed-in users sync to Supabase (an empty browser draft is reloaded from there).
 - **14 templates** with colour themes, previewed live with your own data in the gallery and on a full-size preview page (zoom slider, fit-to-screen).
-- **One-time payment** (Stripe; Safepay planned) → server-rendered, pixel-perfect PDF via Puppeteer.
-- **Dashboard** (magic-link login): re-download or edit purchases within 30 days; delete expired ones.
+- **One-time payment** (Stripe; Safepay planned; sign-in required at checkout) → server-rendered, pixel-perfect PDF via Puppeteer, with clickable contact, project and certificate links and clean page breaks.
+- **Dashboard** (magic-link login): every purchase is its own resume. Within 30 days, edits that change ≤10% of the text (and colour changes) are free and the PDF is re-rendered; bigger edits, another template or a brand-new resume are a new purchase. Expired purchases can be deleted.
+- **Tests:** Vitest unit tests and integration tests against a real local Supabase; CI runs format, lint, typecheck, both test suites and the build on every PR.
 
 ## Prerequisites
 
