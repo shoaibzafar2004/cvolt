@@ -67,6 +67,7 @@ function InnerForm({
 }) {
   const stripe = useStripe();
   const elements = useElements();
+  const resumeId = useResumeStore((s) => s.resumeId);
   const [email] = useState(userEmail ?? "");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -85,13 +86,15 @@ function InnerForm({
       return;
     }
 
-    // Attach email to the PaymentIntent so the webhook can read it from intent.metadata.email
+    // Attach email + resume to the PaymentIntent so the webhook snapshots the
+    // resume being bought (read from intent.metadata)
     await fetch("/api/update-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         intentId: clientSecret.split("_secret_")[0],
         email,
+        resumeId,
       }),
     });
 

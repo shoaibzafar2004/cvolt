@@ -36,10 +36,28 @@ export async function POST(request: Request) {
   }
 
   const intent = event.data.object;
-  const { templateId, email: metaEmail, userId: metaUserId } = intent.metadata;
+  const {
+    templateId,
+    email: metaEmail,
+    userId: metaUserId,
+    resumeId: metaResumeId,
+  } = intent.metadata;
   const email = metaEmail ?? intent.receipt_email ?? "";
 
   const supabase = getServiceClient();
+
+  // Stripe retries failed deliveries — reuse the row from an earlier attempt
+  const { data: existingPayment } = await supabase
+    .from("payments")
+    .select("id, status")
+    .eq("stripe_payment_id", intent.id)
+    .maybeSingle();
+
+  if (existingPayment?.status === "completed") {
+    return new Response("Already processed", { status: 200 });
+  }
+
+  let paymentId: string | null = existingPayment?.id ?? null;
 
   try {
     // 1. Resolve userId across all three cases:
@@ -67,16 +85,24 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Find latest resume for this user
-    let { data: resume } = userId
-      ? await supabase
-          .from("resumes")
-          .select("id, personal_info")
-          .eq("user_id", userId)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .single()
-      : { data: null };
+    // 2. Find the resume being bought (set by /api/update-payment-intent,
+    //    which checks ownership); fall back to the user's latest resume
+    let { data: resume } = !userId
+      ? { data: null }
+      : metaResumeId
+        ? await supabase
+            .from("resumes")
+            .select("id, personal_info")
+            .eq("id", metaResumeId)
+            .eq("user_id", userId)
+            .single()
+        : await supabase
+            .from("resumes")
+            .select("id, personal_info")
+            .eq("user_id", userId)
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .single();
 
     // 3. Fetch resume sections
     const { data: sections } = resume
@@ -123,24 +149,38 @@ export async function POST(request: Request) {
 
     // 4. Step 1 of circular FK fix: insert payment with snapshot_id = null
     //    Status stays 'pending' until PDF is uploaded — processing page polls for 'completed'
-    const { data: payment, error: paymentError } = await supabase
-      .from("payments")
-      .insert({
-        user_id: userId,
-        snapshot_id: null,
-        template_id: templateId,
-        stripe_payment_id: intent.id,
-        amount: intent.amount / 100,
-        currency: intent.currency,
-        status: "pending",
-      })
-      .select("id")
-      .single();
+    if (paymentId) {
+      // Retry: back to pending, and drop the previous attempt's snapshot
+      await supabase
+        .from("payments")
+        .update({ status: "pending", snapshot_id: null })
+        .eq("id", paymentId);
+      await supabase
+        .from("resume_snapshots")
+        .delete()
+        .eq("payment_id", paymentId);
+    } else {
+      const { data: inserted, error: paymentError } = await supabase
+        .from("payments")
+        .insert({
+          user_id: userId,
+          snapshot_id: null,
+          template_id: templateId,
+          stripe_payment_id: intent.id,
+          amount: intent.amount / 100,
+          currency: intent.currency,
+          status: "pending",
+        })
+        .select("id")
+        .single();
 
-    if (paymentError || !payment)
-      throw new Error(
-        `Failed to create payment record: ${paymentError?.message}`,
-      );
+      if (paymentError || !inserted)
+        throw new Error(
+          `Failed to create payment record: ${paymentError?.message}`,
+        );
+      paymentId = inserted.id;
+    }
+    const payment = { id: paymentId };
 
     // 5. Step 2: insert snapshot
     if (!resume?.id)
@@ -196,23 +236,23 @@ export async function POST(request: Request) {
       throw new Error(`PDF upload failed: ${uploadError.message}`);
 
     // 9. Mark payment as completed — only now is the PDF ready for download
-    await supabase
+    const { error: completeError } = await supabase
       .from("payments")
       .update({ status: "completed" })
       .eq("id", payment.id);
-
-    // 10. Send magic link so user can access dashboard
-    if (email) {
-      await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email,
-        options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard` },
-      });
-    }
+    if (completeError)
+      throw new Error(`Failed to complete payment: ${completeError.message}`);
 
     return new Response("OK", { status: 200 });
   } catch (err) {
     console.error("Webhook error:", err);
+    // Lets the processing page stop waiting; Stripe's retry resets it to pending
+    if (paymentId) {
+      await supabase
+        .from("payments")
+        .update({ status: "failed" })
+        .eq("id", paymentId);
+    }
     return new Response("Internal error", { status: 500 });
   }
 }
