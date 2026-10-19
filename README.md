@@ -96,13 +96,27 @@ npx supabase migration up                      # apply pending migrations, keepi
 
 ## Payments (local testing)
 
-Stripe webhooks need to reach your local server. With the [Stripe CLI](https://stripe.com/docs/stripe-cli):
+A purchase is only recorded — payment row, resume copy, PDF — when the Stripe webhook reaches `/api/webhook/stripe`. Stripe can't reach `localhost`, so locally the [Stripe CLI](https://stripe.com/docs/stripe-cli) forwards events. Keep it running in its own terminal next to `npm run dev`:
 
 ```bash
+stripe login                                                    # once; the CLI key expires after 90 days
 stripe listen --forward-to localhost:3000/api/webhook/stripe
 ```
 
-Use the `whsec_...` secret it prints as `STRIPE_WEBHOOK_SECRET`.
+- **`--forward-to` is required.** Plain `stripe listen` only prints events and never calls the app, so payments succeed in Stripe but nothing appears on the dashboard.
+- Use the `whsec_...` secret it prints as `STRIPE_WEBHOOK_SECRET` in `.env.local` (it stays the same across restarts; restart `npm run dev` if you change it).
+- Pay with the test card `4242 4242 4242 4242`, any future expiry, any CVC.
+- Each event should be followed by a response line:
+
+  ```
+  --> payment_intent.succeeded [evt_...]
+  <-- [200] POST http://localhost:3000/api/webhook/stripe [evt_...]
+  ```
+
+  No `<--` line → the listener isn't forwarding (missing `--forward-to`). `[ERROR] … connection refused` → `npm run dev` isn't running. `[400]` → wrong `STRIPE_WEBHOOK_SECRET`. `[500]` → the handler failed; check the `npm run dev` output.
+
+- `Expired API Key provided` from the CLI → run `stripe login` again.
+- Missed a payment? `stripe events resend <evt_id>` replays it while the listener is running; the webhook skips payments it has already processed.
 
 ## Other scripts
 

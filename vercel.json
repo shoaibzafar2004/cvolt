@@ -1,6 +1,6 @@
 {
   "functions": {
-    "app/api/generate-pdf/route.ts": { "maxDuration": 60 },
+    "app/api/download-pdf/[paymentId]/route.ts": { "maxDuration": 60 },
     "app/api/webhook/stripe/route.ts": { "maxDuration": 60 }
   }
 }
