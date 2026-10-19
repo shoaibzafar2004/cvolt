@@ -6,9 +6,10 @@ let _stripe: Stripe | null = null;
 
 export function getStripe(): Stripe {
   if (!_stripe) {
-    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2025-03-31.basil",
-    });
+    // No apiVersion: each stripe-node release is built for (and pins) one API
+    // version, and its types only accept that one. Upgrading the SDK is the
+    // API upgrade — check Stripe's changelog for breaking changes when bumping.
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   }
   return _stripe;
 }
