@@ -17,6 +17,13 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -76,6 +83,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 400; src: url('/fonts/libre-franklin-400.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 600; src: url('/fonts/libre-franklin-600.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 700; src: url('/fonts/libre-franklin-700.woff2') format('woff2'); }
+        ${printPageBackground(`${SIDEBAR_BG} ${SIDEBAR_W}px, #ffffff ${SIDEBAR_W}px`)}
       `,
         }}
       />
@@ -173,6 +181,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
             width: SIDEBAR_W,
             backgroundColor: SIDEBAR_BG,
             padding: "28px 20px",
+            ...REPEAT_PADDING,
             boxSizing: "border-box",
             flexShrink: 0,
           }}
@@ -183,10 +192,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
               {education.map((s) => {
                 const c = s.content as EducationContent;
                 return (
-                  <div
-                    key={s.id}
-                    style={{ marginBottom: 14, pageBreakInside: "avoid" }}
-                  >
+                  <div key={s.id} style={{ marginBottom: 14, ...NO_SPLIT }}>
                     <div
                       style={{
                         display: "flex",
@@ -352,6 +358,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
           style={{
             width: MAIN_W,
             padding: "28px 32px",
+            ...REPEAT_PADDING,
             boxSizing: "border-box",
           }}
         >
@@ -373,10 +380,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
               {work.map((s) => {
                 const c = s.content as WorkContent;
                 return (
-                  <div
-                    key={s.id}
-                    style={{ marginBottom: 18, pageBreakInside: "avoid" }}
-                  >
+                  <div key={s.id} style={{ marginBottom: 18 }}>
                     <div
                       style={{
                         display: "flex",
@@ -390,36 +394,39 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                         {CIRCLE}
                       </span>
                       <div style={{ flex: 1 }}>
-                        <div
-                          style={{
-                            fontSize: 9,
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: 1,
-                            color: MUTED,
-                          }}
-                        >
-                          {c.role}
-                          {c.startDate
-                            ? ` | ${c.startDate} – ${c.current ? "Present" : (c.endDate ?? "")}`
-                            : ""}
-                        </div>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 10,
-                            textTransform: "uppercase",
-                            letterSpacing: 0.5,
-                            marginTop: 2,
-                          }}
-                        >
-                          {c.company}
+                        <div style={KEEP_WITH_NEXT}>
+                          <div
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                              letterSpacing: 1,
+                              color: MUTED,
+                            }}
+                          >
+                            {c.role}
+                            {c.startDate
+                              ? ` | ${c.startDate} – ${c.current ? "Present" : (c.endDate ?? "")}`
+                              : ""}
+                          </div>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 10,
+                              textTransform: "uppercase",
+                              letterSpacing: 0.5,
+                              marginTop: 2,
+                            }}
+                          >
+                            {c.company}
+                          </div>
                         </div>
                         <div style={{ marginTop: 5 }}>
                           {c.bullets.filter(Boolean).map((b, i) => (
                             <div
                               key={i}
                               style={{
+                                ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                                 display: "flex",
                                 gap: 6,
                                 marginBottom: 3,
@@ -437,6 +444,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                             <div
                               style={{
                                 display: "flex",
+                                ...NO_SPLIT,
                                 flexWrap: "wrap",
                                 gap: "4px 6px",
                                 marginTop: 6,
@@ -477,10 +485,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                   .filter(Boolean)
                   .join(" | ");
                 return (
-                  <div
-                    key={i}
-                    style={{ marginBottom: 18, pageBreakInside: "avoid" }}
-                  >
+                  <div key={i} style={{ marginBottom: 18 }}>
                     <div
                       style={{
                         display: "flex",
@@ -494,37 +499,43 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                         {CIRCLE}
                       </span>
                       <div style={{ flex: 1 }}>
-                        <div
-                          style={{
-                            fontSize: 9,
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: 1,
-                            color: MUTED,
-                          }}
-                        >
-                          {topLine}
-                        </div>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 10,
-                            textTransform: "uppercase",
-                            letterSpacing: 0.5,
-                            marginTop: 2,
-                          }}
-                        >
-                          {proj.name}
-                        </div>
-                        {proj.url && (
+                        <div style={KEEP_WITH_NEXT}>
                           <div
-                            style={{ fontSize: 9, color: MUTED, marginTop: 1 }}
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                              letterSpacing: 1,
+                              color: MUTED,
+                            }}
                           >
-                            <ResumeLink href={proj.url}>
-                              {displayUrl(proj.url)}
-                            </ResumeLink>
+                            {topLine}
                           </div>
-                        )}
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 10,
+                              textTransform: "uppercase",
+                              letterSpacing: 0.5,
+                              marginTop: 2,
+                            }}
+                          >
+                            {proj.name}
+                          </div>
+                          {proj.url && (
+                            <div
+                              style={{
+                                fontSize: 9,
+                                color: MUTED,
+                                marginTop: 1,
+                              }}
+                            >
+                              <ResumeLink href={proj.url}>
+                                {displayUrl(proj.url)}
+                              </ResumeLink>
+                            </div>
+                          )}
+                        </div>
                         <div style={{ marginTop: 5 }}>
                           {proj.description && (
                             <div
@@ -541,6 +552,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                             <div
                               key={j}
                               style={{
+                                ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                                 display: "flex",
                                 gap: 6,
                                 marginBottom: 3,
@@ -558,6 +570,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                             <div
                               style={{
                                 display: "flex",
+                                ...NO_SPLIT,
                                 flexWrap: "wrap",
                                 gap: "4px 6px",
                                 marginTop: 6,
@@ -604,6 +617,7 @@ function SideSection({
     <div style={{ marginBottom: 24 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 9,
           fontWeight: 700,
           textTransform: "uppercase",
@@ -631,6 +645,7 @@ function MainSection({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 9,
           fontWeight: 700,
           textTransform: "uppercase",

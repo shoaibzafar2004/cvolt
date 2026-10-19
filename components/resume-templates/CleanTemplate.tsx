@@ -17,6 +17,12 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -68,6 +74,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
         color: colors.text,
         backgroundColor: "#ffffff",
         padding: "48px 56px",
+        ...REPEAT_PADDING,
         boxSizing: "border-box",
         lineHeight: 1.5,
       }}
@@ -117,6 +124,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
         <div
           style={{
             display: "flex",
+            ...NO_SPLIT,
             flexWrap: "wrap",
             gap: "0 16px",
             marginTop: 8,
@@ -191,33 +199,41 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           {work.map((s) => {
             const c = s.content as WorkContent;
             return (
-              <div
-                key={s.id}
-                style={{ marginBottom: 14, pageBreakInside: "avoid" }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <span style={{ fontWeight: 600, fontSize: 12 }}>
-                    {c.role}
-                  </span>
-                  <span style={{ fontSize: 10, color: colors.muted }}>
-                    {c.startDate} – {c.current ? "Present" : c.endDate}
-                  </span>
-                </div>
-                <div
-                  style={{ color: colors.muted, fontSize: 11, marginBottom: 4 }}
-                >
-                  {c.company}
+              <div key={s.id} style={{ marginBottom: 14 }}>
+                <div style={KEEP_WITH_NEXT}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
+                    }}
+                  >
+                    <span style={{ fontWeight: 600, fontSize: 12 }}>
+                      {c.role}
+                    </span>
+                    <span style={{ fontSize: 10, color: colors.muted }}>
+                      {c.startDate} – {c.current ? "Present" : c.endDate}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      color: colors.muted,
+                      fontSize: 11,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {c.company}
+                  </div>
                 </div>
                 {c.bullets.filter(Boolean).map((b, i) => (
                   <div
                     key={i}
-                    style={{ display: "flex", gap: 6, marginBottom: 2 }}
+                    style={{
+                      ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
+                      display: "flex",
+                      gap: 6,
+                      marginBottom: 2,
+                    }}
                   >
                     <span style={{ color: colors.accent, flexShrink: 0 }}>
                       •
@@ -229,6 +245,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
                   <div
                     style={{
                       display: "flex",
+                      ...NO_SPLIT,
                       flexWrap: "wrap",
                       gap: "4px 6px",
                       marginTop: 6,
@@ -263,52 +280,56 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
             const meta = projectMeta(p);
             const dates = projectDates(p);
             return (
-              <div
-                key={i}
-                style={{ marginBottom: 14, pageBreakInside: "avoid" }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <span style={{ fontWeight: 600, fontSize: 12 }}>
-                    {p.name}
-                  </span>
-                  {dates && (
-                    <span style={{ fontSize: 10, color: colors.muted }}>
-                      {dates}
-                    </span>
-                  )}
-                </div>
-                {(meta || p.url) && (
+              <div key={i} style={{ marginBottom: 14 }}>
+                <div style={KEEP_WITH_NEXT}>
                   <div
                     style={{
-                      color: colors.muted,
-                      fontSize: 11,
-                      marginBottom: 4,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
                     }}
                   >
-                    {meta}
-                    {meta && p.url ? " · " : ""}
-                    {p.url && (
-                      <span style={{ color: colors.accent }}>
-                        <ResumeLink href={p.url}>
-                          {displayUrl(p.url)}
-                        </ResumeLink>
+                    <span style={{ fontWeight: 600, fontSize: 12 }}>
+                      {p.name}
+                    </span>
+                    {dates && (
+                      <span style={{ fontSize: 10, color: colors.muted }}>
+                        {dates}
                       </span>
                     )}
                   </div>
-                )}
-                {p.description && (
-                  <div style={{ marginBottom: 3 }}>{p.description}</div>
-                )}
+                  {(meta || p.url) && (
+                    <div
+                      style={{
+                        color: colors.muted,
+                        fontSize: 11,
+                        marginBottom: 4,
+                      }}
+                    >
+                      {meta}
+                      {meta && p.url ? " · " : ""}
+                      {p.url && (
+                        <span style={{ color: colors.accent }}>
+                          <ResumeLink href={p.url}>
+                            {displayUrl(p.url)}
+                          </ResumeLink>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {p.description && (
+                    <div style={{ marginBottom: 3 }}>{p.description}</div>
+                  )}
+                </div>
                 {p.bullets.filter(Boolean).map((b, j) => (
                   <div
                     key={j}
-                    style={{ display: "flex", gap: 6, marginBottom: 2 }}
+                    style={{
+                      ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
+                      display: "flex",
+                      gap: 6,
+                      marginBottom: 2,
+                    }}
                   >
                     <span style={{ color: colors.accent, flexShrink: 0 }}>
                       •
@@ -320,6 +341,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
                   <div
                     style={{
                       display: "flex",
+                      ...NO_SPLIT,
                       flexWrap: "wrap",
                       gap: "4px 6px",
                       marginTop: 6,
@@ -357,10 +379,7 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           {education.map((s) => {
             const c = s.content as EducationContent;
             return (
-              <div
-                key={s.id}
-                style={{ marginBottom: 10, pageBreakInside: "avoid" }}
-              >
+              <div key={s.id} style={{ marginBottom: 10, ...NO_SPLIT }}>
                 <div
                   style={{
                     display: "flex",
@@ -388,7 +407,9 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
       {/* Skills */}
       {skills.length > 0 && (
         <Section title="Skills" accent={colors.accent} border={colors.border}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <div
+            style={{ display: "flex", ...NO_SPLIT, flexWrap: "wrap", gap: 6 }}
+          >
             {skills.map((skill, i) => (
               <span
                 key={i}
@@ -460,7 +481,14 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           accent={colors.accent}
           border={colors.border}
         >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 24px" }}>
+          <div
+            style={{
+              display: "flex",
+              ...NO_SPLIT,
+              flexWrap: "wrap",
+              gap: "4px 24px",
+            }}
+          >
             {langs.map((l, i) => (
               <span key={i}>
                 <span style={{ fontWeight: 500 }}>{l.language}</span>
@@ -494,6 +522,7 @@ function Section({
     <div style={{ marginBottom: 20 }}>
       <h2
         style={{
+          ...KEEP_WITH_NEXT,
           margin: "0 0 8px",
           fontSize: 11,
           fontWeight: 700,

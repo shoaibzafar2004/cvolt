@@ -17,6 +17,13 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -61,6 +68,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
         backgroundColor: BG,
         boxSizing: "border-box",
         padding: "48px 60px",
+        ...REPEAT_PADDING,
       }}
     >
       <style
@@ -73,6 +81,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 300; src: url('/fonts/source-sans-300.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
+        ${printPageBackground(`${BG} 0px, ${BG} 794px`)}
       `,
         }}
       />
@@ -284,50 +293,53 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
           {work.map((s) => {
             const c = s.content as WorkContent;
             return (
-              <Entry key={s.id}>
-                <div
-                  style={{
-                    fontFamily: '"Source Sans 3", sans-serif',
-                    fontWeight: 700,
-                    fontSize: 11.5,
-                  }}
-                >
-                  {c.role}
-                </div>
-                <div
-                  style={{
-                    fontFamily: '"Source Sans 3", sans-serif',
-                    fontSize: 10.5,
-                    color: DARK,
-                    marginTop: 1,
-                  }}
-                >
-                  {c.company}
-                </div>
-                {(c.startDate || c.endDate || c.current) && (
+              <Entry split key={s.id}>
+                <div style={KEEP_WITH_NEXT}>
                   <div
                     style={{
-                      fontFamily: '"Lora", serif',
-                      fontStyle: "italic",
-                      fontSize: 10,
-                      color: MUTED,
-                      marginTop: 2,
-                      marginBottom: 5,
+                      fontFamily: '"Source Sans 3", sans-serif',
+                      fontWeight: 700,
+                      fontSize: 11.5,
                     }}
                   >
-                    {c.startDate}
-                    {c.startDate && (c.current || c.endDate)
-                      ? ` to ${c.current ? "Present" : c.endDate}`
-                      : ""}
+                    {c.role}
                   </div>
-                )}
+                  <div
+                    style={{
+                      fontFamily: '"Source Sans 3", sans-serif',
+                      fontSize: 10.5,
+                      color: DARK,
+                      marginTop: 1,
+                    }}
+                  >
+                    {c.company}
+                  </div>
+                  {(c.startDate || c.endDate || c.current) && (
+                    <div
+                      style={{
+                        fontFamily: '"Lora", serif',
+                        fontStyle: "italic",
+                        fontSize: 10,
+                        color: MUTED,
+                        marginTop: 2,
+                        marginBottom: 5,
+                      }}
+                    >
+                      {c.startDate}
+                      {c.startDate && (c.current || c.endDate)
+                        ? ` to ${c.current ? "Present" : c.endDate}`
+                        : ""}
+                    </div>
+                  )}
+                </div>
                 {c.bullets.filter(Boolean).map((b, i) => (
-                  <Bullet key={i} html={b} />
+                  <Bullet key={i} html={b} first={i === 0} />
                 ))}
                 {c.skills && c.skills.length > 0 && (
                   <div
                     style={{
                       display: "flex",
+                      ...NO_SPLIT,
                       flexWrap: "wrap",
                       gap: "4px 6px",
                       marginTop: 6,
@@ -364,59 +376,62 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
             const meta = projectMeta(proj);
             const dates = projectDates(proj).replace(" – ", " to ");
             return (
-              <Entry key={i}>
-                <div
-                  style={{
-                    fontFamily: '"Source Sans 3", sans-serif',
-                    fontWeight: 700,
-                    fontSize: 11.5,
-                  }}
-                >
-                  {proj.name}
-                </div>
-                {(meta || proj.url) && (
+              <Entry split key={i}>
+                <div style={KEEP_WITH_NEXT}>
                   <div
                     style={{
                       fontFamily: '"Source Sans 3", sans-serif',
-                      fontSize: 10.5,
-                      color: DARK,
-                      marginTop: 1,
+                      fontWeight: 700,
+                      fontSize: 11.5,
                     }}
                   >
-                    {meta}
-                    {meta && proj.url ? " · " : ""}
-                    {proj.url && (
-                      <span style={{ color: ACCENT }}>
-                        <ResumeLink href={proj.url}>
-                          {displayUrl(proj.url)}
-                        </ResumeLink>
-                      </span>
-                    )}
+                    {proj.name}
                   </div>
-                )}
-                {(dates || proj.description) && (
-                  <div
-                    style={{
-                      fontFamily: '"Lora", serif',
-                      fontStyle: "italic",
-                      fontSize: 10,
-                      color: MUTED,
-                      marginTop: 2,
-                      marginBottom: 5,
-                    }}
-                  >
-                    {dates}
-                    {dates && proj.description ? " — " : ""}
-                    {proj.description}
-                  </div>
-                )}
+                  {(meta || proj.url) && (
+                    <div
+                      style={{
+                        fontFamily: '"Source Sans 3", sans-serif',
+                        fontSize: 10.5,
+                        color: DARK,
+                        marginTop: 1,
+                      }}
+                    >
+                      {meta}
+                      {meta && proj.url ? " · " : ""}
+                      {proj.url && (
+                        <span style={{ color: ACCENT }}>
+                          <ResumeLink href={proj.url}>
+                            {displayUrl(proj.url)}
+                          </ResumeLink>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {(dates || proj.description) && (
+                    <div
+                      style={{
+                        fontFamily: '"Lora", serif',
+                        fontStyle: "italic",
+                        fontSize: 10,
+                        color: MUTED,
+                        marginTop: 2,
+                        marginBottom: 5,
+                      }}
+                    >
+                      {dates}
+                      {dates && proj.description ? " — " : ""}
+                      {proj.description}
+                    </div>
+                  )}
+                </div>
                 {proj.bullets.filter(Boolean).map((b, j) => (
-                  <Bullet key={j} html={b} />
+                  <Bullet key={j} html={b} first={j === 0} />
                 ))}
                 {proj.techStack && proj.techStack.length > 0 && (
                   <div
                     style={{
                       display: "flex",
+                      ...NO_SPLIT,
                       flexWrap: "wrap",
                       gap: "4px 6px",
                       marginTop: 6,
@@ -452,6 +467,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
           <div
             style={{
               display: "flex",
+              ...NO_SPLIT,
               flexWrap: "wrap",
               gap: "4px 0",
               fontFamily: '"Source Sans 3", sans-serif',
@@ -528,6 +544,7 @@ export default function ElegantSingleTemplate({ data }: { data: ResumeData }) {
           <div
             style={{
               display: "flex",
+              ...NO_SPLIT,
               flexWrap: "wrap",
               gap: "4px 0",
               fontFamily: '"Source Sans 3", sans-serif',
@@ -566,6 +583,7 @@ function Section({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 15,
           fontWeight: 600,
@@ -580,14 +598,21 @@ function Section({
   );
 }
 
-function Entry({ children }: { children: React.ReactNode }) {
+// split: long entries (work, projects) may break across pages between bullets
+function Entry({
+  children,
+  split,
+}: {
+  children: React.ReactNode;
+  split?: boolean;
+}) {
   return (
     <div
       style={{
         display: "flex",
         gap: 14,
         marginBottom: 16,
-        pageBreakInside: "avoid",
+        ...(split ? {} : NO_SPLIT),
       }}
     >
       <div style={{ paddingTop: 4, flexShrink: 0 }}>
@@ -609,13 +634,16 @@ function Entry({ children }: { children: React.ReactNode }) {
 function Bullet({
   children,
   html,
+  first,
 }: {
   children?: React.ReactNode;
   html?: string;
+  first?: boolean;
 }) {
   return (
     <div
       style={{
+        ...(first ? KEEP_WITH_PREV : NO_SPLIT),
         display: "flex",
         gap: 8,
         marginBottom: 3,

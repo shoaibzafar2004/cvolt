@@ -17,6 +17,13 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -117,6 +124,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; src: url('/fonts/inter-400.woff2') format('woff2'); }
         @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; src: url('/fonts/inter-600.woff2') format('woff2'); }
         @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; src: url('/fonts/inter-700.woff2') format('woff2'); }
+        ${printPageBackground(`${SIDEBAR_BG} ${SIDEBAR_W}px, ${MAIN_BG} ${SIDEBAR_W}px`)}
       `,
         }}
       />
@@ -172,6 +180,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
         <div
           style={{
             padding: "28px 22px",
+            ...REPEAT_PADDING,
             display: "flex",
             flexDirection: "column",
             gap: 0,
@@ -384,64 +393,71 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
         </div>
 
         {/* Sections */}
-        <div style={{ padding: "24px 32px", flex: 1 }}>
+        <div
+          style={{
+            padding: "36px 32px",
+            marginTop: -12,
+            ...REPEAT_PADDING,
+            flex: 1,
+          }}
+        >
           {/* Experience */}
           {work.length > 0 && (
             <MainSection title="Experience" accent={ACCENT}>
               {work.map((s) => {
                 const c = s.content as WorkContent;
                 return (
-                  <div
-                    key={s.id}
-                    style={{ marginBottom: 16, pageBreakInside: "avoid" }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "baseline",
-                        marginBottom: 2,
-                      }}
-                    >
-                      <span
+                  <div key={s.id} style={{ marginBottom: 16 }}>
+                    <div style={KEEP_WITH_NEXT}>
+                      <div
                         style={{
-                          fontWeight: 700,
-                          fontSize: 11.5,
-                          textTransform: "uppercase",
-                          letterSpacing: 0.3,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          marginBottom: 2,
                         }}
                       >
-                        {c.role}
-                      </span>
-                      <span
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 11.5,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.3,
+                          }}
+                        >
+                          {c.role}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            fontStyle: "italic",
+                            flexShrink: 0,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {c.startDate}
+                          {c.startDate && (c.current || c.endDate)
+                            ? ` – ${c.current ? "Now" : c.endDate}`
+                            : ""}
+                        </span>
+                      </div>
+                      <div
                         style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          fontStyle: "italic",
-                          flexShrink: 0,
-                          marginLeft: 8,
+                          fontSize: 10.5,
+                          color: ACCENT,
+                          fontWeight: 600,
+                          marginBottom: 5,
                         }}
                       >
-                        {c.startDate}
-                        {c.startDate && (c.current || c.endDate)
-                          ? ` – ${c.current ? "Now" : c.endDate}`
-                          : ""}
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 10.5,
-                        color: ACCENT,
-                        fontWeight: 600,
-                        marginBottom: 5,
-                      }}
-                    >
-                      {c.company}
+                        {c.company}
+                      </div>
                     </div>
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
+                          ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 7,
                           marginBottom: 2.5,
@@ -468,6 +484,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "3px 5px",
                           marginTop: 6,
@@ -502,78 +519,78 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
                 const meta = projectMeta(proj);
                 const dates = projectDates(proj).replace("Present", "Now");
                 return (
-                  <div
-                    key={i}
-                    style={{ marginBottom: 16, pageBreakInside: "avoid" }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "baseline",
-                        marginBottom: 2,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 11.5,
-                          textTransform: "uppercase",
-                          letterSpacing: 0.3,
-                        }}
-                      >
-                        {proj.name}
-                      </span>
-                      {dates && (
-                        <span
-                          style={{
-                            fontSize: 9.5,
-                            color: MUTED,
-                            fontStyle: "italic",
-                            flexShrink: 0,
-                            marginLeft: 8,
-                          }}
-                        >
-                          {dates}
-                        </span>
-                      )}
-                    </div>
-                    {(meta || proj.url) && (
+                  <div key={i} style={{ marginBottom: 16 }}>
+                    <div style={KEEP_WITH_NEXT}>
                       <div
                         style={{
-                          fontSize: 10.5,
-                          color: ACCENT,
-                          fontWeight: 600,
-                          marginBottom: 5,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          marginBottom: 2,
                         }}
                       >
-                        {meta}
-                        {meta && proj.url ? " · " : ""}
-                        {proj.url && (
-                          <span style={{ color: MUTED, fontWeight: 400 }}>
-                            <ResumeLink href={proj.url}>
-                              {displayUrl(proj.url)}
-                            </ResumeLink>
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 11.5,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.3,
+                          }}
+                        >
+                          {proj.name}
+                        </span>
+                        {dates && (
+                          <span
+                            style={{
+                              fontSize: 9.5,
+                              color: MUTED,
+                              fontStyle: "italic",
+                              flexShrink: 0,
+                              marginLeft: 8,
+                            }}
+                          >
+                            {dates}
                           </span>
                         )}
                       </div>
-                    )}
-                    {proj.description && (
-                      <div
-                        style={{
-                          fontSize: 10.5,
-                          lineHeight: 1.55,
-                          color: MUTED,
-                          marginBottom: 3,
-                        }}
-                      >
-                        {proj.description}
-                      </div>
-                    )}
+                      {(meta || proj.url) && (
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: ACCENT,
+                            fontWeight: 600,
+                            marginBottom: 5,
+                          }}
+                        >
+                          {meta}
+                          {meta && proj.url ? " · " : ""}
+                          {proj.url && (
+                            <span style={{ color: MUTED, fontWeight: 400 }}>
+                              <ResumeLink href={proj.url}>
+                                {displayUrl(proj.url)}
+                              </ResumeLink>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {proj.description && (
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            lineHeight: 1.55,
+                            color: MUTED,
+                            marginBottom: 3,
+                          }}
+                        >
+                          {proj.description}
+                        </div>
+                      )}
+                    </div>
                     {proj.bullets.filter(Boolean).map((b, j) => (
                       <div
                         key={j}
                         style={{
+                          ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 7,
                           marginBottom: 2.5,
@@ -600,6 +617,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "3px 5px",
                           marginTop: 6,
@@ -633,10 +651,7 @@ export default function BoldPhotoTemplate({ data }: { data: ResumeData }) {
               {education.map((s) => {
                 const c = s.content as EducationContent;
                 return (
-                  <div
-                    key={s.id}
-                    style={{ marginBottom: 12, pageBreakInside: "avoid" }}
-                  >
+                  <div key={s.id} style={{ marginBottom: 12, ...NO_SPLIT }}>
                     <div
                       style={{
                         display: "flex",
@@ -702,6 +717,7 @@ function SideSection({
     <div style={{ marginBottom: 24 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 9,
           fontWeight: 700,
           textTransform: "uppercase",
@@ -732,6 +748,7 @@ function MainSection({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           display: "flex",
           alignItems: "center",
           gap: 10,

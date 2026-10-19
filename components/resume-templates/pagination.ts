@@ -24,5 +24,11 @@ export const NO_SPLIT: CSSProperties = { breakInside: "avoid" };
  * `stops` is a horizontal linear-gradient stop list across the 794px page.
  */
 export function printPageBackground(stops: string): string {
-  return `@media print { html { background: linear-gradient(to right, ${stops}) !important; } }`;
+  return `@media print { html { background: #ffffff linear-gradient(to right, ${stops}) repeat-y !important; } }`;
 }
+
+/** Never split this box, and never put a page break right before it (first bullet of an entry). */
+export const KEEP_WITH_PREV: CSSProperties = {
+  breakInside: "avoid",
+  breakBefore: "avoid",
+};

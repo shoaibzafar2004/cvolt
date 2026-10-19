@@ -17,6 +17,13 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -78,6 +85,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 300; src: url('/fonts/source-sans-300.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
+        ${printPageBackground(`${BG} ${LEFT_W - 1}px, ${DIVIDER} ${LEFT_W - 1}px ${LEFT_W}px, ${BG} ${LEFT_W}px`)}
       `,
         }}
       />
@@ -229,6 +237,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           style={{
             width: LEFT_W,
             padding: "28px 22px 28px 28px",
+            ...REPEAT_PADDING,
             boxSizing: "border-box",
             borderRight: `1px solid ${DIVIDER}`,
             flexShrink: 0,
@@ -263,7 +272,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       display: "flex",
                       gap: 10,
                       marginBottom: 14,
-                      pageBreakInside: "avoid",
+                      ...NO_SPLIT,
                     }}
                   >
                     <div style={{ paddingTop: 4, flexShrink: 0 }}>
@@ -408,6 +417,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           style={{
             width: RIGHT_W,
             padding: "28px 32px 28px 28px",
+            ...REPEAT_PADDING,
             boxSizing: "border-box",
           }}
         >
@@ -423,7 +433,6 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       display: "flex",
                       gap: 14,
                       marginBottom: 18,
-                      pageBreakInside: "avoid",
                     }}
                   >
                     <div style={{ paddingTop: 4, flexShrink: 0 }}>
@@ -438,45 +447,48 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          fontFamily: '"Source Sans 3", sans-serif',
-                          fontWeight: 700,
-                          fontSize: 11.5,
-                        }}
-                      >
-                        {c.role}
-                      </div>
-                      <div
-                        style={{
-                          fontFamily: '"Source Sans 3", sans-serif',
-                          fontSize: 10.5,
-                          marginTop: 1,
-                        }}
-                      >
-                        {c.company}
-                      </div>
-                      {(c.startDate || c.endDate || c.current) && (
+                      <div style={KEEP_WITH_NEXT}>
                         <div
                           style={{
-                            fontFamily: '"Lora", serif',
-                            fontStyle: "italic",
-                            fontSize: 10,
-                            color: MUTED,
-                            marginTop: 2,
-                            marginBottom: 5,
+                            fontFamily: '"Source Sans 3", sans-serif',
+                            fontWeight: 700,
+                            fontSize: 11.5,
                           }}
                         >
-                          {c.startDate}
-                          {c.startDate && (c.current || c.endDate)
-                            ? ` to ${c.current ? "Present" : c.endDate}`
-                            : ""}
+                          {c.role}
                         </div>
-                      )}
+                        <div
+                          style={{
+                            fontFamily: '"Source Sans 3", sans-serif',
+                            fontSize: 10.5,
+                            marginTop: 1,
+                          }}
+                        >
+                          {c.company}
+                        </div>
+                        {(c.startDate || c.endDate || c.current) && (
+                          <div
+                            style={{
+                              fontFamily: '"Lora", serif',
+                              fontStyle: "italic",
+                              fontSize: 10,
+                              color: MUTED,
+                              marginTop: 2,
+                              marginBottom: 5,
+                            }}
+                          >
+                            {c.startDate}
+                            {c.startDate && (c.current || c.endDate)
+                              ? ` to ${c.current ? "Present" : c.endDate}`
+                              : ""}
+                          </div>
+                        )}
+                      </div>
                       {c.bullets.filter(Boolean).map((b, i) => (
                         <div
                           key={i}
                           style={{
+                            ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                             display: "flex",
                             gap: 8,
                             marginBottom: 3,
@@ -495,6 +507,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                         <div
                           style={{
                             display: "flex",
+                            ...NO_SPLIT,
                             flexWrap: "wrap",
                             gap: "4px 6px",
                             marginTop: 6,
@@ -538,7 +551,6 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       display: "flex",
                       gap: 14,
                       marginBottom: 18,
-                      pageBreakInside: "avoid",
                     }}
                   >
                     <div style={{ paddingTop: 4, flexShrink: 0 }}>
@@ -553,54 +565,57 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                       />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          fontFamily: '"Source Sans 3", sans-serif',
-                          fontWeight: 700,
-                          fontSize: 11.5,
-                        }}
-                      >
-                        {proj.name}
-                      </div>
-                      {(meta || proj.url) && (
+                      <div style={KEEP_WITH_NEXT}>
                         <div
                           style={{
                             fontFamily: '"Source Sans 3", sans-serif',
-                            fontSize: 10.5,
-                            marginTop: 1,
+                            fontWeight: 700,
+                            fontSize: 11.5,
                           }}
                         >
-                          {meta}
-                          {meta && proj.url ? " · " : ""}
-                          {proj.url && (
-                            <span style={{ color: ACCENT }}>
-                              <ResumeLink href={proj.url}>
-                                {displayUrl(proj.url)}
-                              </ResumeLink>
-                            </span>
-                          )}
+                          {proj.name}
                         </div>
-                      )}
-                      {(dates || proj.description) && (
-                        <div
-                          style={{
-                            fontFamily: '"Lora", serif',
-                            fontStyle: "italic",
-                            fontSize: 10,
-                            color: MUTED,
-                            marginTop: 2,
-                            marginBottom: 5,
-                          }}
-                        >
-                          {dates}
-                          {dates && proj.description ? " — " : ""}
-                          {proj.description}
-                        </div>
-                      )}
+                        {(meta || proj.url) && (
+                          <div
+                            style={{
+                              fontFamily: '"Source Sans 3", sans-serif',
+                              fontSize: 10.5,
+                              marginTop: 1,
+                            }}
+                          >
+                            {meta}
+                            {meta && proj.url ? " · " : ""}
+                            {proj.url && (
+                              <span style={{ color: ACCENT }}>
+                                <ResumeLink href={proj.url}>
+                                  {displayUrl(proj.url)}
+                                </ResumeLink>
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {(dates || proj.description) && (
+                          <div
+                            style={{
+                              fontFamily: '"Lora", serif',
+                              fontStyle: "italic",
+                              fontSize: 10,
+                              color: MUTED,
+                              marginTop: 2,
+                              marginBottom: 5,
+                            }}
+                          >
+                            {dates}
+                            {dates && proj.description ? " — " : ""}
+                            {proj.description}
+                          </div>
+                        )}
+                      </div>
                       {proj.bullets.filter(Boolean).map((b, j) => (
                         <div
                           key={j}
                           style={{
+                            ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                             display: "flex",
                             gap: 8,
                             marginBottom: 3,
@@ -619,6 +634,7 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                         <div
                           style={{
                             display: "flex",
+                            ...NO_SPLIT,
                             flexWrap: "wrap",
                             gap: "4px 6px",
                             marginTop: 6,
@@ -665,6 +681,7 @@ function LeftSection({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 13,
           fontWeight: 600,
@@ -692,6 +709,7 @@ function RightSection({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 15,
           fontWeight: 600,
@@ -701,7 +719,14 @@ function RightSection({
       >
         {title}
       </div>
-      <div style={{ height: 1, backgroundColor: DIVIDER, marginBottom: 14 }} />
+      <div
+        style={{
+          ...KEEP_WITH_NEXT,
+          height: 1,
+          backgroundColor: DIVIDER,
+          marginBottom: 14,
+        }}
+      />
       {children}
     </div>
   );

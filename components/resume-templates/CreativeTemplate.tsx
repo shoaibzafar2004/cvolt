@@ -17,6 +17,13 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -107,6 +114,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 400; src: url('/fonts/libre-franklin-400.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 600; src: url('/fonts/libre-franklin-600.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 700; src: url('/fonts/libre-franklin-700.woff2') format('woff2'); }
+        ${printPageBackground(`${DARK} ${SIDEBAR_W}px, #ffffff ${SIDEBAR_W}px`)}
       `,
         }}
       />
@@ -118,6 +126,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
           backgroundColor: DARK,
           color: LIGHT_TEXT,
           padding: "40px 22px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
           flexShrink: 0,
           display: "flex",
@@ -268,7 +277,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
                   style={{
                     marginBottom: 12,
                     fontSize: 9.5,
-                    pageBreakInside: "avoid",
+                    ...NO_SPLIT,
                   }}
                 >
                   <div
@@ -353,6 +362,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
           width: MAIN_W,
           backgroundColor: "#ffffff",
           padding: "40px 32px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
         }}
       >
@@ -368,43 +378,45 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
                     marginBottom: 18,
                     paddingLeft: 12,
                     borderLeft: `2px solid ${MAIN_BORDER}`,
-                    pageBreakInside: "avoid",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: 1,
-                      color: MAIN_MUTED,
-                    }}
-                  >
-                    {c.role}
-                    {c.startDate && (
-                      <span style={{ fontWeight: 400, marginLeft: 6 }}>
-                        | {c.startDate} –{" "}
-                        {c.current ? "Present" : (c.endDate ?? "")}
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      fontWeight: 700,
-                      fontSize: 10.5,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      color: DARK,
-                      marginTop: 3,
-                    }}
-                  >
-                    {c.company}
+                  <div style={KEEP_WITH_NEXT}>
+                    <div
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: 1,
+                        color: MAIN_MUTED,
+                      }}
+                    >
+                      {c.role}
+                      {c.startDate && (
+                        <span style={{ fontWeight: 400, marginLeft: 6 }}>
+                          | {c.startDate} –{" "}
+                          {c.current ? "Present" : (c.endDate ?? "")}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 10.5,
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                        color: DARK,
+                        marginTop: 3,
+                      }}
+                    >
+                      {c.company}
+                    </div>
                   </div>
                   <div style={{ marginTop: 6 }}>
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
+                          ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 6,
                           marginBottom: 3,
@@ -423,6 +435,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "4px 6px",
                           marginTop: 6,
@@ -464,46 +477,47 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
                     marginBottom: 18,
                     paddingLeft: 12,
                     borderLeft: `2px solid ${MAIN_BORDER}`,
-                    pageBreakInside: "avoid",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: 1,
-                      color: MAIN_MUTED,
-                    }}
-                  >
-                    {meta || "Project"}
-                    {dates && (
-                      <span style={{ fontWeight: 400, marginLeft: 6 }}>
-                        | {dates}
-                      </span>
+                  <div style={KEEP_WITH_NEXT}>
+                    <div
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: 1,
+                        color: MAIN_MUTED,
+                      }}
+                    >
+                      {meta || "Project"}
+                      {dates && (
+                        <span style={{ fontWeight: 400, marginLeft: 6 }}>
+                          | {dates}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 10.5,
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                        color: DARK,
+                        marginTop: 3,
+                      }}
+                    >
+                      {proj.name}
+                    </div>
+                    {proj.url && (
+                      <div
+                        style={{ fontSize: 9, color: MAIN_MUTED, marginTop: 1 }}
+                      >
+                        <ResumeLink href={proj.url}>
+                          {displayUrl(proj.url)}
+                        </ResumeLink>
+                      </div>
                     )}
                   </div>
-                  <div
-                    style={{
-                      fontWeight: 700,
-                      fontSize: 10.5,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      color: DARK,
-                      marginTop: 3,
-                    }}
-                  >
-                    {proj.name}
-                  </div>
-                  {proj.url && (
-                    <div
-                      style={{ fontSize: 9, color: MAIN_MUTED, marginTop: 1 }}
-                    >
-                      <ResumeLink href={proj.url}>
-                        {displayUrl(proj.url)}
-                      </ResumeLink>
-                    </div>
-                  )}
                   <div style={{ marginTop: 6 }}>
                     {proj.description && (
                       <div
@@ -521,6 +535,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
                       <div
                         key={j}
                         style={{
+                          ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 6,
                           marginBottom: 3,
@@ -539,6 +554,7 @@ export default function CreativeTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "4px 6px",
                           marginTop: 6,
@@ -586,6 +602,7 @@ function SideSection({
     <div style={{ marginBottom: 24 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 8.5,
           fontWeight: 700,
           textTransform: "uppercase",
@@ -616,6 +633,7 @@ function MainSection({
     <div style={{ marginBottom: 24 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 9,
           fontWeight: 700,
           textTransform: "uppercase",

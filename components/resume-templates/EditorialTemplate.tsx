@@ -18,6 +18,12 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -111,6 +117,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
         color: BODY,
         boxSizing: "border-box",
         padding: PAGE_PAD,
+        ...REPEAT_PADDING,
       }}
     >
       <style
@@ -285,6 +292,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
               display: "flex",
               gap: COL_GAP,
               padding: `18px ${H_PAD}px 22px`,
+              ...REPEAT_PADDING,
             }}
           >
             <div style={{ width: COL_W, flexShrink: 0 }}>
@@ -321,6 +329,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
               display: "flex",
               gap: COL_GAP,
               padding: `18px ${H_PAD}px 22px`,
+              ...REPEAT_PADDING,
             }}
           >
             <div style={{ width: COL_W, flexShrink: 0 }}>
@@ -357,6 +366,7 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
               display: "flex",
               gap: COL_GAP,
               padding: `18px ${H_PAD}px 22px`,
+              ...REPEAT_PADDING,
             }}
           >
             {[
@@ -522,7 +532,13 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
 // ── Full-width dark section bar ──
 function SectionBar({ title, accent }: { title: string; accent: string }) {
   return (
-    <div style={{ backgroundColor: accent, padding: "7px 36px" }}>
+    <div
+      style={{
+        ...KEEP_WITH_NEXT,
+        backgroundColor: accent,
+        padding: "7px 36px",
+      }}
+    >
       <div
         style={{
           fontSize: 10,
@@ -573,7 +589,7 @@ function HeaderContact({
 // ── Education entry ──
 function EduEntry({ c, accent }: { c: EducationContent; accent: string }) {
   return (
-    <div style={{ marginBottom: 14, pageBreakInside: "avoid" }}>
+    <div style={{ marginBottom: 14, ...NO_SPLIT }}>
       {(c.startDate || c.endDate) && (
         <div
           style={{
@@ -613,50 +629,53 @@ function EduEntry({ c, accent }: { c: EducationContent; accent: string }) {
 // ── Work entry ──
 function WorkEntry({ c, accent }: { c: WorkContent; accent: string }) {
   return (
-    <div style={{ marginBottom: 16, pageBreakInside: "avoid" }}>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          color: "#1a1a1a",
-          textTransform: "uppercase",
-          letterSpacing: 0.3,
-        }}
-      >
-        {c.role}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          marginBottom: 5,
-        }}
-      >
-        <span style={{ fontSize: 10.5, color: accent, fontWeight: 600 }}>
-          {c.company}
-        </span>
-        {(c.startDate || c.endDate || c.current) && (
-          <span
-            style={{
-              fontSize: 9.5,
-              color: "#888888",
-              fontStyle: "italic",
-              flexShrink: 0,
-              marginLeft: 8,
-            }}
-          >
-            {c.startDate}
-            {c.startDate && (c.current || c.endDate)
-              ? ` – ${c.current ? "Present" : c.endDate}`
-              : ""}
+    <div style={{ marginBottom: 16 }}>
+      <div style={KEEP_WITH_NEXT}>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: "#1a1a1a",
+            textTransform: "uppercase",
+            letterSpacing: 0.3,
+          }}
+        >
+          {c.role}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            marginBottom: 5,
+          }}
+        >
+          <span style={{ fontSize: 10.5, color: accent, fontWeight: 600 }}>
+            {c.company}
           </span>
-        )}
+          {(c.startDate || c.endDate || c.current) && (
+            <span
+              style={{
+                fontSize: 9.5,
+                color: "#888888",
+                fontStyle: "italic",
+                flexShrink: 0,
+                marginLeft: 8,
+              }}
+            >
+              {c.startDate}
+              {c.startDate && (c.current || c.endDate)
+                ? ` – ${c.current ? "Present" : c.endDate}`
+                : ""}
+            </span>
+          )}
+        </div>
       </div>
       {c.bullets.filter(Boolean).map((b, i) => (
         <div
           key={i}
           style={{
+            ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
             display: "flex",
             gap: 7,
             marginBottom: 3,
@@ -677,66 +696,69 @@ function ProjectEntry({ p, accent }: { p: ProjectContent; accent: string }) {
   const meta = projectMeta(p);
   const dates = projectDates(p);
   return (
-    <div style={{ marginBottom: 16, pageBreakInside: "avoid" }}>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          color: "#1a1a1a",
-          textTransform: "uppercase",
-          letterSpacing: 0.3,
-        }}
-      >
-        {p.name}
-      </div>
-      {(meta || dates) && (
+    <div style={{ marginBottom: 16 }}>
+      <div style={KEEP_WITH_NEXT}>
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
+            fontSize: 12,
+            fontWeight: 700,
+            color: "#1a1a1a",
+            textTransform: "uppercase",
+            letterSpacing: 0.3,
           }}
         >
-          <span style={{ fontSize: 10.5, color: accent, fontWeight: 600 }}>
-            {meta}
-          </span>
-          {dates && (
-            <span
-              style={{
-                fontSize: 9.5,
-                color: "#888888",
-                fontStyle: "italic",
-                flexShrink: 0,
-                marginLeft: 8,
-              }}
-            >
-              {dates}
+          {p.name}
+        </div>
+        {(meta || dates) && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+            }}
+          >
+            <span style={{ fontSize: 10.5, color: accent, fontWeight: 600 }}>
+              {meta}
             </span>
-          )}
-        </div>
-      )}
-      {p.url && (
-        <div style={{ fontSize: 9.5, color: "#888888" }}>
-          <ResumeLink href={p.url}>{displayUrl(p.url)}</ResumeLink>
-        </div>
-      )}
-      <div style={{ height: 5 }} />
-      {p.description && (
-        <div
-          style={{
-            fontSize: 10.5,
-            lineHeight: 1.6,
-            color: "#3d3d3d",
-            marginBottom: 3,
-          }}
-        >
-          {p.description}
-        </div>
-      )}
+            {dates && (
+              <span
+                style={{
+                  fontSize: 9.5,
+                  color: "#888888",
+                  fontStyle: "italic",
+                  flexShrink: 0,
+                  marginLeft: 8,
+                }}
+              >
+                {dates}
+              </span>
+            )}
+          </div>
+        )}
+        {p.url && (
+          <div style={{ fontSize: 9.5, color: "#888888" }}>
+            <ResumeLink href={p.url}>{displayUrl(p.url)}</ResumeLink>
+          </div>
+        )}
+        <div style={{ height: 5 }} />
+        {p.description && (
+          <div
+            style={{
+              fontSize: 10.5,
+              lineHeight: 1.6,
+              color: "#3d3d3d",
+              marginBottom: 3,
+            }}
+          >
+            {p.description}
+          </div>
+        )}
+      </div>
       {p.bullets.filter(Boolean).map((b, i) => (
         <div
           key={i}
           style={{
+            ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
             display: "flex",
             gap: 7,
             marginBottom: 3,

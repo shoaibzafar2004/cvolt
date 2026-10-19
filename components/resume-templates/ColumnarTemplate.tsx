@@ -17,6 +17,12 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -111,6 +117,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
         color: BODY,
         boxSizing: "border-box",
         padding: `${PAD_Y}px ${PAD_X}px`,
+        ...REPEAT_PADDING,
       }}
     >
       <style
@@ -161,6 +168,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
           <div
             style={{
               display: "flex",
+              ...NO_SPLIT,
               flexWrap: "wrap",
               justifyContent: "center",
               gap: "4px 14px",
@@ -214,50 +222,54 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
                 key={s.id}
                 style={{
                   marginBottom: idx < work.length - 1 ? 16 : 0,
-                  pageBreakInside: "avoid",
                 }}
               >
-                {/* Role + dates row */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <div style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}>
-                    {c.role}
-                  </div>
-                  {(c.startDate || c.endDate || c.current) && (
+                <div style={KEEP_WITH_NEXT}>
+                  {/* Role + dates row */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
+                    }}
+                  >
                     <div
-                      style={{
-                        fontSize: 9.5,
-                        color: MUTED,
-                        fontStyle: "italic",
-                        flexShrink: 0,
-                        marginLeft: 10,
-                      }}
+                      style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}
                     >
-                      {c.startDate}
-                      {c.startDate && (c.current || c.endDate)
-                        ? ` – ${c.current ? "Present" : c.endDate}`
-                        : ""}
+                      {c.role}
+                    </div>
+                    {(c.startDate || c.endDate || c.current) && (
+                      <div
+                        style={{
+                          fontSize: 9.5,
+                          color: MUTED,
+                          fontStyle: "italic",
+                          flexShrink: 0,
+                          marginLeft: 10,
+                        }}
+                      >
+                        {c.startDate}
+                        {c.startDate && (c.current || c.endDate)
+                          ? ` – ${c.current ? "Present" : c.endDate}`
+                          : ""}
+                      </div>
+                    )}
+                  </div>
+                  {/* Company */}
+                  {c.company && (
+                    <div
+                      style={{ fontSize: 10.5, color: MUTED, marginBottom: 5 }}
+                    >
+                      {c.company}
                     </div>
                   )}
+                  {/* Bullets */}
                 </div>
-                {/* Company */}
-                {c.company && (
-                  <div
-                    style={{ fontSize: 10.5, color: MUTED, marginBottom: 5 }}
-                  >
-                    {c.company}
-                  </div>
-                )}
-                {/* Bullets */}
                 {c.bullets.filter(Boolean).map((b, i) => (
                   <div
                     key={i}
                     style={{
+                      ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                       display: "flex",
                       gap: 7,
                       marginBottom: 3,
@@ -289,63 +301,67 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
                 key={i}
                 style={{
                   marginBottom: i < projects.length - 1 ? 16 : 0,
-                  pageBreakInside: "avoid",
                 }}
               >
-                {/* Name + dates row */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <div style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}>
-                    {proj.name}
-                  </div>
-                  {dates && (
-                    <div
-                      style={{
-                        fontSize: 9.5,
-                        color: MUTED,
-                        fontStyle: "italic",
-                        flexShrink: 0,
-                        marginLeft: 10,
-                      }}
-                    >
-                      {dates}
-                    </div>
-                  )}
-                </div>
-                {/* Role · type · link */}
-                {(meta || proj.url) && (
-                  <div
-                    style={{ fontSize: 10.5, color: MUTED, marginBottom: 5 }}
-                  >
-                    {meta}
-                    {meta && proj.url ? " · " : ""}
-                    <ResumeLink href={proj.url}>
-                      {displayUrl(proj.url)}
-                    </ResumeLink>
-                  </div>
-                )}
-                {proj.description && (
+                <div style={KEEP_WITH_NEXT}>
+                  {/* Name + dates row */}
                   <div
                     style={{
-                      fontSize: 10.5,
-                      lineHeight: 1.6,
-                      color: BODY,
-                      marginBottom: 3,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
                     }}
                   >
-                    {proj.description}
+                    <div
+                      style={{ fontSize: 11.5, fontWeight: 700, color: BODY }}
+                    >
+                      {proj.name}
+                    </div>
+                    {dates && (
+                      <div
+                        style={{
+                          fontSize: 9.5,
+                          color: MUTED,
+                          fontStyle: "italic",
+                          flexShrink: 0,
+                          marginLeft: 10,
+                        }}
+                      >
+                        {dates}
+                      </div>
+                    )}
                   </div>
-                )}
-                {/* Bullets */}
+                  {/* Role · type · link */}
+                  {(meta || proj.url) && (
+                    <div
+                      style={{ fontSize: 10.5, color: MUTED, marginBottom: 5 }}
+                    >
+                      {meta}
+                      {meta && proj.url ? " · " : ""}
+                      <ResumeLink href={proj.url}>
+                        {displayUrl(proj.url)}
+                      </ResumeLink>
+                    </div>
+                  )}
+                  {proj.description && (
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        lineHeight: 1.6,
+                        color: BODY,
+                        marginBottom: 3,
+                      }}
+                    >
+                      {proj.description}
+                    </div>
+                  )}
+                  {/* Bullets */}
+                </div>
                 {proj.bullets.filter(Boolean).map((b, j) => (
                   <div
                     key={j}
                     style={{
+                      ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                       display: "flex",
                       gap: 7,
                       marginBottom: 3,
@@ -388,7 +404,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
                 key={s.id}
                 style={{
                   marginBottom: idx < education.length - 1 ? 14 : 0,
-                  pageBreakInside: "avoid",
+                  ...NO_SPLIT,
                 }}
               >
                 <div
@@ -446,6 +462,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
           <div
             style={{
               display: "flex",
+              ...NO_SPLIT,
               flexWrap: "wrap",
               columnGap: 40,
               rowGap: 0,
@@ -481,7 +498,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
               key={i}
               style={{
                 marginBottom: i < certs.length - 1 ? 10 : 0,
-                pageBreakInside: "avoid",
+                ...NO_SPLIT,
               }}
             >
               <div
@@ -524,6 +541,7 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
           <div
             style={{
               display: "flex",
+              ...NO_SPLIT,
               flexWrap: "wrap",
               columnGap: 40,
               rowGap: 0,
@@ -570,7 +588,14 @@ function SectionRow({
   return (
     <div style={{ marginBottom: 4 }}>
       {/* Top rule */}
-      <div style={{ height: 1, backgroundColor: RULE, marginBottom: 12 }} />
+      <div
+        style={{
+          ...KEEP_WITH_NEXT,
+          height: 1,
+          backgroundColor: RULE,
+          marginBottom: 12,
+        }}
+      />
       {/* Label + content */}
       <div style={{ display: "flex", gap: GAP, marginBottom: 18 }}>
         {/* Label */}

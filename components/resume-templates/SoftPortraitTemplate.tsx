@@ -17,6 +17,13 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -85,6 +92,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; src: url('/fonts/source-sans-700.woff2') format('woff2'); }
+        ${printPageBackground(`${SIDEBAR_BG} ${SIDEBAR_W - 1}px, #e5e7eb ${SIDEBAR_W - 1}px ${SIDEBAR_W}px, #ffffff ${SIDEBAR_W}px`)}
       `,
         }}
       />
@@ -190,7 +198,9 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
 
         <div
           style={{
-            padding: "16px 22px",
+            padding: "36px 22px",
+            marginTop: -20,
+            ...REPEAT_PADDING,
             display: "flex",
             flexDirection: "column",
             gap: 0,
@@ -416,6 +426,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
           width: MAIN_W,
           backgroundColor: "#ffffff",
           padding: "36px 38px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
         }}
       >
@@ -429,56 +440,59 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                   key={s.id}
                   style={{
                     marginBottom: idx < work.length - 1 ? 18 : 0,
-                    pageBreakInside: "avoid",
                   }}
                 >
-                  {/* Role + dates */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "baseline",
-                      flexWrap: "wrap",
-                      gap: 4,
-                    }}
-                  >
-                    <span
-                      style={{ fontSize: 12, fontWeight: 700, color: DARK }}
+                  <div style={KEEP_WITH_NEXT}>
+                    {/* Role + dates */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        ...NO_SPLIT,
+                        flexWrap: "wrap",
+                        gap: 4,
+                      }}
                     >
-                      {c.role}
-                    </span>
-                    {(c.startDate || c.endDate || c.current) && (
                       <span
-                        style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          fontStyle: "italic",
-                          flexShrink: 0,
-                        }}
+                        style={{ fontSize: 12, fontWeight: 700, color: DARK }}
                       >
-                        {c.startDate}
-                        {c.startDate && (c.current || c.endDate)
-                          ? ` – ${c.current ? "Present" : c.endDate}`
-                          : ""}
+                        {c.role}
                       </span>
-                    )}
+                      {(c.startDate || c.endDate || c.current) && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            fontStyle: "italic",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {c.startDate}
+                          {c.startDate && (c.current || c.endDate)
+                            ? ` – ${c.current ? "Present" : c.endDate}`
+                            : ""}
+                        </span>
+                      )}
+                    </div>
+                    {/* Company */}
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: ACCENT,
+                        fontWeight: 600,
+                        marginBottom: 5,
+                      }}
+                    >
+                      {c.company}
+                    </div>
+                    {/* Bullets */}
                   </div>
-                  {/* Company */}
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: ACCENT,
-                      fontWeight: 600,
-                      marginBottom: 5,
-                    }}
-                  >
-                    {c.company}
-                  </div>
-                  {/* Bullets */}
                   {c.bullets.filter(Boolean).map((b, i) => (
                     <div
                       key={i}
                       style={{
+                        ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                         display: "flex",
                         gap: 8,
                         marginBottom: 3,
@@ -499,6 +513,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         display: "flex",
+                        ...NO_SPLIT,
                         flexWrap: "wrap",
                         gap: "3px 5px",
                         marginTop: 5,
@@ -538,81 +553,84 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                   key={i}
                   style={{
                     marginBottom: i < projects.length - 1 ? 18 : 0,
-                    pageBreakInside: "avoid",
                   }}
                 >
-                  {/* Name + dates */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "baseline",
-                      flexWrap: "wrap",
-                      gap: 4,
-                    }}
-                  >
-                    <span
-                      style={{ fontSize: 12, fontWeight: 700, color: DARK }}
-                    >
-                      {proj.name}
-                    </span>
-                    {dates && (
-                      <span
-                        style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          fontStyle: "italic",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {dates}
-                      </span>
-                    )}
-                  </div>
-                  {/* Role · type · link */}
-                  {(meta || proj.url) && (
+                  <div style={KEEP_WITH_NEXT}>
+                    {/* Name + dates */}
                     <div
                       style={{
-                        fontSize: 11,
-                        color: ACCENT,
-                        fontWeight: 600,
-                        marginBottom: 5,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        ...NO_SPLIT,
+                        flexWrap: "wrap",
+                        gap: 4,
                       }}
                     >
-                      {meta}
-                      {meta && proj.url ? " · " : ""}
-                      {proj.url && (
+                      <span
+                        style={{ fontSize: 12, fontWeight: 700, color: DARK }}
+                      >
+                        {proj.name}
+                      </span>
+                      {dates && (
                         <span
                           style={{
+                            fontSize: 9.5,
                             color: MUTED,
-                            fontWeight: 400,
-                            fontSize: 10,
+                            fontStyle: "italic",
+                            flexShrink: 0,
                           }}
                         >
-                          <ResumeLink href={proj.url}>
-                            {displayUrl(proj.url)}
-                          </ResumeLink>
+                          {dates}
                         </span>
                       )}
                     </div>
-                  )}
-                  {proj.description && (
-                    <div
-                      style={{
-                        fontSize: 10.5,
-                        lineHeight: 1.6,
-                        color: BODY,
-                        marginBottom: 3,
-                      }}
-                    >
-                      {proj.description}
-                    </div>
-                  )}
-                  {/* Bullets */}
+                    {/* Role · type · link */}
+                    {(meta || proj.url) && (
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: ACCENT,
+                          fontWeight: 600,
+                          marginBottom: 5,
+                        }}
+                      >
+                        {meta}
+                        {meta && proj.url ? " · " : ""}
+                        {proj.url && (
+                          <span
+                            style={{
+                              color: MUTED,
+                              fontWeight: 400,
+                              fontSize: 10,
+                            }}
+                          >
+                            <ResumeLink href={proj.url}>
+                              {displayUrl(proj.url)}
+                            </ResumeLink>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {proj.description && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          lineHeight: 1.6,
+                          color: BODY,
+                          marginBottom: 3,
+                        }}
+                      >
+                        {proj.description}
+                      </div>
+                    )}
+                    {/* Bullets */}
+                  </div>
                   {proj.bullets.filter(Boolean).map((b, j) => (
                     <div
                       key={j}
                       style={{
+                        ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                         display: "flex",
                         gap: 8,
                         marginBottom: 3,
@@ -633,6 +651,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         display: "flex",
+                        ...NO_SPLIT,
                         flexWrap: "wrap",
                         gap: "3px 5px",
                         marginTop: 5,
@@ -671,7 +690,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                   key={s.id}
                   style={{
                     marginBottom: idx < education.length - 1 ? 12 : 0,
-                    pageBreakInside: "avoid",
+                    ...NO_SPLIT,
                   }}
                 >
                   <div
@@ -679,6 +698,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "baseline",
+                      ...NO_SPLIT,
                       flexWrap: "wrap",
                       gap: 4,
                     }}
@@ -731,6 +751,7 @@ function SideHeading({ title, accent }: { title: string; accent: string }) {
   return (
     <div
       style={{
+        ...KEEP_WITH_NEXT,
         fontSize: 11,
         fontWeight: 700,
         color: accent,
@@ -757,6 +778,7 @@ function MainSection({
     <div style={{ marginBottom: 26 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontSize: 14,
           fontWeight: 700,
           color: "#1a1a1a",

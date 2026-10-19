@@ -17,6 +17,12 @@ import {
   PinIcon,
 } from "./ContactIcons";
 import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -60,15 +66,6 @@ const DARK = "#1c1c1c";
 
 // PDF pagination: padding repeats at the top/bottom of every printed page
 const PAGE_PAD_Y = 36;
-const PAGE_PADDING: React.CSSProperties = {
-  boxDecorationBreak: "clone",
-  WebkitBoxDecorationBreak: "clone",
-};
-// Headings and entry headers never end a page on their own
-const KEEP_WITH_NEXT: React.CSSProperties = {
-  breakInside: "avoid",
-  breakAfter: "avoid",
-};
 const MUTED = "#6b7280";
 
 export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
@@ -114,9 +111,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; src: url('/fonts/source-sans-700.woff2') format('woff2'); }
-        @media print {
-          html { background: linear-gradient(to right, ${SIDEBAR_BG} ${SIDEBAR_W - 1}px, ${SIDEBAR_BORDER} ${SIDEBAR_W - 1}px, ${SIDEBAR_BORDER} ${SIDEBAR_W}px, #ffffff ${SIDEBAR_W}px) !important; }
-        }
+        ${printPageBackground(`${SIDEBAR_BG} ${SIDEBAR_W - 1}px, ${SIDEBAR_BORDER} ${SIDEBAR_W - 1}px ${SIDEBAR_W}px, #ffffff ${SIDEBAR_W}px`)}
       `,
         }}
       />
@@ -205,7 +200,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
 
         <div
           style={{
-            ...PAGE_PADDING,
+            ...REPEAT_PADDING,
             padding: `${PAGE_PAD_Y}px 22px`,
             marginTop: 16 - PAGE_PAD_Y,
             display: "flex",
@@ -395,7 +390,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
         style={{
           width: MAIN_W,
           backgroundColor: "#ffffff",
-          ...PAGE_PADDING,
+          ...REPEAT_PADDING,
           padding: `${PAGE_PAD_Y}px 36px`,
           boxSizing: "border-box",
         }}
@@ -457,7 +452,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                       key={i}
                       style={{
                         display: "flex",
-                        breakInside: "avoid",
+                        ...NO_SPLIT,
                         gap: 7,
                         marginBottom: 3,
                         fontSize: 10.5,
@@ -478,7 +473,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         display: "flex",
-                        breakInside: "avoid",
+                        ...NO_SPLIT,
                         flexWrap: "wrap",
                         gap: "3px 5px",
                         marginTop: 6,
@@ -584,7 +579,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                       key={j}
                       style={{
                         display: "flex",
-                        breakInside: "avoid",
+                        ...NO_SPLIT,
                         gap: 7,
                         marginBottom: 3,
                         fontSize: 10.5,
@@ -605,7 +600,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                     <div
                       style={{
                         display: "flex",
-                        breakInside: "avoid",
+                        ...NO_SPLIT,
                         flexWrap: "wrap",
                         gap: "3px 5px",
                         marginTop: 6,
@@ -640,10 +635,7 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
             {education.map((s) => {
               const c = s.content as EducationContent;
               return (
-                <div
-                  key={s.id}
-                  style={{ marginBottom: 14, breakInside: "avoid" }}
-                >
+                <div key={s.id} style={{ marginBottom: 14, ...NO_SPLIT }}>
                   <div
                     style={{
                       display: "flex",
