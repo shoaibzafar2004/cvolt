@@ -149,7 +149,7 @@ cvolt/
 │   ├── ui/                             # shadcn components (badge, button, dialog, input, select,
 │   │                                   #   sheet, skeleton, textarea) + custom month-picker
 │   └── shared/                         # Navbar, Footer, AuthGate, LogoutButton, SectionLine,
-│                                       #   ThemeProvider, ThemeToggle
+│                                       #   ThemeProvider, ThemeToggle, ResumeDraftLoader
 │
 ├── lib/
 │   ├── supabase/
@@ -248,6 +248,7 @@ cvolt/
 
 **Persistence:**
 - localStorage (`cvolt_draft`) writes on every field blur
+- On page load `ResumeDraftLoader` (root layout) keeps the localStorage draft if there is one; if it's empty and the user is signed in, it loads their latest resume from Supabase. Pages that need the draft wait for `uiStore.draftReady`
 - Supabase upsert on step completion (requires auth or anon key)
 - On sign-in: merge anon draft into user account
 

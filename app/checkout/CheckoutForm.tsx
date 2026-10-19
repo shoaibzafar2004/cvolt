@@ -11,6 +11,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/store/resumeStore";
+import { useUIStore } from "@/store/uiStore";
 
 interface CheckoutFormProps {
   clientSecret: string;
@@ -27,12 +28,15 @@ export default function CheckoutForm({
 }: CheckoutFormProps) {
   const router = useRouter();
   const personalInfo = useResumeStore((s) => s.personalInfo);
+  const draftReady = useUIStore((s) => s.draftReady);
 
+  // Only once the draft has loaded (localStorage or DB) — otherwise a
+  // signed-in user with an empty browser draft is bounced to /build
   useEffect(() => {
-    if (!personalInfo.name) {
+    if (draftReady && !personalInfo.name) {
       router.replace("/build");
     }
-  }, [personalInfo.name, router]);
+  }, [draftReady, personalInfo.name, router]);
 
   // userEmail is always set — checkout page redirects to login if not authenticated
 
