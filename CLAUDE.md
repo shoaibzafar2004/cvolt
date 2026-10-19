@@ -288,7 +288,7 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 - Section order in every template: Work → Projects → Education (where they share a column). Project date/meta/link formatting comes from `lib/resume-format.ts`
 - Contact rows (phone, email, location, website, LinkedIn, GitHub) use the icons in `ContactIcons.tsx` — never text glyphs (◉ ⊕ ✆). Icons inherit colour and size (`currentColor`, `1em`).
 - Certification link + skills render through `<CertExtras>` with the template's own link/muted colours
-- When adding a field, update every template and verify by rendering all 14 (renderToStaticMarkup) — there is no automated visual test suite
+- When adding a field, update every template and add it to `tests/fixtures.ts` — `tests/unit/templates.test.tsx` renders all 14 with renderToStaticMarkup (full + minimal data, links, no nested `<a>`, no `class=`). Layout/pagination still needs a visual check: there is no automated visual test suite
 
 ---
 
@@ -768,7 +768,11 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 
 ## Git & formatting
 - Never commit to `main` or `develop` directly. Branch off `develop` (`feat/`, `fix/`, `chore/`), PR into `develop`. Only `develop` → `main` PRs update main.
-- Code is formatted by Prettier with its default style (semicolons, double quotes, width 80) plus Tailwind class sorting. Don't hand-format; let Prettier do it. Run `npm run format` before committing; CI fails on `format:check`, `lint`, `typecheck` or `build`.
+- Code is formatted by Prettier with its default style (semicolons, double quotes, width 80) plus Tailwind class sorting. Don't hand-format; let Prettier do it. Run `npm run format` before committing; CI runs `format:check`, `lint`, `typecheck`, `test` and `build` as separate parallel jobs (Format, Lint, Typecheck, Unit tests, Build); any failure blocks the PR.
+
+## Tests
+- Unit tests: Vitest, `tests/unit/**/*.test.ts(x)`, run with `npm test`. Shared resume fixtures in `tests/fixtures.ts`. `@/` resolves to the repo root; `server-only` is stubbed so server helpers (e.g. `lib/purchases.ts`) can be tested.
+- Add or update tests with any change to `lib/resume-diff.ts`, `lib/purchases.ts` (pure helpers), `lib/resume-format.ts`, schemas or templates.
 
 ## TypeScript
 - No `any`. Use types from types/index.ts.
