@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -167,10 +168,22 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
           }}
         >
           {p.phone && (
-            <ContactRow icon={<PhoneIcon />} text={p.phone} accent={ACCENT} />
+            <ContactRow
+              icon={<PhoneIcon />}
+              text={p.phone}
+              href={p.phone}
+              kind="phone"
+              accent={ACCENT}
+            />
           )}
           {p.email && (
-            <ContactRow icon={<MailIcon />} text={p.email} accent={ACCENT} />
+            <ContactRow
+              icon={<MailIcon />}
+              text={p.email}
+              href={p.email}
+              kind="email"
+              accent={ACCENT}
+            />
           )}
           {p.location && (
             <ContactRow icon={<PinIcon />} text={p.location} accent={ACCENT} />
@@ -179,14 +192,25 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
             <ContactRow
               icon={<LinkedInIcon />}
               text={p.linkedIn}
+              href={p.linkedIn}
               accent={ACCENT}
             />
           )}
           {p.github && (
-            <ContactRow icon={<GitHubIcon />} text={p.github} accent={ACCENT} />
+            <ContactRow
+              icon={<GitHubIcon />}
+              text={p.github}
+              href={p.github}
+              accent={ACCENT}
+            />
           )}
           {p.website && (
-            <ContactRow icon={<GlobeIcon />} text={p.website} accent={ACCENT} />
+            <ContactRow
+              icon={<GlobeIcon />}
+              text={p.website}
+              href={p.website}
+              accent={ACCENT}
+            />
           )}
         </div>
       </div>
@@ -403,7 +427,9 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{ fontSize: 9.5, color: MUTED, marginBottom: 6 }}
                       >
-                        {displayUrl(proj.url)}
+                        <ResumeLink href={proj.url}>
+                          {displayUrl(proj.url)}
+                        </ResumeLink>
                       </div>
                     )}
                     {proj.description && (
@@ -698,10 +724,14 @@ function SectionHeading({ title, accent }: { title: string; accent: string }) {
 function ContactRow({
   icon,
   text,
+  href,
+  kind,
   accent,
 }: {
   icon: React.ReactNode;
   text: string;
+  href?: string;
+  kind?: "url" | "email" | "phone";
   accent: string;
 }) {
   return (
@@ -719,7 +749,9 @@ function ContactRow({
           lineHeight: 1.4,
         }}
       >
-        {text}
+        <ResumeLink href={href} kind={kind}>
+          {text}
+        </ResumeLink>
       </span>
     </div>
   );

@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -187,27 +188,35 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
           )}
           {p.phone && (
             <div>
-              <PhoneIcon /> {p.phone}
+              <PhoneIcon />{" "}
+              <ResumeLink href={p.phone} kind="phone">
+                {p.phone}
+              </ResumeLink>
             </div>
           )}
           {p.email && (
             <div>
-              <MailIcon /> {p.email}
+              <MailIcon />{" "}
+              <ResumeLink href={p.email} kind="email">
+                {p.email}
+              </ResumeLink>
             </div>
           )}
           {p.linkedIn && (
             <div style={{ wordBreak: "break-all" }}>
-              <LinkedInIcon /> {p.linkedIn}
+              <LinkedInIcon />{" "}
+              <ResumeLink href={p.linkedIn}>{p.linkedIn}</ResumeLink>
             </div>
           )}
           {p.github && (
             <div style={{ wordBreak: "break-all" }}>
-              <GitHubIcon /> {p.github}
+              <GitHubIcon /> <ResumeLink href={p.github}>{p.github}</ResumeLink>
             </div>
           )}
           {p.website && (
             <div style={{ wordBreak: "break-all" }}>
-              <GlobeIcon /> {p.website}
+              <GlobeIcon />{" "}
+              <ResumeLink href={p.website}>{p.website}</ResumeLink>
             </div>
           )}
         </div>
@@ -565,7 +574,9 @@ export default function ElegantBannerTemplate({ data }: { data: ResumeData }) {
                           {meta && proj.url ? " · " : ""}
                           {proj.url && (
                             <span style={{ color: ACCENT }}>
-                              {displayUrl(proj.url)}
+                              <ResumeLink href={proj.url}>
+                                {displayUrl(proj.url)}
+                              </ResumeLink>
                             </span>
                           )}
                         </div>

@@ -17,6 +17,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -208,19 +209,45 @@ export default function EditorialTemplate({ data }: { data: ResumeData }) {
           )}
           {/* Contact rows */}
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {p.phone && <HeaderContact icon={<PhoneIcon />} text={p.phone} />}
-            {p.email && <HeaderContact icon={<MailIcon />} text={p.email} />}
+            {p.phone && (
+              <HeaderContact
+                icon={<PhoneIcon />}
+                text={p.phone}
+                href={p.phone}
+                kind="phone"
+              />
+            )}
+            {p.email && (
+              <HeaderContact
+                icon={<MailIcon />}
+                text={p.email}
+                href={p.email}
+                kind="email"
+              />
+            )}
             {p.website && (
-              <HeaderContact icon={<GlobeIcon />} text={p.website} />
+              <HeaderContact
+                icon={<GlobeIcon />}
+                text={p.website}
+                href={p.website}
+              />
             )}
             {p.location && (
               <HeaderContact icon={<PinIcon />} text={p.location} />
             )}
             {p.linkedIn && (
-              <HeaderContact icon={<LinkedInIcon />} text={p.linkedIn} />
+              <HeaderContact
+                icon={<LinkedInIcon />}
+                text={p.linkedIn}
+                href={p.linkedIn}
+              />
             )}
             {p.github && (
-              <HeaderContact icon={<GitHubIcon />} text={p.github} />
+              <HeaderContact
+                icon={<GitHubIcon />}
+                text={p.github}
+                href={p.github}
+              />
             )}
           </div>
         </div>
@@ -515,9 +542,13 @@ function SectionBar({ title, accent }: { title: string; accent: string }) {
 function HeaderContact({
   icon,
   text,
+  href,
+  kind,
 }: {
   icon: React.ReactNode;
   text: string;
+  href?: string;
+  kind?: "url" | "email" | "phone";
 }) {
   return (
     <div
@@ -530,7 +561,11 @@ function HeaderContact({
       }}
     >
       <span style={{ fontSize: 11, lineHeight: 1 }}>{icon}</span>
-      <span style={{ wordBreak: "break-all" }}>{text}</span>
+      <span style={{ wordBreak: "break-all" }}>
+        <ResumeLink href={href} kind={kind}>
+          {text}
+        </ResumeLink>
+      </span>
     </div>
   );
 }
@@ -682,7 +717,7 @@ function ProjectEntry({ p, accent }: { p: ProjectContent; accent: string }) {
       )}
       {p.url && (
         <div style={{ fontSize: 9.5, color: "#888888" }}>
-          {displayUrl(p.url)}
+          <ResumeLink href={p.url}>{displayUrl(p.url)}</ResumeLink>
         </div>
       )}
       <div style={{ height: 5 }} />

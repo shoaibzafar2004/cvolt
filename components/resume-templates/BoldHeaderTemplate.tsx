@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -338,7 +339,9 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                       >
                         {dates}
                         {dates && proj.url ? " · " : ""}
-                        {displayUrl(proj.url)}
+                        <ResumeLink href={proj.url}>
+                          {displayUrl(proj.url)}
+                        </ResumeLink>
                       </div>
                     )}
                     {proj.description && (
@@ -478,6 +481,8 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<PhoneIcon />}
                   text={p.phone}
+                  href={p.phone}
+                  kind="phone"
                   accent={ACCENT}
                 />
               )}
@@ -485,6 +490,8 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<MailIcon />}
                   text={p.email}
+                  href={p.email}
+                  kind="email"
                   accent={ACCENT}
                   wrap
                 />
@@ -500,6 +507,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<LinkedInIcon />}
                   text={p.linkedIn}
+                  href={p.linkedIn}
                   accent={ACCENT}
                   wrap
                 />
@@ -508,6 +516,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<GitHubIcon />}
                   text={p.github}
+                  href={p.github}
                   accent={ACCENT}
                   wrap
                 />
@@ -516,6 +525,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<GlobeIcon />}
                   text={p.website}
+                  href={p.website}
                   accent={ACCENT}
                   wrap
                 />
@@ -686,11 +696,15 @@ function ColHeading({ title, accent }: { title: string; accent: string }) {
 function ContactRow({
   icon,
   text,
+  href,
+  kind,
   accent,
   wrap,
 }: {
   icon: React.ReactNode;
   text: string;
+  href?: string;
+  kind?: "url" | "email" | "phone";
   accent: string;
   wrap?: boolean;
 }) {
@@ -723,7 +737,9 @@ function ContactRow({
           marginTop: 3,
         }}
       >
-        {text}
+        <ResumeLink href={href} kind={kind}>
+          {text}
+        </ResumeLink>
       </span>
     </div>
   );

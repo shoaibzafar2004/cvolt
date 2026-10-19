@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -146,12 +147,18 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
             )}
             {p.phone && (
               <div>
-                <PhoneIcon /> {p.phone}
+                <PhoneIcon />{" "}
+                <ResumeLink href={p.phone} kind="phone">
+                  {p.phone}
+                </ResumeLink>
               </div>
             )}
             {p.email && (
               <div>
-                <MailIcon /> {p.email}
+                <MailIcon />{" "}
+                <ResumeLink href={p.email} kind="email">
+                  {p.email}
+                </ResumeLink>
               </div>
             )}
           </div>
@@ -250,7 +257,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                     LinkedIn:
                   </div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
-                    {p.linkedIn}
+                    <ResumeLink href={p.linkedIn}>{p.linkedIn}</ResumeLink>
                   </div>
                 </div>
               )}
@@ -261,7 +268,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                     GitHub:
                   </div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
-                    {p.github}
+                    <ResumeLink href={p.github}>{p.github}</ResumeLink>
                   </div>
                 </div>
               )}
@@ -272,7 +279,7 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                     Website:
                   </div>
                   <div style={{ fontSize: 9, wordBreak: "break-all" }}>
-                    {p.website}
+                    <ResumeLink href={p.website}>{p.website}</ResumeLink>
                   </div>
                 </div>
               )}
@@ -513,7 +520,9 @@ export default function ModernTemplate({ data }: { data: ResumeData }) {
                           <div
                             style={{ fontSize: 9, color: MUTED, marginTop: 1 }}
                           >
-                            {displayUrl(proj.url)}
+                            <ResumeLink href={proj.url}>
+                              {displayUrl(proj.url)}
+                            </ResumeLink>
                           </div>
                         )}
                         <div style={{ marginTop: 5 }}>

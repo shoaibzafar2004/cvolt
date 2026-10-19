@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -210,6 +211,8 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <ContactLine
                   icon={<PhoneIcon />}
                   text={p.phone}
+                  href={p.phone}
+                  kind="phone"
                   accent={ACCENT}
                 />
               )}
@@ -217,6 +220,8 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <ContactLine
                   icon={<MailIcon />}
                   text={p.email}
+                  href={p.email}
+                  kind="email"
                   accent={ACCENT}
                 />
               )}
@@ -231,6 +236,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <ContactLine
                   icon={<LinkedInIcon />}
                   text={p.linkedIn}
+                  href={p.linkedIn}
                   accent={ACCENT}
                 />
               )}
@@ -238,6 +244,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <ContactLine
                   icon={<GitHubIcon />}
                   text={p.github}
+                  href={p.github}
                   accent={ACCENT}
                 />
               )}
@@ -245,6 +252,7 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                 <ContactLine
                   icon={<GlobeIcon />}
                   text={p.website}
+                  href={p.website}
                   accent={ACCENT}
                 />
               )}
@@ -581,7 +589,9 @@ export default function SoftPortraitTemplate({ data }: { data: ResumeData }) {
                             fontSize: 10,
                           }}
                         >
-                          {displayUrl(proj.url)}
+                          <ResumeLink href={proj.url}>
+                            {displayUrl(proj.url)}
+                          </ResumeLink>
                         </span>
                       )}
                     </div>
@@ -766,10 +776,14 @@ function MainSection({
 function ContactLine({
   icon,
   text,
+  href,
+  kind,
   accent,
 }: {
   icon: React.ReactNode;
   text: string;
+  href?: string;
+  kind?: "url" | "email" | "phone";
   accent: string;
 }) {
   return (
@@ -777,7 +791,11 @@ function ContactLine({
       <span style={{ color: accent, fontSize: 11, lineHeight: "15px" }}>
         {icon}
       </span>
-      <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>{text}</span>
+      <span style={{ wordBreak: "break-all", lineHeight: 1.5 }}>
+        <ResumeLink href={href} kind={kind}>
+          {text}
+        </ResumeLink>
+      </span>
     </div>
   );
 }

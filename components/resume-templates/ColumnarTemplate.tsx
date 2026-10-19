@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -67,12 +68,36 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
   const projects = projSec ? (projSec.content as ProjectContent[]) : [];
 
   // Build contact items
-  const contacts: { icon: React.ReactNode; text: string }[] = [];
-  if (p.email) contacts.push({ icon: <MailIcon />, text: p.email });
-  if (p.phone) contacts.push({ icon: <PhoneIcon />, text: p.phone });
-  if (p.website) contacts.push({ icon: <GlobeIcon />, text: p.website });
-  if (p.linkedIn) contacts.push({ icon: <LinkedInIcon />, text: p.linkedIn });
-  if (p.github) contacts.push({ icon: <GitHubIcon />, text: p.github });
+  const contacts: {
+    icon: React.ReactNode;
+    text: string;
+    href?: string;
+    kind?: "url" | "email" | "phone";
+  }[] = [];
+  if (p.email)
+    contacts.push({
+      icon: <MailIcon />,
+      text: p.email,
+      href: p.email,
+      kind: "email",
+    });
+  if (p.phone)
+    contacts.push({
+      icon: <PhoneIcon />,
+      text: p.phone,
+      href: p.phone,
+      kind: "phone",
+    });
+  if (p.website)
+    contacts.push({ icon: <GlobeIcon />, text: p.website, href: p.website });
+  if (p.linkedIn)
+    contacts.push({
+      icon: <LinkedInIcon />,
+      text: p.linkedIn,
+      href: p.linkedIn,
+    });
+  if (p.github)
+    contacts.push({ icon: <GitHubIcon />, text: p.github, href: p.github });
   if (p.location) contacts.push({ icon: <PinIcon />, text: p.location });
 
   return (
@@ -150,7 +175,9 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
                 style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
               >
                 {c.icon}
-                {c.text}
+                <ResumeLink href={c.href} kind={c.kind}>
+                  {c.text}
+                </ResumeLink>
               </span>
             ))}
           </div>
@@ -297,7 +324,9 @@ export default function ColumnarTemplate({ data }: { data: ResumeData }) {
                   >
                     {meta}
                     {meta && proj.url ? " · " : ""}
-                    {displayUrl(proj.url)}
+                    <ResumeLink href={proj.url}>
+                      {displayUrl(proj.url)}
+                    </ResumeLink>
                   </div>
                 )}
                 {proj.description && (

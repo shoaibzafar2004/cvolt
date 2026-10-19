@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -125,12 +126,18 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
         >
           {personalInfo.email && (
             <span>
-              <MailIcon /> {personalInfo.email}
+              <MailIcon />{" "}
+              <ResumeLink href={personalInfo.email} kind="email">
+                {personalInfo.email}
+              </ResumeLink>
             </span>
           )}
           {personalInfo.phone && (
             <span>
-              <PhoneIcon /> {personalInfo.phone}
+              <PhoneIcon />{" "}
+              <ResumeLink href={personalInfo.phone} kind="phone">
+                {personalInfo.phone}
+              </ResumeLink>
             </span>
           )}
           {personalInfo.location && (
@@ -140,17 +147,26 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
           )}
           {personalInfo.linkedIn && (
             <span>
-              <LinkedInIcon /> {personalInfo.linkedIn}
+              <LinkedInIcon />{" "}
+              <ResumeLink href={personalInfo.linkedIn}>
+                {personalInfo.linkedIn}
+              </ResumeLink>
             </span>
           )}
           {personalInfo.github && (
             <span>
-              <GitHubIcon /> {personalInfo.github}
+              <GitHubIcon />{" "}
+              <ResumeLink href={personalInfo.github}>
+                {personalInfo.github}
+              </ResumeLink>
             </span>
           )}
           {personalInfo.website && (
             <span>
-              <GlobeIcon /> {personalInfo.website}
+              <GlobeIcon />{" "}
+              <ResumeLink href={personalInfo.website}>
+                {personalInfo.website}
+              </ResumeLink>
             </span>
           )}
         </div>
@@ -279,7 +295,9 @@ export default function CleanTemplate({ data }: { data: ResumeData }) {
                     {meta && p.url ? " · " : ""}
                     {p.url && (
                       <span style={{ color: colors.accent }}>
-                        {displayUrl(p.url)}
+                        <ResumeLink href={p.url}>
+                          {displayUrl(p.url)}
+                        </ResumeLink>
                       </span>
                     )}
                   </div>

@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -212,7 +213,11 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 <span style={{ marginRight: 6 }}>
                   <PhoneIcon />
                 </span>
-                <span style={{ color: MUTED }}>{p.phone}</span>
+                <span style={{ color: MUTED }}>
+                  <ResumeLink href={p.phone} kind="phone">
+                    {p.phone}
+                  </ResumeLink>
+                </span>
               </div>
             )}
             {p.email && (
@@ -220,7 +225,11 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 <span style={{ marginRight: 6 }}>
                   <MailIcon />
                 </span>
-                <span style={{ color: MUTED }}>{p.email}</span>
+                <span style={{ color: MUTED }}>
+                  <ResumeLink href={p.email} kind="email">
+                    {p.email}
+                  </ResumeLink>
+                </span>
               </div>
             )}
             {p.linkedIn && (
@@ -229,7 +238,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   <LinkedInIcon />
                 </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
-                  {p.linkedIn}
+                  <ResumeLink href={p.linkedIn}>{p.linkedIn}</ResumeLink>
                 </span>
               </div>
             )}
@@ -239,7 +248,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   <GitHubIcon />
                 </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
-                  {p.github}
+                  <ResumeLink href={p.github}>{p.github}</ResumeLink>
                 </span>
               </div>
             )}
@@ -249,7 +258,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   <GlobeIcon />
                 </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
-                  {p.website}
+                  <ResumeLink href={p.website}>{p.website}</ResumeLink>
                 </span>
               </div>
             )}
@@ -514,7 +523,9 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                         {meta && proj.url ? " · " : ""}
                         {proj.url && (
                           <span style={{ color: ACCENT }}>
-                            {displayUrl(proj.url)}
+                            <ResumeLink href={proj.url}>
+                              {displayUrl(proj.url)}
+                            </ResumeLink>
                           </span>
                         )}
                       </div>

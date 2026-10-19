@@ -16,6 +16,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -220,7 +221,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   <span style={{ color: ACCENT }}>
                     <PhoneIcon />
                   </span>{" "}
-                  {p.phone}
+                  <ResumeLink href={p.phone} kind="phone">
+                    {p.phone}
+                  </ResumeLink>
                 </div>
               )}
               {p.email && (
@@ -230,7 +233,11 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   <span style={{ color: ACCENT }}>
                     <MailIcon />
                   </span>{" "}
-                  <span style={{ wordBreak: "break-all" }}>{p.email}</span>
+                  <span style={{ wordBreak: "break-all" }}>
+                    <ResumeLink href={p.email} kind="email">
+                      {p.email}
+                    </ResumeLink>
+                  </span>
                 </div>
               )}
               {p.location && (
@@ -248,7 +255,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   <span style={{ color: ACCENT }}>
                     <LinkedInIcon />
                   </span>{" "}
-                  <span style={{ wordBreak: "break-all" }}>{p.linkedIn}</span>
+                  <span style={{ wordBreak: "break-all" }}>
+                    <ResumeLink href={p.linkedIn}>{p.linkedIn}</ResumeLink>
+                  </span>
                 </div>
               )}
               {p.github && (
@@ -258,7 +267,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   <span style={{ color: ACCENT }}>
                     <GitHubIcon />
                   </span>{" "}
-                  <span style={{ wordBreak: "break-all" }}>{p.github}</span>
+                  <span style={{ wordBreak: "break-all" }}>
+                    <ResumeLink href={p.github}>{p.github}</ResumeLink>
+                  </span>
                 </div>
               )}
               {p.website && (
@@ -268,7 +279,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                   <span style={{ color: ACCENT }}>
                     <GlobeIcon />
                   </span>{" "}
-                  <span style={{ wordBreak: "break-all" }}>{p.website}</span>
+                  <span style={{ wordBreak: "break-all" }}>
+                    <ResumeLink href={p.website}>{p.website}</ResumeLink>
+                  </span>
                 </div>
               )}
             </div>
@@ -545,7 +558,9 @@ export default function ProSidebarTemplate({ data }: { data: ResumeData }) {
                         {meta && proj.url ? " · " : ""}
                         {proj.url && (
                           <span style={{ color: MUTED, fontWeight: 400 }}>
-                            {displayUrl(proj.url)}
+                            <ResumeLink href={proj.url}>
+                              {displayUrl(proj.url)}
+                            </ResumeLink>
                           </span>
                         )}
                       </div>
