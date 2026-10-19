@@ -27,15 +27,15 @@ const HOW_IT_WORKS = [
 const FAQ = [
   {
     q: "Can I edit my resume after paying?",
-    a: "Yes — sign in with the magic link we email you, go to your dashboard, and edit for free. Re-download is available if your changes are under 10% of the original content.",
+    a: "Yes — sign in to your dashboard with a magic link and edit for free. Re-downloading is free within 30 days if your changes are under 10% of the original content.",
   },
   {
     q: "How long until I can download?",
-    a: "Your PDF is generated in about 10–20 seconds after payment. A download link is also emailed to you.",
+    a: "Your PDF is generated in about 10–20 seconds after payment and you can download it straight away. It also stays in your dashboard for 30 days.",
   },
   {
     q: "What payment methods are accepted?",
-    a: "Credit and debit cards via Stripe globally. Safepay for Pakistan-based users.",
+    a: "Credit and debit cards via Stripe, worldwide. Safepay for Pakistan-based users is coming soon.",
   },
   {
     q: "Is there a refund policy?",
@@ -43,7 +43,7 @@ const FAQ = [
   },
   {
     q: "Do I need to create an account?",
-    a: "No — build and pay without signing up. We email you a magic link after purchase so you can re-download later.",
+    a: "Not to build — fill in your details and preview every template without signing up. At checkout you sign in with a magic link (no password), so your purchase is saved to your dashboard.",
   },
 ];
 
@@ -398,7 +398,7 @@ export default function LandingPage() {
                 ))}
                 {[
                   "No subscription",
-                  "No account needed",
+                  "Build without an account",
                   "Instant re-download",
                 ].map((f) => (
                   <li
@@ -461,7 +461,7 @@ export default function LandingPage() {
                   "PDF download",
                   "All templates included",
                   "No subscription",
-                  "No account needed",
+                  "Build without an account",
                   "30-day re-download",
                 ].map((f) => (
                   <li

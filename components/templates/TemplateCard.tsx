@@ -234,10 +234,10 @@ export default function TemplateCard({
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md">
-      {/* Live preview */}
-      <Link
-        href={`/templates/${template.slug}`}
-        className="block overflow-hidden bg-white"
+      {/* Live preview — the link is an overlay, not a wrapper: templates
+          contain their own <a> tags (contact links), which can't nest */}
+      <div
+        className="relative overflow-hidden bg-white"
         style={{
           height: CARD_HEIGHT,
           display: "flex",
@@ -247,6 +247,7 @@ export default function TemplateCard({
       >
         {/* Centered box — width = A4 scaled width, clips vertically */}
         <div
+          aria-hidden="true"
           style={{
             width: A4_WIDTH * SCALE,
             height: CARD_HEIGHT,
@@ -270,7 +271,12 @@ export default function TemplateCard({
             <ClientOnlyTemplate slug={template.slug} data={previewData} />
           </div>
         </div>
-      </Link>
+        <Link
+          href={`/templates/${template.slug}`}
+          aria-label={`Preview ${template.name}`}
+          className="absolute inset-0"
+        />
+      </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between border-t bg-card px-4 py-3">
