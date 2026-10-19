@@ -1,0 +1,4 @@
+# Not needed to build or run the app — keep them out of Vercel deployments
+tests/
+vitest.config.ts
+vitest.integration.config.ts
