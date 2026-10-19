@@ -4,7 +4,7 @@ A one-time-pay resume builder. Users fill in their details, browse templates wit
 
 **Stack:** Next.js (App Router) · Supabase (Postgres, Auth, Storage) · Tailwind + shadcn/ui · Zustand + React Hook Form + Zod · Puppeteer PDF generation · Stripe (Safepay planned) · Vitest
 
-See [CLAUDE.md](CLAUDE.md) for the full architecture, database schema, routes and build plan.
+See [CLAUDE.md](CLAUDE.md) for the architecture, database schema, routes and the rules for working on the code.
 
 ## Features
 
