@@ -7,14 +7,24 @@ import CheckoutForm from "./CheckoutForm";
 import TemplateThumbnail from "./TemplateThumbnail";
 
 interface Props {
-  searchParams: Promise<{ templateId?: string; slug?: string; name?: string }>;
+  searchParams: Promise<{
+    templateId?: string;
+    slug?: string;
+    name?: string;
+    resumeId?: string;
+  }>;
 }
 
 const PRICE_CENTS = 150;
 const CURRENCY = "usd";
 
 export default async function CheckoutPage({ searchParams }: Props) {
-  const { templateId, slug: slugParam, name: nameParam } = await searchParams;
+  const {
+    templateId,
+    slug: slugParam,
+    name: nameParam,
+    resumeId: resumeParam,
+  } = await searchParams;
 
   if (!templateId) {
     redirect("/templates");
@@ -46,6 +56,18 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   const userEmail = user.email ?? null;
 
+  // Buying a specific resume (e.g. a re-edited purchase from the dashboard):
+  // only accepted when it belongs to this user (RLS-scoped query)
+  const { data: ownedResume } = resumeParam
+    ? await supabase
+        .from("resumes")
+        .select("id")
+        .eq("id", resumeParam)
+        .eq("user_id", user.id)
+        .maybeSingle()
+    : { data: null };
+  const resumeId = ownedResume?.id ?? null;
+
   // Create PaymentIntent server-side — never trust client for amount
   const intent = await createStripePaymentIntent({
     amountCents: PRICE_CENTS,
@@ -54,6 +76,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
       templateId: templateId ?? "",
       ...(user?.id ? { userId: user.id } : {}),
       ...(user?.email ? { email: user.email } : {}),
+      ...(resumeId ? { resumeId } : {}),
     },
   });
 
@@ -93,6 +116,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
         clientSecret={intent.client_secret!}
         templateId={templateId ?? ""}
         userEmail={userEmail}
+        resumeId={resumeId}
         publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
       />
     </main>

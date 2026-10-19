@@ -22,6 +22,7 @@ export default async function EditPage({ params }: Props) {
     .select(
       `
       id,
+      purchased,
       personal_info,
       resume_sections ( id, section_type, content, display_order )
     `,
@@ -31,8 +32,25 @@ export default async function EditPage({ params }: Props) {
     .single();
 
   if (!resume) notFound();
+  // Drafts are edited in /build; this page edits a purchase's own resume
+  if (!resume.purchased) redirect("/build");
+
+  const { data: snapshot } = await supabase
+    .from("resume_snapshots")
+    .select("payment_id")
+    .eq("resume_id", resume.id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (!snapshot) notFound();
 
   const resumeData = shapeDbRowToResumeData(resume as DbResume);
 
-  return <EditFormShell resumeId={resume.id} resumeData={resumeData} />;
+  return (
+    <EditFormShell
+      resumeId={resume.id}
+      paymentId={snapshot.payment_id}
+      resumeData={resumeData}
+    />
+  );
 }

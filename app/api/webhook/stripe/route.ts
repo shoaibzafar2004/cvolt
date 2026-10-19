@@ -1,22 +1,18 @@
 import { verifyStripeWebhook } from "@/lib/payments";
-import { createClient } from "@supabase/supabase-js";
-import { generatePdfFromHtml } from "@/lib/pdf";
-import { getTemplate } from "@/lib/templates";
-import type {
-  ResumeData,
-  WorkContent,
-  EducationContent,
-  SkillsContent,
-} from "@/types";
-import { createElement } from "react";
+import {
+  createPurchasedResume,
+  getServiceClient,
+  loadResume,
+  renderAndStorePdf,
+  replaceResumeContent,
+  type LoadedResume,
+} from "@/lib/purchases";
+import type { ResumeData } from "@/types";
 
-// Use service role client — webhook runs outside user session
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-}
+// Every completed payment owns a new resume: the resume being bought (the /build
+// draft, or a re-edited purchase) is copied into a purchased resume, frozen as a
+// snapshot, and rendered to a PDF. A re-edited purchase is then reverted to what
+// it was bought as, so it keeps matching its own purchase.
 
 export async function POST(request: Request) {
   const payload = await request.text();
@@ -84,73 +80,36 @@ export async function POST(request: Request) {
         userId = existing?.id ?? null;
       }
     }
+    if (!userId) throw new Error("Cannot resolve the buyer's account");
 
-    // 2. Find the resume being bought (set by /api/update-payment-intent,
-    //    which checks ownership); fall back to the user's latest resume
-    let { data: resume } = !userId
-      ? { data: null }
-      : metaResumeId
-        ? await supabase
-            .from("resumes")
-            .select("id, personal_info")
-            .eq("id", metaResumeId)
-            .eq("user_id", userId)
-            .single()
-        : await supabase
-            .from("resumes")
-            .select("id, personal_info")
-            .eq("user_id", userId)
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .single();
-
-    // 3. Fetch resume sections
-    const { data: sections } = resume
-      ? await supabase
-          .from("resume_sections")
-          .select("*")
-          .eq("resume_id", resume.id)
-          .order("display_order")
-      : { data: [] };
-
-    const resumeData: ResumeData = {
-      personalInfo: (resume?.personal_info as ResumeData["personalInfo"]) ?? {
-        name: "",
-        jobTitle: "",
-        email,
-        phone: "",
-        location: "",
-      },
-      sections: (sections ?? []).map((s) => ({
-        id: s.id,
-        type: s.section_type,
-        content: s.content as WorkContent | EducationContent | SkillsContent,
-        displayOrder: s.display_order,
-      })),
-    };
-
-    // 3b. resume_snapshots.resume_id is NOT NULL — ensure a resume row exists
-    if (!resume && userId) {
-      const { data: newResume, error: resumeInsertError } = await supabase
-        .from("resumes")
-        .insert({
-          user_id: userId,
-          title: resumeData.personalInfo.name
-            ? `${resumeData.personalInfo.name}'s Resume`
-            : "My Resume",
-          personal_info: resumeData.personalInfo,
-        })
-        .select("id, personal_info")
-        .single();
-      if (resumeInsertError)
-        console.error("Resume insert error:", resumeInsertError);
-      resume = newResume;
+    // 2. The resume being bought: metadata.resumeId (ownership checked again
+    //    here), else the user's latest draft
+    let source: LoadedResume | null = null;
+    if (metaResumeId) {
+      source = await loadResume(supabase, metaResumeId);
+      if (source && source.userId !== userId) source = null;
     }
+    if (!source) {
+      const { data: latest } = await supabase
+        .from("resumes")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("purchased", false)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (latest) source = await loadResume(supabase, latest.id);
+    }
+    if (!source) throw new Error("No resume found to purchase");
 
-    // 4. Step 1 of circular FK fix: insert payment with snapshot_id = null
-    //    Status stays 'pending' until PDF is uploaded — processing page polls for 'completed'
+    // 3. Payment row with snapshot_id = null (circular FK); stays 'pending'
+    //    until the PDF is uploaded — the processing page polls for 'completed'
     if (paymentId) {
-      // Retry: back to pending, and drop the previous attempt's snapshot
+      // Retry: drop the previous attempt's purchased copy (cascades its snapshot)
+      const { data: oldSnaps } = await supabase
+        .from("resume_snapshots")
+        .select("resume_id")
+        .eq("payment_id", paymentId);
       await supabase
         .from("payments")
         .update({ status: "pending", snapshot_id: null })
@@ -159,6 +118,13 @@ export async function POST(request: Request) {
         .from("resume_snapshots")
         .delete()
         .eq("payment_id", paymentId);
+      const oldIds = (oldSnaps ?? []).map((s) => s.resume_id);
+      if (oldIds.length)
+        await supabase
+          .from("resumes")
+          .delete()
+          .in("id", oldIds)
+          .eq("purchased", true);
     } else {
       const { data: inserted, error: paymentError } = await supabase
         .from("payments")
@@ -180,21 +146,25 @@ export async function POST(request: Request) {
         );
       paymentId = inserted.id;
     }
+    if (!paymentId) throw new Error("Payment record missing");
     const payment = { id: paymentId };
 
-    // 5. Step 2: insert snapshot
-    if (!resume?.id)
-      throw new Error("Cannot create snapshot: resume record is missing");
-    // Measure only section content — must match what the download gate computes
+    // 4. This purchase's own resume + frozen snapshot of it
+    const purchaseResumeId = await createPurchasedResume(
+      supabase,
+      userId,
+      source.data,
+    );
+    // Measure only section content (kept for reference; the re-edit gate uses a word diff)
     const charCount = JSON.stringify(
-      resumeData.sections.map((s) => s.content),
+      source.data.sections.map((s) => s.content),
     ).length;
     const { data: snapshot, error: snapshotError } = await supabase
       .from("resume_snapshots")
       .insert({
-        resume_id: resume?.id,
+        resume_id: purchaseResumeId,
         payment_id: payment.id,
-        snapshot_data: resumeData,
+        snapshot_data: source.data,
         char_count: charCount,
       })
       .select("id")
@@ -203,13 +173,12 @@ export async function POST(request: Request) {
     if (snapshotError || !snapshot)
       throw new Error(`Failed to create snapshot: ${snapshotError?.message}`);
 
-    // 6. Step 3: link snapshot back to payment
     await supabase
       .from("payments")
       .update({ snapshot_id: snapshot.id })
       .eq("id", payment.id);
 
-    // 7. Generate PDF — look up slug from DB since templateId is a UUID
+    // 5. Generate + upload the PDF — look up slug since templateId is a UUID
     const { data: templateRow } = await supabase
       .from("templates")
       .select("slug")
@@ -217,31 +186,38 @@ export async function POST(request: Request) {
       .single();
 
     if (!templateRow) throw new Error(`Template not found: ${templateId}`);
-    const TemplateComponent = getTemplate(templateRow.slug);
-    const { renderToStaticMarkup } = await import("react-dom/server");
-    const html = renderToStaticMarkup(
-      createElement(TemplateComponent, { data: resumeData }),
-    );
-    const pdfBuffer = await generatePdfFromHtml(html);
+    await renderAndStorePdf(supabase, {
+      userId,
+      paymentId: payment.id,
+      slug: templateRow.slug,
+      data: source.data,
+    });
 
-    // 8. Upload PDF to Supabase Storage
-    const pdfPath = `resumes/${userId ?? "anon"}/${payment.id}.pdf`;
-    const { error: uploadError } = await supabase.storage
-      .from("pdfs")
-      .upload(pdfPath, pdfBuffer, {
-        contentType: "application/pdf",
-        upsert: true,
-      });
-    if (uploadError)
-      throw new Error(`PDF upload failed: ${uploadError.message}`);
-
-    // 9. Mark payment as completed — only now is the PDF ready for download
+    // 6. Mark payment as completed — only now is the PDF ready for download
     const { error: completeError } = await supabase
       .from("payments")
       .update({ status: "completed" })
       .eq("id", payment.id);
     if (completeError)
       throw new Error(`Failed to complete payment: ${completeError.message}`);
+
+    // 7. Bought from an edited purchase: the edits now live in the new purchase,
+    //    so the original goes back to what it was bought as
+    if (source.purchased) {
+      const { data: original } = await supabase
+        .from("resume_snapshots")
+        .select("snapshot_data")
+        .eq("resume_id", source.id)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (original)
+        await replaceResumeContent(
+          supabase,
+          source.id,
+          original.snapshot_data as ResumeData,
+        );
+    }
 
     return new Response("OK", { status: 200 });
   } catch (err) {

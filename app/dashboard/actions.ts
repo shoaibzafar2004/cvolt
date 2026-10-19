@@ -50,8 +50,20 @@ export async function deleteExpiredPurchase(
     return { ok: false, error: "Couldn't delete the PDF. Please try again." };
   }
 
+  // Delete the purchase's own resume; its snapshot cascades, and
   // payments.snapshot_id is ON DELETE SET NULL, so this also unlinks it.
   if (payment.snapshot_id) {
+    const { data: snapshot } = await service
+      .from("resume_snapshots")
+      .select("resume_id")
+      .eq("id", payment.snapshot_id)
+      .maybeSingle();
+    if (snapshot)
+      await service
+        .from("resumes")
+        .delete()
+        .eq("id", snapshot.resume_id)
+        .eq("purchased", true);
     await service
       .from("resume_snapshots")
       .delete()

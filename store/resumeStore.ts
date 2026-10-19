@@ -15,6 +15,8 @@ const defaultPersonalInfo: PersonalInfo = {
 
 interface ResumeStore {
   resumeId: string | null;
+  /** Set while editing a purchased resume (its payment id); null for drafts */
+  purchaseId: string | null;
   mode: "create" | "edit";
   personalInfo: PersonalInfo;
   sections: Section[];
@@ -25,7 +27,7 @@ interface ResumeStore {
   upsertSection: (section: Section) => void;
   removeSection: (id: string) => void;
   reorderSections: (type: SectionType, orderedIds: string[]) => void;
-  hydrate: (data: ResumeData, id: string) => void;
+  hydrate: (data: ResumeData, id: string, purchaseId?: string | null) => void;
   reset: () => void;
   markSaved: () => void;
 }
@@ -34,6 +36,7 @@ export const useResumeStore = create<ResumeStore>()(
   persist(
     (set) => ({
       resumeId: null,
+      purchaseId: null,
       mode: "create" as const,
       personalInfo: defaultPersonalInfo,
       sections: [],
@@ -68,9 +71,10 @@ export const useResumeStore = create<ResumeStore>()(
           isDirty: true,
         })),
 
-      hydrate: (data, id) =>
+      hydrate: (data, id, purchaseId = null) =>
         set({
           resumeId: id,
+          purchaseId,
           mode: "edit",
           personalInfo: data.personalInfo,
           sections: data.sections,
@@ -81,6 +85,7 @@ export const useResumeStore = create<ResumeStore>()(
       reset: () =>
         set({
           resumeId: null,
+          purchaseId: null,
           mode: "create",
           personalInfo: defaultPersonalInfo,
           sections: [],
@@ -95,6 +100,7 @@ export const useResumeStore = create<ResumeStore>()(
       // Only persist data — not transient UI flags
       partialize: (state) => ({
         resumeId: state.resumeId,
+        purchaseId: state.purchaseId,
         personalInfo: state.personalInfo,
         sections: state.sections,
       }),

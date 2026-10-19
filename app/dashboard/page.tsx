@@ -199,7 +199,7 @@ export default async function DashboardPage() {
               </p>
             </div>
             <Link
-              href="/build"
+              href="/build?new=1"
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-background transition-opacity hover:opacity-85"
               style={{ fontFamily: "var(--font-jost)" }}
             >
@@ -229,7 +229,7 @@ export default async function DashboardPage() {
               pixel-perfect PDF.
             </p>
             <Link
-              href="/build"
+              href="/build?new=1"
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition-opacity hover:opacity-85"
               style={{ fontFamily: "var(--font-jost)" }}
             >
