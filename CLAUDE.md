@@ -772,6 +772,8 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 
 ## Tests
 - Unit tests: Vitest, `tests/unit/**/*.test.ts(x)`, run with `npm test`. Shared resume fixtures in `tests/fixtures.ts`. `@/` resolves to the repo root; `server-only` is stubbed so server helpers (e.g. `lib/purchases.ts`) can be tested.
+- Integration tests: `npm run test:integration` (`tests/integration/`, `vitest.integration.config.ts`) call the real route handlers (Stripe webhook, `/api/download-pdf`) against the local Supabase stack — start it first (`npm run db:start`); URLs/keys come from `supabase status`. Webhook events are signed with Stripe's `generateTestHeaderString`; only the cookie-based `getUser()` is mocked. Each run uses a throwaway user and deletes everything it created. CI runs them in the Integration tests job (`supabase start` in Docker).
+- Tests never ship: nothing in `app/` imports `tests/`, so they aren't bundled, and `.vercelignore` keeps them out of deployments.
 - Add or update tests with any change to `lib/resume-diff.ts`, `lib/purchases.ts` (pure helpers), `lib/resume-format.ts`, schemas or templates.
 
 ## TypeScript

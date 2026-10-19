@@ -1,8 +1,10 @@
 name: CI
 
-# One job per check so each shows as its own status on the PR and they run in
-# parallel. If branch protection requires status checks, require these job
-# names: Format, Lint, Typecheck, Unit tests, Build.
+# One job per check so each shows as its own status on the PR. Format, Lint,
+# Typecheck, Unit tests and Integration tests run in parallel; Build (the
+# slowest) only runs once the four quick checks pass. If branch protection
+# requires status checks, require these job names: Format, Lint, Typecheck,
+# Unit tests, Integration tests, Build.
 on:
   pull_request:
     branches: [develop, main]
@@ -65,8 +67,25 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Local Supabase stack (migrations + seed) in Docker. Only the database,
+      # auth, REST, storage and the API gateway are needed.
+      - name: Start Supabase
+        run: npx supabase start -x realtime,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - run: npm run test:integration
+
   build:
     name: Build
+    needs: [format, lint, typecheck, test]
     runs-on: ubuntu-latest
     env:
       # Placeholders so `next build` can evaluate modules; no real services are called.
