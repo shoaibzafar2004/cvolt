@@ -16,6 +16,14 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -74,6 +82,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 300; src: url('/fonts/source-sans-300.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
+        ${printPageBackground(`${BG} ${LEFT_W}px, ${DIVIDER} ${LEFT_W}px ${LEFT_W + 1}px, ${BG} ${LEFT_W + 1}px`)}
       `,
         }}
       />
@@ -83,6 +92,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         style={{
           width: LEFT_W,
           padding: "40px 24px 40px 28px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
           flexShrink: 0,
           display: "flex",
@@ -212,7 +222,11 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 <span style={{ marginRight: 6 }}>
                   <PhoneIcon />
                 </span>
-                <span style={{ color: MUTED }}>{p.phone}</span>
+                <span style={{ color: MUTED }}>
+                  <ResumeLink href={p.phone} kind="phone">
+                    {p.phone}
+                  </ResumeLink>
+                </span>
               </div>
             )}
             {p.email && (
@@ -220,7 +234,11 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                 <span style={{ marginRight: 6 }}>
                   <MailIcon />
                 </span>
-                <span style={{ color: MUTED }}>{p.email}</span>
+                <span style={{ color: MUTED }}>
+                  <ResumeLink href={p.email} kind="email">
+                    {p.email}
+                  </ResumeLink>
+                </span>
               </div>
             )}
             {p.linkedIn && (
@@ -229,7 +247,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   <LinkedInIcon />
                 </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
-                  {p.linkedIn}
+                  <ResumeLink href={p.linkedIn}>{p.linkedIn}</ResumeLink>
                 </span>
               </div>
             )}
@@ -239,7 +257,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   <GitHubIcon />
                 </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
-                  {p.github}
+                  <ResumeLink href={p.github}>{p.github}</ResumeLink>
                 </span>
               </div>
             )}
@@ -249,7 +267,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                   <GlobeIcon />
                 </span>
                 <span style={{ color: MUTED, wordBreak: "break-all" }}>
-                  {p.website}
+                  <ResumeLink href={p.website}>{p.website}</ResumeLink>
                 </span>
               </div>
             )}
@@ -343,6 +361,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
         style={{
           width: RIGHT_W,
           padding: "40px 32px 40px 28px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
           borderLeft: `1px solid ${DIVIDER}`,
         }}
@@ -359,7 +378,6 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     display: "flex",
                     gap: 14,
                     marginBottom: 20,
-                    pageBreakInside: "avoid",
                   }}
                 >
                   {/* Circle marker */}
@@ -375,47 +393,50 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontWeight: 700,
-                        fontSize: 11.5,
-                        color: DARK,
-                      }}
-                    >
-                      {c.role}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontSize: 10.5,
-                        color: DARK,
-                        marginTop: 1,
-                      }}
-                    >
-                      {c.company}
-                    </div>
-                    {(c.startDate || c.endDate) && (
+                    <div style={KEEP_WITH_NEXT}>
                       <div
                         style={{
-                          fontFamily: '"Lora", serif',
-                          fontStyle: "italic",
-                          fontSize: 10,
-                          color: MUTED,
-                          marginTop: 2,
-                          marginBottom: 6,
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                          color: DARK,
                         }}
                       >
-                        {c.startDate}
-                        {c.endDate || c.current
-                          ? ` to ${c.current ? "Present" : c.endDate}`
-                          : ""}
+                        {c.role}
                       </div>
-                    )}
+                      <div
+                        style={{
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontSize: 10.5,
+                          color: DARK,
+                          marginTop: 1,
+                        }}
+                      >
+                        {c.company}
+                      </div>
+                      {(c.startDate || c.endDate) && (
+                        <div
+                          style={{
+                            fontFamily: '"Lora", serif',
+                            fontStyle: "italic",
+                            fontSize: 10,
+                            color: MUTED,
+                            marginTop: 2,
+                            marginBottom: 6,
+                          }}
+                        >
+                          {c.startDate}
+                          {c.endDate || c.current
+                            ? ` to ${c.current ? "Present" : c.endDate}`
+                            : ""}
+                        </div>
+                      )}
+                    </div>
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
+                          ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 8,
                           marginBottom: 3,
@@ -432,6 +453,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "4px 6px",
                           marginTop: 6,
@@ -475,7 +497,6 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     display: "flex",
                     gap: 14,
                     marginBottom: 20,
-                    pageBreakInside: "avoid",
                   }}
                 >
                   {/* Circle marker */}
@@ -491,54 +512,59 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontWeight: 700,
-                        fontSize: 11.5,
-                        color: DARK,
-                      }}
-                    >
-                      {proj.name}
-                    </div>
-                    {(meta || proj.url) && (
+                    <div style={KEEP_WITH_NEXT}>
                       <div
                         style={{
                           fontFamily: '"Source Sans 3", sans-serif',
-                          fontSize: 10.5,
+                          fontWeight: 700,
+                          fontSize: 11.5,
                           color: DARK,
-                          marginTop: 1,
                         }}
                       >
-                        {meta}
-                        {meta && proj.url ? " · " : ""}
-                        {proj.url && (
-                          <span style={{ color: ACCENT }}>
-                            {displayUrl(proj.url)}
-                          </span>
-                        )}
+                        {proj.name}
                       </div>
-                    )}
-                    {(dates || proj.description) && (
-                      <div
-                        style={{
-                          fontFamily: '"Lora", serif',
-                          fontStyle: "italic",
-                          fontSize: 10,
-                          color: MUTED,
-                          marginTop: 2,
-                          marginBottom: 6,
-                        }}
-                      >
-                        {dates}
-                        {dates && proj.description ? " — " : ""}
-                        {proj.description}
-                      </div>
-                    )}
+                      {(meta || proj.url) && (
+                        <div
+                          style={{
+                            fontFamily: '"Source Sans 3", sans-serif',
+                            fontSize: 10.5,
+                            color: DARK,
+                            marginTop: 1,
+                          }}
+                        >
+                          {meta}
+                          {meta && proj.url ? " · " : ""}
+                          {proj.url && (
+                            <span style={{ color: ACCENT }}>
+                              <ResumeLink href={proj.url}>
+                                {displayUrl(proj.url)}
+                              </ResumeLink>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {(dates || proj.description) && (
+                        <div
+                          style={{
+                            fontFamily: '"Lora", serif',
+                            fontStyle: "italic",
+                            fontSize: 10,
+                            color: MUTED,
+                            marginTop: 2,
+                            marginBottom: 6,
+                          }}
+                        >
+                          {dates}
+                          {dates && proj.description ? " — " : ""}
+                          {proj.description}
+                        </div>
+                      )}
+                    </div>
                     {proj.bullets.filter(Boolean).map((b, j) => (
                       <div
                         key={j}
                         style={{
+                          ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 8,
                           marginBottom: 3,
@@ -555,6 +581,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "4px 6px",
                           marginTop: 6,
@@ -597,7 +624,7 @@ export default function ElegantTemplate({ data }: { data: ResumeData }) {
                     display: "flex",
                     gap: 14,
                     marginBottom: 18,
-                    pageBreakInside: "avoid",
+                    ...NO_SPLIT,
                   }}
                 >
                   <div style={{ flexShrink: 0, marginTop: 3 }}>
@@ -682,6 +709,7 @@ function LeftSection({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 13,
           fontWeight: 600,
@@ -707,6 +735,7 @@ function RightSection({
     <div style={{ marginBottom: 26 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 16,
           fontWeight: 600,

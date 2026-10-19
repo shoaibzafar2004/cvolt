@@ -16,6 +16,14 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -111,6 +119,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 400; src: url('/fonts/libre-franklin-400.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 600; src: url('/fonts/libre-franklin-600.woff2') format('woff2'); }
         @font-face { font-family: 'Libre Franklin'; font-style: normal; font-weight: 700; src: url('/fonts/libre-franklin-700.woff2') format('woff2'); }
+        ${printPageBackground(`#ffffff ${PAD + LEFT_W + GAP}px, ${RULE} ${PAD + LEFT_W + GAP}px ${PAD + LEFT_W + GAP + 1}px, #ffffff ${PAD + LEFT_W + GAP + 1}px`)}
       `,
         }}
       />
@@ -175,6 +184,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
           display: "flex",
           gap: GAP,
           padding: `32px ${PAD}px 40px`,
+          ...REPEAT_PADDING,
           flex: 1,
         }}
       >
@@ -191,54 +201,56 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                     key={s.id}
                     style={{
                       marginBottom: idx < work.length - 1 ? 18 : 0,
-                      pageBreakInside: "avoid",
                     }}
                   >
-                    {/* Role title */}
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: BODY,
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        marginBottom: 1,
-                      }}
-                    >
-                      {c.role}
-                    </div>
-                    {/* Company */}
-                    <div
-                      style={{
-                        fontSize: 10.5,
-                        fontWeight: 600,
-                        color: ACCENT,
-                        marginBottom: 1,
-                      }}
-                    >
-                      {c.company}
-                    </div>
-                    {/* Dates */}
-                    {(c.startDate || c.endDate || c.current) && (
+                    <div style={KEEP_WITH_NEXT}>
+                      {/* Role title */}
                       <div
                         style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          marginBottom: 6,
-                          fontStyle: "italic",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: BODY,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          marginBottom: 1,
                         }}
                       >
-                        {c.startDate}
-                        {c.startDate && (c.current || c.endDate)
-                          ? ` – ${c.current ? "Present" : c.endDate}`
-                          : ""}
+                        {c.role}
                       </div>
-                    )}
-                    {/* Bullets */}
+                      {/* Company */}
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          fontWeight: 600,
+                          color: ACCENT,
+                          marginBottom: 1,
+                        }}
+                      >
+                        {c.company}
+                      </div>
+                      {/* Dates */}
+                      {(c.startDate || c.endDate || c.current) && (
+                        <div
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            marginBottom: 6,
+                            fontStyle: "italic",
+                          }}
+                        >
+                          {c.startDate}
+                          {c.startDate && (c.current || c.endDate)
+                            ? ` – ${c.current ? "Present" : c.endDate}`
+                            : ""}
+                        </div>
+                      )}
+                      {/* Bullets */}
+                    </div>
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
+                          ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 7,
                           marginBottom: 3,
@@ -259,6 +271,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "3px 5px",
                           marginTop: 5,
@@ -297,67 +310,71 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                     key={i}
                     style={{
                       marginBottom: i < projects.length - 1 ? 18 : 0,
-                      pageBreakInside: "avoid",
                     }}
                   >
-                    {/* Name */}
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: BODY,
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        marginBottom: 1,
-                      }}
-                    >
-                      {proj.name}
-                    </div>
-                    {/* Role · type */}
-                    {meta && (
+                    <div style={KEEP_WITH_NEXT}>
+                      {/* Name */}
                       <div
                         style={{
-                          fontSize: 10.5,
-                          fontWeight: 600,
-                          color: ACCENT,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: BODY,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
                           marginBottom: 1,
                         }}
                       >
-                        {meta}
+                        {proj.name}
                       </div>
-                    )}
-                    {/* Dates · link */}
-                    {(dates || proj.url) && (
-                      <div
-                        style={{
-                          fontSize: 9.5,
-                          color: MUTED,
-                          marginBottom: 6,
-                          fontStyle: "italic",
-                        }}
-                      >
-                        {dates}
-                        {dates && proj.url ? " · " : ""}
-                        {displayUrl(proj.url)}
-                      </div>
-                    )}
-                    {proj.description && (
-                      <div
-                        style={{
-                          fontSize: 10.5,
-                          lineHeight: 1.65,
-                          color: BODY,
-                          marginBottom: 3,
-                        }}
-                      >
-                        {proj.description}
-                      </div>
-                    )}
-                    {/* Bullets */}
+                      {/* Role · type */}
+                      {meta && (
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            fontWeight: 600,
+                            color: ACCENT,
+                            marginBottom: 1,
+                          }}
+                        >
+                          {meta}
+                        </div>
+                      )}
+                      {/* Dates · link */}
+                      {(dates || proj.url) && (
+                        <div
+                          style={{
+                            fontSize: 9.5,
+                            color: MUTED,
+                            marginBottom: 6,
+                            fontStyle: "italic",
+                          }}
+                        >
+                          {dates}
+                          {dates && proj.url ? " · " : ""}
+                          <ResumeLink href={proj.url}>
+                            {displayUrl(proj.url)}
+                          </ResumeLink>
+                        </div>
+                      )}
+                      {proj.description && (
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            lineHeight: 1.65,
+                            color: BODY,
+                            marginBottom: 3,
+                          }}
+                        >
+                          {proj.description}
+                        </div>
+                      )}
+                      {/* Bullets */}
+                    </div>
                     {proj.bullets.filter(Boolean).map((b, j) => (
                       <div
                         key={j}
                         style={{
+                          ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 7,
                           marginBottom: 3,
@@ -378,6 +395,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "3px 5px",
                           marginTop: 5,
@@ -415,7 +433,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                     key={s.id}
                     style={{
                       marginBottom: idx < education.length - 1 ? 14 : 0,
-                      pageBreakInside: "avoid",
+                      ...NO_SPLIT,
                     }}
                   >
                     {/* Dates */}
@@ -478,6 +496,8 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<PhoneIcon />}
                   text={p.phone}
+                  href={p.phone}
+                  kind="phone"
                   accent={ACCENT}
                 />
               )}
@@ -485,6 +505,8 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<MailIcon />}
                   text={p.email}
+                  href={p.email}
+                  kind="email"
                   accent={ACCENT}
                   wrap
                 />
@@ -500,6 +522,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<LinkedInIcon />}
                   text={p.linkedIn}
+                  href={p.linkedIn}
                   accent={ACCENT}
                   wrap
                 />
@@ -508,6 +531,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<GitHubIcon />}
                   text={p.github}
+                  href={p.github}
                   accent={ACCENT}
                   wrap
                 />
@@ -516,6 +540,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
                 <ContactRow
                   icon={<GlobeIcon />}
                   text={p.website}
+                  href={p.website}
                   accent={ACCENT}
                   wrap
                 />
@@ -612,10 +637,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
             <div style={{ marginBottom: 26 }}>
               <ColHeading title="Certifications" accent={ACCENT} />
               {certs.map((c, i) => (
-                <div
-                  key={i}
-                  style={{ marginBottom: 10, pageBreakInside: "avoid" }}
-                >
+                <div key={i} style={{ marginBottom: 10, ...NO_SPLIT }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: BODY }}>
                     {c.name}
                   </div>
@@ -655,7 +677,7 @@ export default function BoldHeaderTemplate({ data }: { data: ResumeData }) {
 // Section heading: bold uppercase + thin line extending right
 function ColHeading({ title, accent }: { title: string; accent: string }) {
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ ...KEEP_WITH_NEXT, marginBottom: 14 }}>
       <div
         style={{
           display: "flex",
@@ -686,11 +708,15 @@ function ColHeading({ title, accent }: { title: string; accent: string }) {
 function ContactRow({
   icon,
   text,
+  href,
+  kind,
   accent,
   wrap,
 }: {
   icon: React.ReactNode;
   text: string;
+  href?: string;
+  kind?: "url" | "email" | "phone";
   accent: string;
   wrap?: boolean;
 }) {
@@ -723,7 +749,9 @@ function ContactRow({
           marginTop: 3,
         }}
       >
-        {text}
+        <ResumeLink href={href} kind={kind}>
+          {text}
+        </ResumeLink>
       </span>
     </div>
   );

@@ -16,6 +16,8 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
+import { KEEP_WITH_NEXT, KEEP_WITH_PREV, NO_SPLIT } from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -167,10 +169,22 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
           }}
         >
           {p.phone && (
-            <ContactRow icon={<PhoneIcon />} text={p.phone} accent={ACCENT} />
+            <ContactRow
+              icon={<PhoneIcon />}
+              text={p.phone}
+              href={p.phone}
+              kind="phone"
+              accent={ACCENT}
+            />
           )}
           {p.email && (
-            <ContactRow icon={<MailIcon />} text={p.email} accent={ACCENT} />
+            <ContactRow
+              icon={<MailIcon />}
+              text={p.email}
+              href={p.email}
+              kind="email"
+              accent={ACCENT}
+            />
           )}
           {p.location && (
             <ContactRow icon={<PinIcon />} text={p.location} accent={ACCENT} />
@@ -179,14 +193,25 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
             <ContactRow
               icon={<LinkedInIcon />}
               text={p.linkedIn}
+              href={p.linkedIn}
               accent={ACCENT}
             />
           )}
           {p.github && (
-            <ContactRow icon={<GitHubIcon />} text={p.github} accent={ACCENT} />
+            <ContactRow
+              icon={<GitHubIcon />}
+              text={p.github}
+              href={p.github}
+              accent={ACCENT}
+            />
           )}
           {p.website && (
-            <ContactRow icon={<GlobeIcon />} text={p.website} accent={ACCENT} />
+            <ContactRow
+              icon={<GlobeIcon />}
+              text={p.website}
+              href={p.website}
+              accent={ACCENT}
+            />
           )}
         </div>
       </div>
@@ -238,56 +263,58 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                     key={s.id}
                     style={{
                       marginBottom: idx < work.length - 1 ? 12 : 0,
-                      pageBreakInside: "avoid",
                     }}
                   >
-                    {/* Date + Company */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "baseline",
-                        marginBottom: 2,
-                      }}
-                    >
-                      <span
+                    <div style={KEEP_WITH_NEXT}>
+                      {/* Date + Company */}
+                      <div
                         style={{
-                          fontSize: 9.5,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          marginBottom: 2,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.8,
+                            color: ACCENT,
+                          }}
+                        >
+                          {dateStr}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 10,
+                            color: MUTED,
+                            flexShrink: 0,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {c.company}
+                        </span>
+                      </div>
+                      {/* Role */}
+                      <div
+                        style={{
+                          fontSize: 12,
                           fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: 0.8,
-                          color: ACCENT,
+                          color: "#55565c",
+                          marginBottom: 6,
                         }}
                       >
-                        {dateStr}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          color: MUTED,
-                          flexShrink: 0,
-                          marginLeft: 8,
-                        }}
-                      >
-                        {c.company}
-                      </span>
+                        {c.role}
+                      </div>
+                      {/* Bullets — square markers */}
                     </div>
-                    {/* Role */}
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: "#55565c",
-                        marginBottom: 6,
-                      }}
-                    >
-                      {c.role}
-                    </div>
-                    {/* Bullets — square markers */}
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
+                          ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 8,
                           marginBottom: 3,
@@ -314,6 +341,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "3px 6px",
                           marginTop: 6,
@@ -352,77 +380,85 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                     key={i}
                     style={{
                       marginBottom: i < projects.length - 1 ? 12 : 0,
-                      pageBreakInside: "avoid",
                     }}
                   >
-                    {/* Date + role/type */}
-                    {(dates || meta) && (
+                    <div style={KEEP_WITH_NEXT}>
+                      {/* Date + role/type */}
+                      {(dates || meta) && (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "baseline",
+                            marginBottom: 2,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: 9.5,
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                              letterSpacing: 0.8,
+                              color: ACCENT,
+                            }}
+                          >
+                            {dates}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              color: MUTED,
+                              flexShrink: 0,
+                              marginLeft: 8,
+                            }}
+                          >
+                            {meta}
+                          </span>
+                        </div>
+                      )}
+                      {/* Name */}
                       <div
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "baseline",
-                          marginBottom: 2,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "#55565c",
+                          marginBottom: proj.url ? 1 : 6,
                         }}
                       >
-                        <span
+                        {proj.name}
+                      </div>
+                      {proj.url && (
+                        <div
                           style={{
                             fontSize: 9.5,
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: 0.8,
-                            color: ACCENT,
-                          }}
-                        >
-                          {dates}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 10,
                             color: MUTED,
-                            flexShrink: 0,
-                            marginLeft: 8,
+                            marginBottom: 6,
                           }}
                         >
-                          {meta}
-                        </span>
-                      </div>
-                    )}
-                    {/* Name */}
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: "#55565c",
-                        marginBottom: proj.url ? 1 : 6,
-                      }}
-                    >
-                      {proj.name}
+                          <ResumeLink href={proj.url}>
+                            {displayUrl(proj.url)}
+                          </ResumeLink>
+                        </div>
+                      )}
+                      {proj.description && (
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            lineHeight: 1.4,
+                            color: BODY,
+                            marginBottom: 3,
+                          }}
+                        >
+                          {proj.description}
+                        </div>
+                      )}
+                      {/* Bullets — square markers */}
                     </div>
-                    {proj.url && (
-                      <div
-                        style={{ fontSize: 9.5, color: MUTED, marginBottom: 6 }}
-                      >
-                        {displayUrl(proj.url)}
-                      </div>
-                    )}
-                    {proj.description && (
-                      <div
-                        style={{
-                          fontSize: 10.5,
-                          lineHeight: 1.4,
-                          color: BODY,
-                          marginBottom: 3,
-                        }}
-                      >
-                        {proj.description}
-                      </div>
-                    )}
-                    {/* Bullets — square markers */}
                     {proj.bullets.filter(Boolean).map((b, j) => (
                       <div
                         key={j}
                         style={{
+                          ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 8,
                           marginBottom: 3,
@@ -449,6 +485,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "3px 6px",
                           marginTop: 6,
@@ -495,7 +532,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
                     key={s.id}
                     style={{
                       marginBottom: idx < education.length - 1 ? 14 : 0,
-                      pageBreakInside: "avoid",
+                      ...NO_SPLIT,
                     }}
                   >
                     {dateStr && (
@@ -615,10 +652,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
             <div style={{ marginBottom: 18 }}>
               <SectionHeading title="Certifications" accent={ACCENT} />
               {certs.map((c, i) => (
-                <div
-                  key={i}
-                  style={{ marginBottom: 10, pageBreakInside: "avoid" }}
-                >
+                <div key={i} style={{ marginBottom: 10, ...NO_SPLIT }}>
                   {c.date && (
                     <div
                       style={{
@@ -661,7 +695,7 @@ export default function GeometricTemplate({ data }: { data: ResumeData }) {
 
 function SectionHeading({ title, accent }: { title: string; accent: string }) {
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ ...KEEP_WITH_NEXT, marginBottom: 10 }}>
       <div
         style={{
           display: "flex",
@@ -698,10 +732,14 @@ function SectionHeading({ title, accent }: { title: string; accent: string }) {
 function ContactRow({
   icon,
   text,
+  href,
+  kind,
   accent,
 }: {
   icon: React.ReactNode;
   text: string;
+  href?: string;
+  kind?: "url" | "email" | "phone";
   accent: string;
 }) {
   return (
@@ -719,7 +757,9 @@ function ContactRow({
           lineHeight: 1.4,
         }}
       >
-        {text}
+        <ResumeLink href={href} kind={kind}>
+          {text}
+        </ResumeLink>
       </span>
     </div>
   );

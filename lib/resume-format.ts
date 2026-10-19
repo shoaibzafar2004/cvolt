@@ -28,3 +28,14 @@ export function projectMeta(p: ProjectContent): string {
 export function displayUrl(url?: string): string {
   return (url ?? "").replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
+
+/** href for a contact value or URL: mailto:/tel: for email and phone, https:// added when missing. */
+export function linkHref(
+  value: string,
+  kind: "url" | "email" | "phone" = "url",
+): string {
+  const v = value.trim();
+  if (kind === "email") return `mailto:${v}`;
+  if (kind === "phone") return `tel:${v.replace(/[^\d+]/g, "")}`;
+  return /^[a-z][a-z\d+.-]*:/i.test(v) ? v : `https://${v}`;
+}

@@ -16,6 +16,14 @@ import {
   PhoneIcon,
   PinIcon,
 } from "./ContactIcons";
+import ResumeLink from "./ResumeLink";
+import {
+  KEEP_WITH_NEXT,
+  KEEP_WITH_PREV,
+  NO_SPLIT,
+  REPEAT_PADDING,
+  printPageBackground,
+} from "./pagination";
 import { displayUrl, projectDates, projectMeta } from "@/lib/resume-format";
 
 // RULES: Inline styles ONLY. No Tailwind. No hooks. No fetches.
@@ -111,6 +119,7 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 300; src: url('/fonts/source-sans-300.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; src: url('/fonts/source-sans-400.woff2') format('woff2'); }
         @font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; src: url('/fonts/source-sans-600.woff2') format('woff2'); }
+        ${printPageBackground(`${SIDEBAR_BG} ${LEFT_W}px, ${CREAM} ${LEFT_W}px`)}
       `,
         }}
       />
@@ -121,6 +130,7 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
           width: LEFT_W,
           backgroundColor: SIDEBAR_BG,
           padding: "40px 22px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
           flexShrink: 0,
           display: "flex",
@@ -227,27 +237,36 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
             )}
             {p.phone && (
               <div>
-                <PhoneIcon /> {p.phone}
+                <PhoneIcon />{" "}
+                <ResumeLink href={p.phone} kind="phone">
+                  {p.phone}
+                </ResumeLink>
               </div>
             )}
             {p.email && (
               <div style={{ wordBreak: "break-all" }}>
-                <MailIcon /> {p.email}
+                <MailIcon />{" "}
+                <ResumeLink href={p.email} kind="email">
+                  {p.email}
+                </ResumeLink>
               </div>
             )}
             {p.linkedIn && (
               <div style={{ wordBreak: "break-all", marginTop: 4 }}>
-                <LinkedInIcon /> {p.linkedIn}
+                <LinkedInIcon />{" "}
+                <ResumeLink href={p.linkedIn}>{p.linkedIn}</ResumeLink>
               </div>
             )}
             {p.github && (
               <div style={{ wordBreak: "break-all" }}>
-                <GitHubIcon /> {p.github}
+                <GitHubIcon />{" "}
+                <ResumeLink href={p.github}>{p.github}</ResumeLink>
               </div>
             )}
             {p.website && (
               <div style={{ wordBreak: "break-all" }}>
-                <GlobeIcon /> {p.website}
+                <GlobeIcon />{" "}
+                <ResumeLink href={p.website}>{p.website}</ResumeLink>
               </div>
             )}
           </div>
@@ -289,7 +308,7 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                     marginBottom: 12,
                     fontFamily: '"Source Sans 3", sans-serif',
                     fontSize: 9.5,
-                    pageBreakInside: "avoid",
+                    ...NO_SPLIT,
                   }}
                 >
                   <div
@@ -410,6 +429,7 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
           width: RIGHT_W,
           backgroundColor: CREAM,
           padding: "40px 32px",
+          ...REPEAT_PADDING,
           boxSizing: "border-box",
         }}
       >
@@ -425,7 +445,6 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                     display: "flex",
                     gap: 14,
                     marginBottom: 18,
-                    pageBreakInside: "avoid",
                   }}
                 >
                   <div style={{ paddingTop: 4, flexShrink: 0 }}>
@@ -440,47 +459,50 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontWeight: 700,
-                        fontSize: 11.5,
-                        color: DARK,
-                      }}
-                    >
-                      {c.role}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontSize: 10.5,
-                        color: DARK,
-                        marginTop: 1,
-                      }}
-                    >
-                      {c.company}
-                    </div>
-                    {(c.startDate || c.endDate || c.current) && (
+                    <div style={KEEP_WITH_NEXT}>
                       <div
                         style={{
-                          fontFamily: '"Lora", serif',
-                          fontStyle: "italic",
-                          fontSize: 10,
-                          color: MUTED,
-                          marginTop: 2,
-                          marginBottom: 5,
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                          color: DARK,
                         }}
                       >
-                        {c.startDate}
-                        {c.startDate && (c.current || c.endDate)
-                          ? ` to ${c.current ? "Present" : c.endDate}`
-                          : ""}
+                        {c.role}
                       </div>
-                    )}
+                      <div
+                        style={{
+                          fontFamily: '"Source Sans 3", sans-serif',
+                          fontSize: 10.5,
+                          color: DARK,
+                          marginTop: 1,
+                        }}
+                      >
+                        {c.company}
+                      </div>
+                      {(c.startDate || c.endDate || c.current) && (
+                        <div
+                          style={{
+                            fontFamily: '"Lora", serif',
+                            fontStyle: "italic",
+                            fontSize: 10,
+                            color: MUTED,
+                            marginTop: 2,
+                            marginBottom: 5,
+                          }}
+                        >
+                          {c.startDate}
+                          {c.startDate && (c.current || c.endDate)
+                            ? ` to ${c.current ? "Present" : c.endDate}`
+                            : ""}
+                        </div>
+                      )}
+                    </div>
                     {c.bullets.filter(Boolean).map((b, i) => (
                       <div
                         key={i}
                         style={{
+                          ...(i === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 8,
                           marginBottom: 3,
@@ -497,6 +519,7 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "4px 6px",
                           marginTop: 6,
@@ -540,7 +563,6 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                     display: "flex",
                     gap: 14,
                     marginBottom: 18,
-                    pageBreakInside: "avoid",
                   }}
                 >
                   <div style={{ paddingTop: 4, flexShrink: 0 }}>
@@ -555,54 +577,59 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontFamily: '"Source Sans 3", sans-serif',
-                        fontWeight: 700,
-                        fontSize: 11.5,
-                        color: DARK,
-                      }}
-                    >
-                      {proj.name}
-                    </div>
-                    {(meta || proj.url) && (
+                    <div style={KEEP_WITH_NEXT}>
                       <div
                         style={{
                           fontFamily: '"Source Sans 3", sans-serif',
-                          fontSize: 10.5,
+                          fontWeight: 700,
+                          fontSize: 11.5,
                           color: DARK,
-                          marginTop: 1,
                         }}
                       >
-                        {meta}
-                        {meta && proj.url ? " · " : ""}
-                        {proj.url && (
-                          <span style={{ color: ACCENT }}>
-                            {displayUrl(proj.url)}
-                          </span>
-                        )}
+                        {proj.name}
                       </div>
-                    )}
-                    {(dates || proj.description) && (
-                      <div
-                        style={{
-                          fontFamily: '"Lora", serif',
-                          fontStyle: "italic",
-                          fontSize: 10,
-                          color: MUTED,
-                          marginTop: 2,
-                          marginBottom: 5,
-                        }}
-                      >
-                        {dates}
-                        {dates && proj.description ? " — " : ""}
-                        {proj.description}
-                      </div>
-                    )}
+                      {(meta || proj.url) && (
+                        <div
+                          style={{
+                            fontFamily: '"Source Sans 3", sans-serif',
+                            fontSize: 10.5,
+                            color: DARK,
+                            marginTop: 1,
+                          }}
+                        >
+                          {meta}
+                          {meta && proj.url ? " · " : ""}
+                          {proj.url && (
+                            <span style={{ color: ACCENT }}>
+                              <ResumeLink href={proj.url}>
+                                {displayUrl(proj.url)}
+                              </ResumeLink>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {(dates || proj.description) && (
+                        <div
+                          style={{
+                            fontFamily: '"Lora", serif',
+                            fontStyle: "italic",
+                            fontSize: 10,
+                            color: MUTED,
+                            marginTop: 2,
+                            marginBottom: 5,
+                          }}
+                        >
+                          {dates}
+                          {dates && proj.description ? " — " : ""}
+                          {proj.description}
+                        </div>
+                      )}
+                    </div>
                     {proj.bullets.filter(Boolean).map((b, j) => (
                       <div
                         key={j}
                         style={{
+                          ...(j === 0 ? KEEP_WITH_PREV : NO_SPLIT),
                           display: "flex",
                           gap: 8,
                           marginBottom: 3,
@@ -619,6 +646,7 @@ export default function ElegantDarkTemplate({ data }: { data: ResumeData }) {
                       <div
                         style={{
                           display: "flex",
+                          ...NO_SPLIT,
                           flexWrap: "wrap",
                           gap: "4px 6px",
                           marginTop: 6,
@@ -668,6 +696,7 @@ function SideSection({
     <div style={{ marginBottom: 22 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 11,
           fontWeight: 600,
@@ -695,6 +724,7 @@ function RightSection({
     <div style={{ marginBottom: 24 }}>
       <div
         style={{
+          ...KEEP_WITH_NEXT,
           fontFamily: '"Lora", serif',
           fontSize: 15,
           fontWeight: 600,
@@ -704,7 +734,14 @@ function RightSection({
       >
         {title}
       </div>
-      <div style={{ height: 1, backgroundColor: DIVIDER, marginBottom: 14 }} />
+      <div
+        style={{
+          ...KEEP_WITH_NEXT,
+          height: 1,
+          backgroundColor: DIVIDER,
+          marginBottom: 14,
+        }}
+      />
       {children}
     </div>
   );
