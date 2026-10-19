@@ -37,7 +37,9 @@ export default async function EditPage({ params }: Props) {
 
   const { data: snapshot } = await supabase
     .from("resume_snapshots")
-    .select("payment_id")
+    .select(
+      "payment_id, payments!resume_snapshots_payment_id_fkey ( template_id )",
+    )
     .eq("resume_id", resume.id)
     .order("created_at", { ascending: true })
     .limit(1)
@@ -50,6 +52,13 @@ export default async function EditPage({ params }: Props) {
     <EditFormShell
       resumeId={resume.id}
       paymentId={snapshot.payment_id}
+      templateId={
+        (
+          (Array.isArray(snapshot.payments)
+            ? snapshot.payments[0]
+            : snapshot.payments) as { template_id: string } | null
+        )?.template_id ?? ""
+      }
       resumeData={resumeData}
     />
   );

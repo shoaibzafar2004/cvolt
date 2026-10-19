@@ -323,6 +323,8 @@ The page is a React Server Component. It fetches the resume server-side, checks 
 **Re-download / free re-edit gate (`/dashboard/download/[id]`, enforced again in `/api/download-pdf/[paymentId]`):**
 - Within 30 days of purchase, and word-level change ≤10% of the purchased snapshot (cumulative, `lib/resume-diff.ts`) → free: the PDF is re-rendered when `payments.pdf_hash` no longer matches, then served.
 - Otherwise → "Buy as a new resume": paying creates a new purchase with the edited content, and the original purchase reverts to what was bought.
+- A purchase always renders with its own template (`payments.template_id`). Colour theme (`personalInfo.theme`) changes on that template are free and don't count toward the 10%. Picking a different template while editing a purchase is a new purchase (new resume) — the gallery, template page and checkout say so (`resumeStore.purchaseId` / `purchaseTemplateId`).
+- `ThemePicker` saves the theme to the resume row as well as the store — PDFs are rendered from the DB copy.
 
 ---
 

@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useUIStore } from "@/store/uiStore";
+import { useResumeStore } from "@/store/resumeStore";
 import FilterBar from "@/components/templates/FilterBar";
 import TemplateCard from "@/components/templates/TemplateCard";
 import type { Template, Payment } from "@/types";
@@ -15,6 +17,7 @@ export default function TemplateGallery({
   payments,
 }: TemplateGalleryProps) {
   const { activeFilter } = useUIStore();
+  const purchaseId = useResumeStore((s) => s.purchaseId);
 
   const filtered =
     activeFilter === "all"
@@ -23,6 +26,20 @@ export default function TemplateGallery({
 
   return (
     <div className="space-y-6">
+      {purchaseId && (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+          You&apos;re editing a purchased resume. Its own template updates for
+          free (
+          <Link
+            href={`/dashboard/download/${purchaseId}`}
+            className="font-medium underline underline-offset-2"
+          >
+            get the updated PDF
+          </Link>
+          ); any other template is a new $1.50 purchase and is added as a new
+          resume.
+        </p>
+      )}
       <FilterBar />
 
       {filtered.length === 0 ? (
