@@ -125,6 +125,8 @@ stripe listen --forward-to localhost:3000/api/webhook/stripe
 | `npm run build`                   | Production build                             |
 | `npm run lint`                    | ESLint                                       |
 | `npm run typecheck`               | TypeScript check (`tsc --noEmit`)            |
+| `npm test`                        | Unit tests (Vitest, `tests/unit/`)           |
+| `npm run test:watch`              | Unit tests in watch mode                     |
 | `npm run format`                  | Format all files with Prettier               |
 | `npm run format:check`            | Check formatting without writing (CI)        |
 | `node scripts/download-fonts.mjs` | Download template fonts into `public/fonts/` |
