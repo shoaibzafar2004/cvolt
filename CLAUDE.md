@@ -46,6 +46,7 @@ Six tables. All IDs are UUIDs. **Source of truth: `supabase/migrations/`** — t
 | id | uuid | PK |
 | user_id | uuid | FK → users |
 | title | text | e.g. "Software Engineer Resume" |
+| purchased | boolean | false = a /build draft; true = the resume owned by one purchase (copied by the webhook, linked via `resume_snapshots.resume_id`) |
 | personal_info | jsonb | name, email, phone, location, LinkedIn, GitHub, website |
 | created_at | timestamp | |
 | updated_at | timestamp | |
@@ -85,6 +86,7 @@ Six tables. All IDs are UUIDs. **Source of truth: `supabase/migrations/`** — t
 | status | text | 'pending', 'completed', 'failed' |
 | purchased_at | timestamp | |
 | expires_at | timestamp | 30 days from purchase |
+| pdf_hash | text | Hash of the template + resume content the stored PDF was rendered from; a free re-edit re-renders when it no longer matches |
 | deleted_at | timestamp | Nullable. Set when the user deletes an expired purchase from the dashboard (row kept for reconciliation; PDF + snapshot are deleted). All payment queries filter `deleted_at is null` |
 
 ### resume_snapshots
@@ -126,7 +128,7 @@ cvolt/
 │   │   ├── actions.ts                  # Server actions: deleteExpiredPurchase
 │   │   ├── DeleteResumeButton.tsx      # Delete + confirm dialog (client)
 │   │   ├── edit/[id]/                  # [id] = resume id. page.tsx (server) → EditFormShell.tsx (client)
-│   │   └── download/[id]/page.tsx      # Re-download gate
+│   │   └── download/[id]/page.tsx      # Re-download / free re-edit gate
 │   ├── api/
 │   │   ├── generate-pdf/route.ts
 │   │   ├── download-pdf/[paymentId]/route.ts
@@ -158,6 +160,9 @@ cvolt/
 │   ├── pdf.ts                          # Puppeteer + chromium
 │   ├── schemas.ts                      # All Zod schemas
 │   ├── payments.ts                     # Stripe + Safepay helpers
+│   ├── purchases.ts                    # Server: purchase lookup, resume copy/revert, PDF render+store, re-edit status
+│   ├── resume-diff.ts                  # Word-level change ratio + FREE_EDIT_LIMIT (10%)
+│   ├── load-draft.ts                   # Client: load latest draft from DB into the store
 │   ├── templates.ts                    # Registry: slug → component, plus per-template themes
 │   ├── build-steps.ts                  # BUILD_STEPS / TOTAL_STEPS — single source for the /build steps
 │   ├── resume-format.ts                # Template display helpers: dateRange, projectMeta, displayUrl
@@ -223,7 +228,7 @@ cvolt/
 |---|---|
 | `/dashboard` | Purchased resumes. Active: Edit (→ `/dashboard/edit/[resumeId]`) + Download. Expired: Delete only (confirm dialog → `deleteExpiredPurchase` server action in `app/dashboard/actions.ts`) |
 | `/dashboard/edit/[id]` | Same multi-step form as /build but pre-filled. Hydrates Zustand from Supabase on mount |
-| `/dashboard/download/[id]` | Gate: within 30 days + diff under 10%? Serve PDF. Expired? → /checkout. High diff? → /checkout |
+| `/dashboard/download/[id]` | Gate: within 30 days + word diff ≤10% vs the purchased snapshot? Serve the PDF, re-rendered with the edits. Otherwise offer "Buy as a new resume" → /checkout?resumeId= |
 | `/login` | Magic link only. Email input → "Check your inbox" → redirect to /dashboard |
 
 ### Static / utility
@@ -313,14 +318,15 @@ API route: `POST /api/generate-pdf`
 1. User submits checkout form
 2. Payment intent created server-side
 3. Stripe/Safepay webhook fires on success
-4. Webhook: create (or reuse) payment record → freeze resume snapshot → generate PDF → upload to storage → mark completed
+4. Webhook: create (or reuse) payment record → copy the resume being bought into a new purchased resume → freeze snapshot → generate PDF → upload → mark completed → if the source was a re-edited purchase, revert it to its own snapshot
 5. Processing page polls status → redirects to /success
 6. /success shows download button + 30-day countdown
 
-**Re-download gate (`/dashboard/download/[id]`):**
-- Check 1: within 30 days of purchase?
-- Check 2: resume diff under 10% from snapshot char count?
-- Both pass → serve PDF. Either fails → redirect to /checkout.
+**Purchases own their resume.** Every completed payment gets its own resume (`resumes.purchased = true`); the /build draft and other purchases are never affected by editing it. Dashboard "Edit" edits that purchase's resume (`/dashboard/edit/[resumeId]`, finishing at its download page); "New resume" is `/build?new=1`.
+
+**Re-download / free re-edit gate (`/dashboard/download/[id]`, enforced again in `/api/download-pdf/[paymentId]`):**
+- Within 30 days of purchase, and word-level change ≤10% of the purchased snapshot (cumulative, `lib/resume-diff.ts`) → free: the PDF is re-rendered when `payments.pdf_hash` no longer matches, then served.
+- Otherwise → "Buy as a new resume": paying creates a new purchase with the edited content, and the original purchase reverts to what was bought.
 
 ---
 
@@ -753,7 +759,8 @@ Create a file called `CLAUDE.md` at the root of the repo. Claude Code reads this
 ## Payments
 - Never trust client-side payment confirmation.
 - Mark payments complete ONLY inside the webhook handler after signature verification.
-- The webhook creates the snapshot (of `metadata.resumeId`), triggers PDF generation, and marks the payment `completed` (or `failed` on error). It is idempotent per `stripe_payment_id` — Stripe retries reuse the same row.
+- The webhook copies the resume being bought (`metadata.resumeId`) into a new purchased resume, snapshots it, triggers PDF generation, and marks the payment `completed` (or `failed` on error). It is idempotent per `stripe_payment_id` — Stripe retries reuse the same row and replace the previous attempt's copy.
+- Never edit a purchase's snapshot; it is the baseline for the free re-edit diff.
 
 ## React / lint
 - `npm run lint` must report zero errors.

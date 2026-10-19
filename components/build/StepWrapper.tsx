@@ -17,7 +17,12 @@ import Step5 from "./Step5";
 // `destination` is only used by the last step, which navigates away after saving.
 export type StepSubmitRef = { submit: (destination?: string) => void };
 
-export default function StepWrapper() {
+export default function StepWrapper({
+  finish,
+}: {
+  /** Last-step primary action, e.g. editing a purchase → its download page */
+  finish?: { href: string; label: string };
+} = {}) {
   const { currentStep, setStep } = useUIStore();
   const stepRef = useRef<StepSubmitRef>(null);
   const searchParams = useSearchParams();
@@ -169,7 +174,7 @@ export default function StepWrapper() {
             // Last step: save the summary, then leave. Coming from a template
             // preview (?returnTo=) offers both the way back and the gallery.
             <div className="flex items-center gap-2">
-              {returnTo && (
+              {(returnTo || finish) && (
                 <Button
                   variant="outline"
                   size="lg"
@@ -184,11 +189,17 @@ export default function StepWrapper() {
               <Button
                 size="lg"
                 onClick={() =>
-                  stepRef.current?.submit(returnTo ?? "/templates")
+                  stepRef.current?.submit(
+                    finish?.href ?? returnTo ?? "/templates",
+                  )
                 }
                 className="rounded-full"
               >
-                {returnTo ? (
+                {finish ? (
+                  <>
+                    {finish.label} <ArrowRight className="h-4 w-4" />
+                  </>
+                ) : returnTo ? (
                   <>
                     Back to preview <ArrowRight className="h-4 w-4" />
                   </>

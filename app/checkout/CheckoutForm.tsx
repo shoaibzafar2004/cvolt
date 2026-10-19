@@ -18,6 +18,8 @@ interface CheckoutFormProps {
   templateId: string;
   publishableKey: string;
   userEmail: string | null;
+  /** Resume chosen in the URL (owner-checked server-side); else the store's draft */
+  resumeId: string | null;
 }
 
 export default function CheckoutForm({
@@ -25,6 +27,7 @@ export default function CheckoutForm({
   templateId,
   publishableKey,
   userEmail,
+  resumeId,
 }: CheckoutFormProps) {
   const router = useRouter();
   const personalInfo = useResumeStore((s) => s.personalInfo);
@@ -33,10 +36,10 @@ export default function CheckoutForm({
   // Only once the draft has loaded (localStorage or DB) — otherwise a
   // signed-in user with an empty browser draft is bounced to /build
   useEffect(() => {
-    if (draftReady && !personalInfo.name) {
+    if (!resumeId && draftReady && !personalInfo.name) {
       router.replace("/build");
     }
-  }, [draftReady, personalInfo.name, router]);
+  }, [resumeId, draftReady, personalInfo.name, router]);
 
   // userEmail is always set — checkout page redirects to login if not authenticated
 
@@ -55,6 +58,7 @@ export default function CheckoutForm({
         templateId={templateId}
         clientSecret={clientSecret}
         userEmail={userEmail}
+        resumeId={resumeId}
       />
     </Elements>
   );
@@ -64,14 +68,17 @@ function InnerForm({
   templateId,
   clientSecret,
   userEmail,
+  resumeId: chosenResumeId,
 }: {
   templateId: string;
   clientSecret: string;
   userEmail: string | null;
+  resumeId: string | null;
 }) {
   const stripe = useStripe();
   const elements = useElements();
-  const resumeId = useResumeStore((s) => s.resumeId);
+  const draftResumeId = useResumeStore((s) => s.resumeId);
+  const resumeId = chosenResumeId ?? draftResumeId;
   const [email] = useState(userEmail ?? "");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
